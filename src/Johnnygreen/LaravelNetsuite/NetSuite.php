@@ -2,7 +2,11 @@
 
 class NetSuite {
 
-  public $config;
+  // token or email
+  public $auth_driver;
+
+  // credentials hash
+  public $credentials;
 
   public function __construct()
   {
@@ -16,8 +20,18 @@ class NetSuite {
 
   public function setAuth(Array $auth)
   {
-    $this->auth_driver = array_get($auth, 'driver', 'email');
-    $this->credentials = array_get($auth, 'credentials', []);
+    $this->setAuthDriver(array_get($auth, 'driver', 'email'));
+    $this->setCredentials(array_get($auth, 'credentials', []));
+  }
+
+  public function setAuthDriver($auth_driver)
+  {
+    $this->auth_driver = $auth_driver;
+  }
+
+  public function setCredentials($credentials)
+  {
+    $this->credentials = $credentials;
   }
 
 }
