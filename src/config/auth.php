@@ -8,7 +8,8 @@ return array(
   // role id for SuiteTalk user
   'role_id' => '',
 
-  // email auth
+  'account' => '',
+
   'credentials' => array(
 
     // used by email driver
