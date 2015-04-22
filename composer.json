@@ -1,0 +1,23 @@
+{
+    "name": "johnnygreen/laravel-netsuite",
+    "description": "",
+    "authors": [
+        {
+            "name": "Johnny Green",
+            "email": "johnnygreen@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
+        "psr-0": {
+            "Johnnygreen\\LaravelNetsuite\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
