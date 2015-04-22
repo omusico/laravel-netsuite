@@ -16,7 +16,7 @@
             "src/migrations"
         ],
         "psr-0": {
-            "Johnnygreen\\LaravelNetsuite\\": "src/"
+            "Johnnygreen\\LaravelNetSuite\\": "src/"
         }
     },
     "minimum-stability": "stable"

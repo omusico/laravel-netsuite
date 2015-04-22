@@ -1,4 +1,4 @@
-<?php namespace Johnnygreen\LaravelNetsuite\Facades;
+<?php namespace Johnnygreen\LaravelNetSuite\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

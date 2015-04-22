@@ -1,8 +1,8 @@
-<?php namespace Johnnygreen\LaravelNetsuite;
+<?php namespace Johnnygreen\LaravelNetSuite;
 
 use Illuminate\Support\ServiceProvider;
 
-class LaravelNetsuiteServiceProvider extends ServiceProvider {
+class LaravelNetSuiteServiceProvider extends ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -25,6 +25,7 @@ class LaravelNetsuiteServiceProvider extends ServiceProvider {
 			$netsuite = new NetSuite();
 			$netsuite->setConfig($app['config']->get('netsuite::config'));
 			$netsuite->setAuth($app['config']->get('netsuite::auth'));
+
 			return $netsuite;
 		});
 	}
