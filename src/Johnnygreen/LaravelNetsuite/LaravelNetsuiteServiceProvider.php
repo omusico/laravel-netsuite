@@ -23,8 +23,8 @@ class LaravelNetSuiteServiceProvider extends ServiceProvider {
 		$this->app['netsuite'] = $this->app->share(function($app)
 		{
 			$netsuite = new NetSuite();
-			$netsuite->setConfig($app['config']->get('netsuite::config'));
-			$netsuite->setAuth($app['config']->get('netsuite::auth'));
+			$netsuite->setConfig($app['config']->get('NetSuite::config'));
+			$netsuite->setAuth($app['config']->get('NetSuite::auth'));
 
 			return $netsuite;
 		});

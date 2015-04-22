@@ -1,4 +1,4 @@
-<?php namespace Johnnygreen\Netsuite;
+<?php namespace Johnnygreen\LaravelNetSuite;
 
 class NetSuite {
 
