@@ -10,7 +10,10 @@ gulp.task('customers', function() {
   .src([
     'src/restlets/Lib/Log.js',
     'src/restlets/Lib/Util.js',
+    'src/restlets/Lib/Base.js',
     'src/restlets/Lib/Model.js',
+    'src/restlets/Lib/Controller.js',
+    'src/restlets/Lib/Repository.js',
     'src/restlets/Customers/**/*.js'
   ])
   .pipe(concat('customers.js'))

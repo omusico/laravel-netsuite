@@ -1,37 +1,38 @@
 (function(core)
 {
-  core.CustomersController = function()
+  core.CustomersController = core.Controller.extend(
   {
-    core.Log.debug('Step 2', 'Instantiating CustomersController');
-    this.customer = new core.Customer();
-  };
+    initialize: function()
+    {
+      core.Log.debug('Step 2', 'Instantiating CustomersController');
+      this.customers = new core.CustomerRepository();
+    },
 
-  core.CustomersController.prototype.index = function(input)
-  {
-    return this.customer.paginate(input.page, input.per_page);
-  };
+    // index: function(input)
+    // {
+    //   return this.customers.paginate(input.page, input.per_page);
+    // },
 
-  core.CustomersController.prototype.show = function(input)
-  {
-    core.Log.debug('Step 3', 'Finding customer with id ' + input.id);
+    show: function(input)
+    {
+      core.Log.debug('Step 4', 'Finding customer with id ' + input.id);
+      var customer = this.customers.find(input.id);
+      return customer ? customer.toJSON() : this.notFound();
+    },
 
-    
-
-    return this.customer.find(input.id).toJSON();
-  };
-
-  core.CustomersController.prototype.store = function(input)
-  {
-    return this.customer.create(input).toJSON();
-  };
-
-  core.CustomersController.prototype.update = function(input)
-  {
-    return this.customer.update(input).toJSON();
-  };
-
-  core.CustomersController.prototype.destroy = function(input)
-  {
-    return this.customer.find(input.id).delete().toJSON();
-  };
+    // store: function(input)
+    // {
+    //   return this.customers.create(input).toJSON();
+    // },
+    //
+    // update: function(input)
+    // {
+    //   return this.customers.update(input).toJSON();
+    // },
+    //
+    // destroy: function(input)
+    // {
+    //   return this.customers.find(input.id).delete().toJSON();
+    // }
+  });
 })(global || window);

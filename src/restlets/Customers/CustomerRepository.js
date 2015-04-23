@@ -1,32 +1,35 @@
-var CustomerRepository = (function()
+(function(core)
 {
-  var CustomerRepository = function() {};
-
-  CustomerRepository.paginate = function()
+  core.CustomerRepository = core.Repository.extend(
   {
-    
-  };
+    recordType: 'customer',
+    recordClass: Customer,
+    // paginate: function(page, per_page)
+    // {
+    //
+    // },
 
-  CustomerRepository.find = function(id)
-  {
-    return new Customer(nlapiLoadRecord('customer', id));
-  };
+    find: function(id)
+    {
+      var record = nlapiLoadRecord(this.recordType, id);
+      core.Log.debug('Step 5', 'Found record with id ' + record.getId());
+      return data.internalId ? new this.recordClass(record.getAllFields()) : null;
+    },
 
-  CustomerRepository.create = function(data)
-  {
-    return new Customer(data).save();
-  };
-
-  CustomerRepository.update = function(id, data)
-  {
-
-  };
-
-  CustomerRepository.destroy = function(id)
-  {
-    var customer = CustomerRepository.find(id);
-    customer.delete();
-  };
-
-  return CustomerRepository;
-})();
+    // create: function(data)
+    // {
+    //   return new Customer(data).save();
+    // },
+    //
+    // update: function(id, data)
+    // {
+    //
+    // },
+    //
+    // destroy: function(id)
+    // {
+    //   var customer = CustomerRepository.find(id);
+    //   customer.delete();
+    // }
+  });
+})(global || window);

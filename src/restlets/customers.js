@@ -49,41 +49,13 @@
   };
 })(global || window);
 
-(function(core)
+(function (core)
 {
-  core.Model = function(attrs) {
-    this.attrs = {};
-    this.set(attrs || {});
+  core.Base = function(attrs) {
     this.initialize.apply(this, arguments);
   };
 
-  core.Model.prototype.initialize = function() {};
-
-  core.Model.prototype.set = function(key, value)
-  {
-    if (arguments.length > 1) {
-      this.attrs[key] = value;
-    } else {
-      this.attrs = key;
-    }
-  };
-
-  core.Model.prototype.get = function(key)
-  {
-    return this.attrs[key];
-  };
-
-  core.Model.prototype.toHash = function()
-  {
-    return this.attrs;
-  };
-
-  core.Model.prototype.toJSON = function()
-  {
-    return JSON.stringify(this.toHash());
-  };
-
-  core.Model.extend = function(protoProps, staticProps)
+  core.Base.extend = function(protoProps, staticProps)
   {
     var parent = this;
     var child;
@@ -106,105 +78,191 @@
   };
 })(global || window);
 
-var Customer = (function()
-{
-  var Customer = function(data)
-  {
-    this.data = data || {};
-  };
-
-  Customer.prototype.set = function(data)
-  {
-    if (arguments.length > 1) {
-      this.data = this.data || {};
-      this.data[arguments[0]] = arguments[1];
-    } else {
-      this.data = data;
-    }
-  };
-
-  Customer.prototype.toArray = function()
-  {
-    return this.data;
-  };
-
-  Customer.prototype.toJSON = function()
-  {
-    return JSON.stringify(this.toArray());
-  };
-
-  return Customer;
-})();
-
-var CustomerRepository = (function()
-{
-  var CustomerRepository = function() {};
-
-  CustomerRepository.paginate = function()
-  {
-
-  };
-
-  CustomerRepository.find = function(id)
-  {
-    return new Customer(nlapiLoadRecord('customer', id));
-  };
-
-  CustomerRepository.create = function(data)
-  {
-    return new Customer(data).save();
-  };
-
-  CustomerRepository.update = function(id, data)
-  {
-
-  };
-
-  CustomerRepository.destroy = function(id)
-  {
-    var customer = CustomerRepository.find(id);
-    customer.delete();
-  };
-
-  return CustomerRepository;
-})();
-
 (function(core)
 {
-  core.CustomersController = function()
+  core.Model = core.Base.extend(
   {
-    this.customer = new core.Customer();
-  };
+    constructor: function(attrs)
+    {
+      this.attrs = {};
+      this.set(attrs || {});
+      this.initialize.apply(this, arguments);
+    },
 
-  core.CustomersController.prototype.index = function(input)
-  {
-    return this.customer.paginate(input.page, input.per_page);
-  };
+    set: function(key, value)
+    {
+      if (arguments.length > 1) {
+        this.attrs[key] = value;
+      } else {
+        this.attrs = key;
+      }
+    },
 
-  core.CustomersController.prototype.show = function(input)
-  {
-    return this.customer.find(input.id).toJSON();
-  };
+    get: function(key)
+    {
+      return this.attrs[key];
+    },
 
-  core.CustomersController.prototype.store = function(input)
-  {
-    return this.customer.create(input);
-  };
+    toHash: function()
+    {
+      return this.attrs;
+    },
 
-  core.CustomersController.prototype.update = function(input)
-  {
-    return this.customer.update(input);
-  };
-
-  core.CustomersController.prototype.destroy = function(input)
-  {
-    return this.customer.find(input.id);
-  };
+    toJSON: function()
+    {
+      return JSON.stringify(this.toHash());
+    }
+  });
 })(global || window);
 
 (function(core)
 {
+  core.Controller = core.Base.extend(
+  {
+    constructor: function(attrs)
+    {
+      this.initialize.apply(this, arguments);
+    },
+
+    notFound: function(message)
+    {
+      return this.error(404, message || 'Not Found');
+    },
+
+    error: function(code, message)
+    {
+      return JSON.stringify(
+      {
+        'error':
+        {
+          'code':    code,
+          'message': message
+        }
+      });
+    }
+  });
+})(global || window);
+
+(function(core)
+{
+  core.Repository = core.Base.extend(
+  {
+    recordType: '',
+    recordClass: '',
+
+    constructor: function()
+    {
+      if ( ! this.recordType) throw 'Repository missing recordType';
+      if ( ! this.recordClass) throw 'Repository missing recordClass';
+    },
+
+    find: function(id)
+    {
+      var record = nlapiLoadRecord(this.recordType, id);
+      core.Log.debug('Step 5', 'Found record with id ' + record.getId());
+      return data.internalId ? new this.recordClass(record.getAllFields()) : null;
+    },
+
+    // paginate: function(page, per_page) {},
+    // create: function(data) {},
+    // update: function(id, data) {},
+    // destroy: function(id) {}
+  });
+})(global || window);
+
+(function(core)
+{
+  var Customer = core.Model.extend(
+  {
+    initialize: function()
+    {
+      core.Log.debug('Step 3', 'Customer model initialized');
+    }
+  });
+})(global || window);
+
+(function(core)
+{
+  core.CustomerRepository = core.Repository.extend(
+  {
+    recordType: 'customer',
+    recordClass: Customer,
+    // paginate: function(page, per_page)
+    // {
+    //
+    // },
+
+    find: function(id)
+    {
+      var record = nlapiLoadRecord(this.recordType, id);
+      core.Log.debug('Step 5', 'Found record with id ' + record.getId());
+      return data.internalId ? new this.recordClass(record.getAllFields()) : null;
+    },
+
+    // create: function(data)
+    // {
+    //   return new Customer(data).save();
+    // },
+    //
+    // update: function(id, data)
+    // {
+    //
+    // },
+    //
+    // destroy: function(id)
+    // {
+    //   var customer = CustomerRepository.find(id);
+    //   customer.delete();
+    // }
+  });
+})(global || window);
+
+(function(core)
+{
+  core.CustomersController = core.Controller.extend(
+  {
+    initialize: function()
+    {
+      core.Log.debug('Step 2', 'Instantiating CustomersController');
+      this.customers = new core.CustomerRepository();
+    },
+
+    // index: function(input)
+    // {
+    //   return this.customers.paginate(input.page, input.per_page);
+    // },
+
+    show: function(input)
+    {
+      core.Log.debug('Step 4', 'Finding customer with id ' + input.id);
+      var customer = this.customers.find(input.id);
+      return customer ? customer.toJSON() : this.notFound();
+    },
+
+    // store: function(input)
+    // {
+    //   return this.customers.create(input).toJSON();
+    // },
+    //
+    // update: function(input)
+    // {
+    //   return this.customers.update(input).toJSON();
+    // },
+    //
+    // destroy: function(input)
+    // {
+    //   return this.customers.find(input.id).delete().toJSON();
+    // }
+  });
+})(global || window);
+
+(function(core)
+{
+  core.Log.debug('Step 1', 'Running main.js');
+
   // this file is utilized by a customers restlet
+  // we are revealing these class methods to the
+  // global scope for NetSuite
   core.controller      = new core.CustomersController();
   core.customer_get    = controller.show;
   core.customer_post   = controller.store;
