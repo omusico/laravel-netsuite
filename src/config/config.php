@@ -2,11 +2,12 @@
 
 return array(
 
-  'wsdl' => array(
+  'restlet' => array(
 
-    'release'  => '2015_1',
-    'endpoint' => ''
+    'endpoint' => 'https://rest.netsuite.com/app/site/hosting/restlet.nl',
+    'script'   => '',
+    'deploy'   => ''
 
-  ),
+  )
 
 );

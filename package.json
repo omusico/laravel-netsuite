@@ -1,0 +1,26 @@
+{
+  "name": "laravel-netsuite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johnnygreen/laravel-netsuite.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johnnygreen/laravel-netsuite/issues"
+  },
+  "homepage": "https://github.com/johnnygreen/laravel-netsuite",
+  "dependencies": {
+    "gulp": "^3.8.11",
+    "gulp-concat": "^2.5.2"
+  }
+}

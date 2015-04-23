@@ -1,6 +1,6 @@
 <?php namespace Johnnygreen\LaravelNetSuite;
 
-class NetSuite {
+class Manager {
 
   // token or email
   public $auth_driver;
