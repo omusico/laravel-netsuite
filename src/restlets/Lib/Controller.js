@@ -2,9 +2,10 @@
 {
   core.Controller = core.Base.extend(
   {
-    constructor: function(attrs)
+    constructor: function()
     {
-      this.initialize.apply(this, arguments);
+      console.log('WTF THIS IS WORKING');
+      // this.initialize.apply(this, arguments);
     },
 
     notFound: function(message)
@@ -24,4 +25,4 @@
       });
     }
   });
-})(global || window);
+})(core);

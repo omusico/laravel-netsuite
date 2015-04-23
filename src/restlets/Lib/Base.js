@@ -1,8 +1,6 @@
 (function (core)
 {
-  core.Base = function(attrs) {
-    this.initialize.apply(this, arguments);
-  };
+  core.Base = function(attrs) {};
 
   core.Base.extend = function(protoProps, staticProps)
   {
@@ -25,4 +23,4 @@
 
     return child;
   };
-})(global || window);
+})(core);

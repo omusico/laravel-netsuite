@@ -35,4 +35,4 @@
     //   return this.customers.find(input.id).delete().toJSON();
     // }
   });
-})(global || window);
+})(core);

@@ -7,7 +7,7 @@
 
     constructor: function()
     {
-      if ( ! this.recordType) throw 'Repository missing recordType';
+      if ( ! this.recordType)  throw 'Repository missing recordType';
       if ( ! this.recordClass) throw 'Repository missing recordClass';
     },
 
@@ -23,4 +23,4 @@
     // update: function(id, data) {},
     // destroy: function(id) {}
   });
-})(global || window);
+})(core);

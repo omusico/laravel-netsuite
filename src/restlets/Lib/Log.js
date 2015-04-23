@@ -7,7 +7,10 @@
   */
   var log = function(type, title, details)
   {
-    nlapiLogExecution(type, title, details);
+    if(console)
+      console.log(type, title, details);
+    else
+      nlapiLogExecution(type, title, details);
   };
 
   core.Log = {
@@ -31,4 +34,4 @@
       log('EMERGENCY', title, details);
     }
   };
-})(global || window);
+})(core);

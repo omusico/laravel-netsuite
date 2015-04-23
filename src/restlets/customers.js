@@ -1,3 +1,7 @@
+var Core = function() {};
+
+var core = new Core();
+
 (function(core)
 {
   /**
@@ -7,7 +11,10 @@
   */
   var log = function(type, title, details)
   {
-    nlapiLogExecution(type, title, details);
+    if(console)
+      console.log(type, title, details);
+    else
+      nlapiLogExecution(type, title, details);
   };
 
   core.Log = {
@@ -31,29 +38,31 @@
       log('EMERGENCY', title, details);
     }
   };
-})(global || window);
+})(core);
 
 (function(core)
 {
   core.Util = {
     extend: function(target, source)
     {
-      Object.getOwnPropertyNames(source).forEach(function(propKey)
-      {
-        var desc = Object.getOwnPropertyDescriptor(source, propKey);
-        Object.defineProperty(target, propKey, desc);
-      });
+      target = target || {};
+
+      for (var prop in source) {
+        if (typeof source[prop] === 'object') {
+          target[prop] = core.Util.extend(target[prop], source[prop]);
+        } else {
+          target[prop] = source[prop];
+        }
+      }
 
       return target;
     }
   };
-})(global || window);
+})(core);
 
 (function (core)
 {
-  core.Base = function(attrs) {
-    this.initialize.apply(this, arguments);
-  };
+  core.Base = function(attrs) {};
 
   core.Base.extend = function(protoProps, staticProps)
   {
@@ -76,7 +85,7 @@
 
     return child;
   };
-})(global || window);
+})(core);
 
 (function(core)
 {
@@ -113,15 +122,16 @@
       return JSON.stringify(this.toHash());
     }
   });
-})(global || window);
+})(core);
 
 (function(core)
 {
   core.Controller = core.Base.extend(
   {
-    constructor: function(attrs)
+    constructor: function()
     {
-      this.initialize.apply(this, arguments);
+      console.log('WTF THIS IS WORKING');
+      // this.initialize.apply(this, arguments);
     },
 
     notFound: function(message)
@@ -141,7 +151,7 @@
       });
     }
   });
-})(global || window);
+})(core);
 
 (function(core)
 {
@@ -152,7 +162,7 @@
 
     constructor: function()
     {
-      if ( ! this.recordType) throw 'Repository missing recordType';
+      if ( ! this.recordType)  throw 'Repository missing recordType';
       if ( ! this.recordClass) throw 'Repository missing recordClass';
     },
 
@@ -168,54 +178,27 @@
     // update: function(id, data) {},
     // destroy: function(id) {}
   });
-})(global || window);
+})(core);
 
 (function(core)
 {
-  var Customer = core.Model.extend(
+  core.Customer = core.Model.extend(
   {
     initialize: function()
     {
       core.Log.debug('Step 3', 'Customer model initialized');
     }
   });
-})(global || window);
+})(core);
 
 (function(core)
 {
   core.CustomerRepository = core.Repository.extend(
   {
     recordType: 'customer',
-    recordClass: Customer,
-    // paginate: function(page, per_page)
-    // {
-    //
-    // },
-
-    find: function(id)
-    {
-      var record = nlapiLoadRecord(this.recordType, id);
-      core.Log.debug('Step 5', 'Found record with id ' + record.getId());
-      return data.internalId ? new this.recordClass(record.getAllFields()) : null;
-    },
-
-    // create: function(data)
-    // {
-    //   return new Customer(data).save();
-    // },
-    //
-    // update: function(id, data)
-    // {
-    //
-    // },
-    //
-    // destroy: function(id)
-    // {
-    //   var customer = CustomerRepository.find(id);
-    //   customer.delete();
-    // }
+    recordClass: core.Customer
   });
-})(global || window);
+})(core);
 
 (function(core)
 {
@@ -254,18 +237,16 @@
     //   return this.customers.find(input.id).delete().toJSON();
     // }
   });
-})(global || window);
+})(core);
 
-(function(core)
-{
-  core.Log.debug('Step 1', 'Running main.js');
 
-  // this file is utilized by a customers restlet
-  // we are revealing these class methods to the
-  // global scope for NetSuite
-  core.controller      = new core.CustomersController();
-  core.customer_get    = controller.show;
-  core.customer_post   = controller.store;
-  core.customer_put    = controller.update;
-  core.customer_delete = controller.destroy;
-})(global || window);
+core.Log.debug('Step 1', 'Running main.js');
+
+// this file is utilized by a customers restlet
+// we are revealing these class methods to the
+// global scope for NetSuite
+controller      = new core.CustomersController();
+customer_get    = controller.show;
+customer_post   = controller.store;
+customer_put    = controller.update;
+customer_delete = controller.destroy;

@@ -33,4 +33,4 @@
       return JSON.stringify(this.toHash());
     }
   });
-})(global || window);
+})(core);
