@@ -8,7 +8,6 @@
     var child;
 
     if (protoProps && core.Util.has(protoProps, 'constructor')) {
-      console.log('Here....');
       child = protoProps.constructor;
     } else {
       child = function() { return parent.apply(this, arguments); };

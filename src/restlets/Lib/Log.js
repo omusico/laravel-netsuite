@@ -7,7 +7,7 @@
   */
   var log = function(type, title, details)
   {
-    if(console)
+    if(typeof console != 'undefined')
       console.log(type, title, details);
     else
       nlapiLogExecution(type, title, details);
