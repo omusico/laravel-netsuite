@@ -273,6 +273,6 @@ try {
   if(console) customer_get({id: 1}); // testing only
 } catch (e) {
    core.Log.error('Customers RESTlet', e.message);
-   var response = new core.Controller();
-   document.write(response.internalServerError(e.message));
+  //  var response = new core.Controller();
+  //  document.write(response.internalServerError(e.message));
 }
