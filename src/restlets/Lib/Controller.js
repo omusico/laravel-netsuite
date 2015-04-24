@@ -14,6 +14,11 @@
       return this.error(404, message || 'Not Found');
     },
 
+    internalServerError: function(message)
+    {
+      return this.error(500, message || 'Internal Server Error');
+    },
+
     error: function(code, message)
     {
       return JSON.stringify(

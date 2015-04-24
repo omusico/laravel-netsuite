@@ -147,6 +147,11 @@ var core = new Core();
       return this.error(404, message || 'Not Found');
     },
 
+    internalServerError: function(message)
+    {
+      return this.error(500, message || 'Internal Server Error');
+    },
+
     error: function(code, message)
     {
       return JSON.stringify(
@@ -268,4 +273,6 @@ try {
   if(console) customer_get({id: 1}); // testing only
 } catch (e) {
    core.Log.error('Customers RESTlet', e.message);
+   var response = new core.Controller();
+   document.write(response.internalServerError(e.message));
 }
