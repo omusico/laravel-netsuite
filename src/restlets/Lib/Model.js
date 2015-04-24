@@ -9,6 +9,8 @@
       this.initialize.apply(this, arguments);
     },
 
+    initialize: function() {},
+
     set: function(key, value)
     {
       if (arguments.length > 1) {

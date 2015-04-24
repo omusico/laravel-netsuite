@@ -56,6 +56,11 @@ var core = new Core();
       }
 
       return target;
+    },
+
+    has: function(obj, key)
+    {
+      return obj !== null && hasOwnProperty.call(obj, key);
     }
   };
 })(core);
@@ -69,7 +74,8 @@ var core = new Core();
     var parent = this;
     var child;
 
-    if (protoProps && protoProps.constructor) {
+    if (protoProps && core.Util.has(protoProps, 'constructor')) {
+      console.log('Here....');
       child = protoProps.constructor;
     } else {
       child = function() { return parent.apply(this, arguments); };
@@ -97,6 +103,8 @@ var core = new Core();
       this.set(attrs || {});
       this.initialize.apply(this, arguments);
     },
+
+    initialize: function() {},
 
     set: function(key, value)
     {
@@ -130,9 +138,10 @@ var core = new Core();
   {
     constructor: function()
     {
-      console.log('WTF THIS IS WORKING');
-      // this.initialize.apply(this, arguments);
+      this.initialize.apply(this, arguments);
     },
+
+    initialize: function() {},
 
     notFound: function(message)
     {
@@ -164,6 +173,7 @@ var core = new Core();
     {
       if ( ! this.recordType)  throw 'Repository missing recordType';
       if ( ! this.recordClass) throw 'Repository missing recordClass';
+      this.initialize.apply(this, arguments);
     },
 
     find: function(id)
@@ -186,7 +196,7 @@ var core = new Core();
   {
     initialize: function()
     {
-      core.Log.debug('Step 3', 'Customer model initialized');
+      core.Log.debug('Step 4', 'Customer model initialized');
     }
   });
 })(core);
@@ -196,7 +206,12 @@ var core = new Core();
   core.CustomerRepository = core.Repository.extend(
   {
     recordType: 'customer',
-    recordClass: core.Customer
+    recordClass: core.Customer,
+
+    initialize: function()
+    {
+      core.Log.debug('Step 3', 'Instantiating CustomerRepository');
+    }
   });
 })(core);
 
@@ -246,7 +261,9 @@ core.Log.debug('Step 1', 'Running main.js');
 // we are revealing these class methods to the
 // global scope for NetSuite
 controller      = new core.CustomersController();
-customer_get    = controller.show;
-customer_post   = controller.store;
-customer_put    = controller.update;
-customer_delete = controller.destroy;
+customer_get    = controller.show.bind(controller);
+// customer_post   = controller.store.bind(controller);
+// customer_put    = controller.update.bind(controller);
+// customer_delete = controller.destroy.bind(controller);
+
+customer_get({id: 1});

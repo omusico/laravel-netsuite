@@ -9,6 +9,7 @@
     {
       if ( ! this.recordType)  throw 'Repository missing recordType';
       if ( ! this.recordClass) throw 'Repository missing recordClass';
+      this.initialize.apply(this, arguments);
     },
 
     find: function(id)

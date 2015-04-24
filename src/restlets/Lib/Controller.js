@@ -4,9 +4,10 @@
   {
     constructor: function()
     {
-      console.log('WTF THIS IS WORKING');
-      // this.initialize.apply(this, arguments);
+      this.initialize.apply(this, arguments);
     },
+
+    initialize: function() {},
 
     notFound: function(message)
     {
