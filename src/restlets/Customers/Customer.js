@@ -4,7 +4,7 @@
   {
     initialize: function()
     {
-      core.Log.debug('Step 4', 'Customer model initialized');
+      core.Log.debug('Step 6', 'Customer model initialized');
     }
   });
 })(core);

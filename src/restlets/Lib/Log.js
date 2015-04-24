@@ -7,10 +7,8 @@
   */
   var log = function(type, title, details)
   {
-    if(typeof console !== 'undefined')
-      console.log(type, title, details);
-    else
-      nlapiLogExecution(type, title, details);
+    if(typeof console !== 'undefined') console.log(type, title, details);
+    else nlapiLogExecution(type, title, JSON.stringify(details));
   };
 
   core.Log = {

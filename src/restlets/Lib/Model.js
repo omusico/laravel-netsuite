@@ -25,6 +25,11 @@
       return this.attrs[key];
     },
 
+    has: function(key)
+    {
+      return this.attrs.hasOwnProperty(key);
+    },
+
     toHash: function()
     {
       return this.attrs;

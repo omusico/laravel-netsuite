@@ -8,10 +8,33 @@
     },
 
     initialize: function() {},
+    index:      function() {},
+    paginate:   function() {},
+    show:       function() {},
+    store:      function() {},
+    update:     function() {},
+    destroy:    function() {},
+
+    // helpers for displaying responses
+
+    okay: function(body)
+    {
+      return this.response(body);
+    },
+
+    created: function(body)
+    {
+      return this.response(body);
+    },
 
     notFound: function(message)
     {
       return this.error(404, message || 'Not Found');
+    },
+
+    badRequest: function(missing)
+    {
+      return this.error(400, missing || 'Bad Request');
     },
 
     internalServerError: function(message)
@@ -21,14 +44,20 @@
 
     error: function(code, message)
     {
-      return JSON.stringify(
-      {
+      core.Log.error(code, message);
+
+      return this.response({
         'error':
         {
           'code':    code,
           'message': message
         }
       });
+    },
+
+    response: function(body)
+    {
+      return JSON.stringify(body);
     }
   });
 })(core);

@@ -6,13 +6,11 @@ try {
   // global scope for NetSuite
   controller      = new core.CustomersController();
   customer_get    = controller.show.bind(controller);
-  // customer_post   = controller.store.bind(controller);
-  // customer_put    = controller.update.bind(controller);
-  // customer_delete = controller.destroy.bind(controller);
+  customer_post   = controller.store.bind(controller);
+  customer_put    = controller.update.bind(controller);
+  customer_delete = controller.destroy.bind(controller);
 
-  if(console) customer_get({id: 1}); // testing only
+  if(typeof console !== 'undefined') customer_post({id: 1}); // testing only
 } catch (e) {
-   core.Log.error('Customers RESTlet', e.message);
-  //  var response = new core.Controller();
-  //  document.write(response.internalServerError(e.message));
+  new core.Controller().internalServerError(e.message);
 }

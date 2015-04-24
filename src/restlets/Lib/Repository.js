@@ -12,16 +12,56 @@
       this.initialize.apply(this, arguments);
     },
 
+    initialize: function() {},
+
     find: function(id)
     {
       var record = nlapiLoadRecord(this.recordType, id);
-      core.Log.debug('Step 5', 'Found record with id ' + record.getId());
-      return data.internalId ? new this.recordClass(record.getAllFields()) : null;
+      core.Log.debug('Step 5', 'Found ' + record.getRecordType() + ' record with id ' + record.getId());
+      return record ? new this.recordClass(record.getAllFields()) : null;
     },
 
-    // paginate: function(page, per_page) {},
-    // create: function(data) {},
-    // update: function(id, data) {},
-    // destroy: function(id) {}
+    paginate: function(page, per_page)
+    {
+
+    },
+
+    create: function(attrs)
+    {
+      var record = nlapiCreateRecord(this.recordType);
+
+      for(var field in attrs) {
+        record.setFieldValue(field, attrs[field]);
+      }
+
+      nlapiSubmitRecord(record, true);
+
+      return new this.recordClass(record.getAllFields());
+    },
+
+    update: function(id, attrs)
+    {
+      var diff = {};
+      var record = nlapiLoadRecord(this.recordType, id);
+
+      for(var field in attrs) {
+        if(record.getFieldValue(field) != attrs[field]) {
+          diff[field] = attrs[field];
+        }
+      }
+
+      for(var field in diff) {
+        record.setFieldValue(field, diff[field]);
+      }
+
+      nlapiSubmitRecord(record, true);
+
+      return new this.recordClass(record.getAllFields());
+    },
+
+    destroy: function(id)
+    {
+      nlapiDeleteRecord(this.recordType, id);
+    }
   });
 })(core);
