@@ -1,6 +1,6 @@
 <?php namespace Johnnygreen\LaravelNetSuite\NetSuite;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 class Request {
 
@@ -16,7 +16,10 @@ class Request {
   {
     $body    = \View::make($this->template, $this->data)->render();
     $client  = new Client;
-    $request = $client->post($this->data['endpoint'], ['content-type' => 'text/xml; charset=UTF8'], $body);
+    $request = $client->createRequest('POST', $this->config['endpoint'], [
+      'headers' => ['content-type' => 'text/xml; charset =UTF8'],
+      'body'    => $body
+    ]);
 
     try
     {
@@ -24,7 +27,7 @@ class Request {
     }
     catch(\Exception $e)
     {
-      $api_down_exception = new ApiDownException('FedEx API is down.');
+      $api_down_exception = new ApiDownException("FedEx API is down - {$e->getMessage()}");
       \Bugsnag::notifyException($api_down_exception);
       throw $api_down_exception;
     }
