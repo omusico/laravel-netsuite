@@ -1,23 +1,24 @@
 var gulp   = require('gulp');
 var concat = require('gulp-concat');
 
-var buildDir = 'src/restlets/';
+var buildDir = 'src/restlets/dist/';
+var baseDir  = 'src/restlets/src/'
 
 // ordering matters here
 var library = [
-  'src/restlets/Lib/Core.js',
-  'src/restlets/Lib/Log.js',
-  'src/restlets/Lib/Util.js',
-  'src/restlets/Lib/Base.js',
-  'src/restlets/Lib/Model.js',
-  'src/restlets/Lib/Input.js',
-  'src/restlets/Lib/Validator.js',
-  'src/restlets/Lib/Controller.js',
-  'src/restlets/Lib/Repository.js'
+  baseDir + 'Library/Core.js',
+  baseDir + 'Library/Log.js',
+  baseDir + 'Library/Util.js',
+  baseDir + 'Library/Base.js',
+  baseDir + 'Library/Model.js',
+  baseDir + 'Library/Input.js',
+  baseDir + 'Library/Validator.js',
+  baseDir + 'Library/Controller.js',
+  baseDir + 'Library/Repository.js'
 ];
 
 var customers = [
-  'src/restlets/Customers/**/*.js'
+  baseDir + 'Customers/**/*.js'
 ];
 
 gulp.task('default', function() {
@@ -42,6 +43,6 @@ gulp.task('customers', function()
 
 gulp.task('watch', function()
 {
-  var libwatcher = gulp.watch(library,   ['library']);
-  var cwatcher   = gulp.watch(customers, ['customers']);
+  gulp.watch(library,   ['library']);
+  gulp.watch(customers, ['customers']);
 });
