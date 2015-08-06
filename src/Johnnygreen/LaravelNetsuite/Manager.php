@@ -2,49 +2,15 @@
 
 class Manager {
 
-  // token or email
-  public $auth_driver;
-
-  // credentials hash
-  public $credentials;
-
-  public function __construct()
+  public function setConfig($config)
   {
-
-  }
-
-  public function setConfig(Array $config)
-  {
+    $this->config = $config;
     return $this;
   }
 
-  public function setAuth(Array $auth)
+  public function getConfig()
   {
-    $this->setAuthDriver(array_get($auth, 'driver', 'email'));
-    $this->setCredentials(array_get($auth, 'credentials', []));
-    return $this;
-  }
-
-  public function setAuthDriver($auth_driver)
-  {
-    $this->auth_driver = $auth_driver;
-    return $this;
-  }
-
-  public function getAuthDriver()
-  {
-    return $this->auth_driver;
-  }
-
-  public function setCredentials($credentials)
-  {
-    $this->credentials = $credentials;
-    return $this;
-  }
-
-  public function getCredentials()
-  {
-    return $this->credentials;
+    return object_get($this, 'config');
   }
 
 }
