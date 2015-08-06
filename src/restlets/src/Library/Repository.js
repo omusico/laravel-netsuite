@@ -18,7 +18,8 @@
     {
       var record = nlapiLoadRecord(this.recordType, id);
       core.Log.debug('Step 5', 'Found ' + record.getRecordType() + ' record with id ' + record.getId());
-      return record ? new this.recordClass(record.getAllFields()) : null;
+      return record;
+      // return record ? new this.recordClass(record.getAllFields()) : null;
     },
 
     paginate: function(page, per_page)

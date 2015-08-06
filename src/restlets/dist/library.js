@@ -212,12 +212,12 @@ var core = new Core();
 
     okay: function(body)
     {
-      return this.response(body);
+      return this.response(body || {});
     },
 
     created: function(body)
     {
-      return this.response(body);
+      return this.response(body || {});
     },
 
     notFound: function(message)
@@ -275,7 +275,8 @@ var core = new Core();
     {
       var record = nlapiLoadRecord(this.recordType, id);
       core.Log.debug('Step 5', 'Found ' + record.getRecordType() + ' record with id ' + record.getId());
-      return record ? new this.recordClass(record.getAllFields()) : null;
+      return record;
+      // return record ? new this.recordClass(record.getAllFields()) : null;
     },
 
     paginate: function(page, per_page)

@@ -10,7 +10,7 @@
 
     index: function(datain)
     {
-      var input     = new core.Input(datain);
+      var input = new core.Input(datain);
       return this.customers.paginate(input.page, input.per_page);
     },
 
