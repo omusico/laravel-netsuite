@@ -4,7 +4,6 @@
   {
     initialize: function()
     {
-      core.Log.debug('Step 2', 'Instantiating CustomersController');
       this.customers = new core.CustomerRepository();
     },
 
@@ -18,8 +17,6 @@
     {
       var input     = new core.Input(datain);
       var validator = new core.Validator(input, ['id']);
-
-      core.Log.debug('Step 4', 'Finding customer with id ' + input.get('id'));
 
       if (validator.passes()) {
         var customer = this.customers.find(input.get('id'));

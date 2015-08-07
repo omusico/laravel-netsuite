@@ -8,6 +8,11 @@
       this.map = {};
     },
 
+    initialize: function()
+    {
+
+    },
+
     parse: function(identifier)
     {
       var parts = identifier.split('@');
