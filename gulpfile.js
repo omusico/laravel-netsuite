@@ -14,6 +14,7 @@ var library = [
   baseDir + 'Library/Input.js',
   baseDir + 'Library/Validator.js',
   baseDir + 'Library/Controller.js',
+  baseDir + 'Library/Router.js',
   baseDir + 'Library/Repository.js'
 ];
 

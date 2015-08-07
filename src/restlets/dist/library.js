@@ -292,7 +292,7 @@ var core = new Core();
 
       nlapiSubmitRecord(record, true);
 
-      return new this.recordClass(record.getAllFields());
+      return new this.recordClass(record);
     },
 
     update: function(id, attrs)
@@ -312,7 +312,7 @@ var core = new Core();
 
       nlapiSubmitRecord(record, true);
 
-      return new this.recordClass(record.getAllFields());
+      return new this.recordClass(record);
     },
 
     destroy: function(id)

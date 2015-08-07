@@ -35,7 +35,7 @@
 
       nlapiSubmitRecord(record, true);
 
-      return new this.recordClass(record.getAllFields());
+      return new this.recordClass(record);
     },
 
     update: function(id, attrs)
@@ -55,7 +55,7 @@
 
       nlapiSubmitRecord(record, true);
 
-      return new this.recordClass(record.getAllFields());
+      return new this.recordClass(record);
     },
 
     destroy: function(id)

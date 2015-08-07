@@ -2,10 +2,7 @@
 {
   core.Customer = core.Model.extend(
   {
-    initialize: function()
-    {
-      core.Log.debug('Step 6', 'Customer model initialized');
-    }
+    initialize: function() {}
   });
 })(core);
 
@@ -16,10 +13,7 @@
     recordType: 'customer',
     recordClass: core.Customer,
 
-    initialize: function()
-    {
-      core.Log.debug('Step 3', 'Instantiating CustomerRepository');
-    }
+    initialize: function() {}
   });
 })(core);
 
@@ -29,7 +23,6 @@
   {
     initialize: function()
     {
-      core.Log.debug('Step 2', 'Instantiating CustomersController');
       this.customers = new core.CustomerRepository();
     },
 
@@ -43,8 +36,6 @@
     {
       var input     = new core.Input(datain);
       var validator = new core.Validator(input, ['id']);
-
-      core.Log.debug('Step 4', 'Finding customer with id ' + input.get('id'));
 
       if (validator.passes()) {
         var customer = this.customers.find(input.get('id'));
@@ -97,10 +88,7 @@
 
 try
 {
-  core.Log.debug('Step 1', 'Running main.js');
-
   new core.Router().resource('customers', 'CustomersController').start('customers', this);
-
 }
 catch (e)
 {
