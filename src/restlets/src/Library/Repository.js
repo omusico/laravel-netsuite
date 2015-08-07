@@ -17,9 +17,7 @@
     find: function(id)
     {
       var record = nlapiLoadRecord(this.recordType, id);
-      core.Log.debug('Step 5', 'Found ' + record.getRecordType() + ' record with id ' + record.getId());
-      return record;
-      // return record ? new this.recordClass(record.getAllFields()) : null;
+      return record ? new this.recordClass(record) : null;
     },
 
     paginate: function(page, per_page)

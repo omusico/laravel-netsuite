@@ -8,24 +8,24 @@
       this.map = {};
     },
 
-    parse: function(identifier)
+    parseIdentifier: function(identifier)
     {
       var parts = identifier.split('@');
       return {controller_name: parts[0], controller_method: parts[1]};
     },
 
-    method: function(resource, identifier, http_method)
+    buildMethod: function(resource, identifier, http_method)
     {
-      var parsed                      = this.parse(indentifier);
-      var controller_instance         = new core[parsed.controller_name]();
-      this.map[resource][http_method] = controller_instance[parsed.controller_method].bind(instance);
+      var parsed_identifier           = this.parseIdentifier(identifier);
+      var controller_instance         = new core[parsed_identifier.controller_name]();
+      this.map[resource][http_method] = controller_instance[parsed_identifier.controller_method].bind(instance);
       return this;
     },
 
-    get:    function(resource, identifier) { return this.method(resource, idnetifier, 'get'); },
-    post:   function(resource, identifier) { return this.method(resource, idnetifier, 'post'); },
-    put:    function(resource, identifier) { return this.method(resource, idnetifier, 'put'); },
-    delete: function(resource, identifier) { return this.method(resource, idnetifier, 'delete'); },
+    get:    function(resource, identifier) { return this.buildMethod(resource, identifier, 'get'); },
+    post:   function(resource, identifier) { return this.buildMethod(resource, identifier, 'post'); },
+    put:    function(resource, identifier) { return this.buildMethod(resource, identifier, 'put'); },
+    delete: function(resource, identifier) { return this.buildMethod(resource, identifier, 'delete'); },
 
     resource: function(resource, controller)
     {
@@ -38,13 +38,11 @@
       return this;
     },
 
-    start: function(datain)
+    start: function(resource, context)
     {
-      var response = {};
-
-      this.map[datain].forEach(function(controller_method, http_method)
+      this.map[resource].forEach(function(controller_method, http_method)
       {
-        response[http_method] = controller_method;
+        context[http_method] = controller_method;
       });
     }
   });
