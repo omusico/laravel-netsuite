@@ -21,6 +21,7 @@
   "homepage": "https://github.com/johnnygreen/laravel-netsuite",
   "dependencies": {
     "gulp": "^3.8.11",
-    "gulp-concat": "^2.5.2"
+    "gulp-concat": "^2.5.2",
+    "ns-upload": "^1.0.2"
   }
 }

@@ -14,10 +14,26 @@
 
     initialize: function() {},
 
+    search: function(key, value)
+    {
+      var filters = [new nlobjSearchFilter(key, null, 'is', value)];
+      var results = nlapiSearchRecord(this.recordType, null, filters, []);
+      core.Log.debug('Got here 3');
+      return results;
+    },
+
     find: function(id)
     {
       var record = nlapiLoadRecord(this.recordType, id);
+      core.Log.debug('Got here 4', record);
       return record ? new this.recordClass(record) : null;
+    },
+
+    findByExternalId: function(id)
+    {
+      var results = this.search('externalid', id);
+      core.Log.debug('Got here 2');
+      return results.length ? this.find(results[0].id) : null;
     },
 
     paginate: function(page, per_page)

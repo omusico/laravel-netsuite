@@ -2,6 +2,11 @@
 {
   core.Customer = core.Model.extend(
   {
-    initialize: function() {}
+    visible: [
+      'id',
+      'firstname',
+      'lastname',
+      'phone',
+    ]
   });
 })(core);
