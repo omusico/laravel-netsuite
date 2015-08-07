@@ -12,7 +12,7 @@
     {
 
     },
-    
+
     parseIdentifier: function(identifier)
     {
       var parts = identifier.split('@');
@@ -21,9 +21,15 @@
 
     buildMethod: function(resource, identifier, http_method)
     {
-      var parsed_identifier           = this.parseIdentifier(identifier);
-      var controller_instance         = new core[parsed_identifier.controller_name]();
-      this.map[resource][http_method] = controller_instance[parsed_identifier.controller_method].bind(instance);
+      var parsed_identifier   = this.parseIdentifier(identifier);
+      var controller_method   = parsed_identifier.controller_method;
+      var controller_name     = parsed_identifier.controller_name;
+      var controller_instance = new core[parsed_identifier.controller_name]();
+      this.map[resource]      = this.map[resource] || {};
+
+      // setup the route map
+      this.map[resource][controller_method] = controller_instance[controller_method].bind(controller_instance);
+
       return this;
     },
 
@@ -45,10 +51,11 @@
 
     start: function(resource, context)
     {
-      this.map[resource].forEach(function(controller_method, http_method)
+      for (var method_name in this.map[resource])
       {
-        context[http_method] = controller_method;
-      });
+        var controller_method = this.map[resource][method_name];
+        context[method_name] = controller_method;
+      }
     }
   });
 })(core);
