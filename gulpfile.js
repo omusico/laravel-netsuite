@@ -39,8 +39,7 @@ gulp.task('customers', function()
 
 gulp.task('upload', function()
 {
-  var config = require('./netsuite.json');
-  if (config) gulp.src(buildDir + '**/*.js').pipe(upload(config));
+  gulp.src(buildDir + '**/*.js').pipe(upload(require('./netsuite.json')));
 });
 
 gulp.task('watch', function()
