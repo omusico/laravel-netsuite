@@ -45,10 +45,14 @@ var core = new Core();
     {
       target = target || {};
 
-      for (var prop in source) {
-        if (typeof source[prop] === 'object') {
+      for (var prop in source)
+      {
+        if (Object.prototype.toString.call(source[prop]) === '[object Object]')
+        {
           target[prop] = core.Util.extend(target[prop], source[prop]);
-        } else {
+        }
+        else
+        {
           target[prop] = source[prop];
         }
       }
@@ -94,32 +98,9 @@ var core = new Core();
 {
   core.Model = core.Base.extend(
   {
-    visible: [],
-
     constructor: function(object)
     {
-      this.attrs = {};
-
-      if (typeof object.getAllFields === 'function')
-      {
-        // object.getAllFields().forEach(function(field)
-        // {
-        //   this.attrs[field] = object.getFieldValue(field);
-        // });
-
-        this.attrs = object;
-      }
-      else
-      {
-        for (var key in object)
-        {
-          if (typeof object[key] !== 'function')
-          {
-            this.attrs[key] = object[key];
-          }
-        }
-      }
-
+      this.attrs = this.parse(object);
       this.initialize.apply(this, arguments);
     },
 
@@ -139,8 +120,7 @@ var core = new Core();
 
     has: function(key)
     {
-      return true;
-      // return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
+      return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
     },
 
     toHash: function()
@@ -149,17 +129,24 @@ var core = new Core();
 
       if (this.visible.length)
       {
+        var that = this;
+
         this.visible.forEach(function(field)
         {
-          if (this.has(field)) attrs[field] = this.get(field);
+          if (that.has(field)) attrs[field] = that.get(field);
         });
       }
       else
       {
-        for (var field in this.attrs)
+        for (var attr in this.attrs)
         {
-          if (this.has(field)) attrs[field] = this.get(field);
+          if (this.has(attr)) attrs[attr] = this.get(attr);
         }
+      }
+
+      for (var sublist in this.sublists)
+      {
+        this.attrs[sublist] = this.attrs.sublist.toHash();
       }
 
       return attrs;
@@ -173,6 +160,64 @@ var core = new Core();
     toString: function()
     {
       return this.toJSON();
+    },
+
+    parse: function(object)
+    {
+      var attrs = {};
+
+      if (this.fields || this.sublists)
+      {
+        for (var field in this.fields)
+        {
+          attrs[field] = object.getFieldText(field) !== null ? object.getFieldText(field) : object.getFieldValue(field);
+          var type = this.fields[field];
+
+          switch(type)
+          {
+            case 'int':
+              attrs[field] = parseInt(attrs[field]);
+              break;
+            case 'float':
+              attrs[field] = parseFloat(attrs[field]);
+              break;
+            default: // string
+              attrs[field] = attrs[field] + '';
+          }
+        }
+
+        for (var sublist in this.sublists)
+        {
+          var fields     = object.getAllLineItemFields(sublist);
+          var count      = object.getLineItemCount(sublist);
+          attrs[sublist] = [];
+
+          for (var i = 1; i <= count; i++)
+          {
+            var item = {};
+
+            for (var index in fields)
+            {
+              item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
+            }
+
+            var recordType = this.sublists[sublist];
+            attrs[sublist].push(new recordType(item));
+          }
+        }
+      }
+      else
+      {
+        for (var key in object)
+        {
+          if (typeof object[key] !== 'function')
+          {
+            attrs[key] = object[key];
+          }
+        }
+      }
+
+      return attrs;
     }
   });
 })(core);
@@ -395,7 +440,7 @@ var core = new Core();
     {
       var record = nlapiLoadRecord(this.recordType, id);
 
-      return record ? record : null;
+      return record ? new this.recordClass(record) : null;
     },
 
     findByExternalId: function(id)
@@ -414,8 +459,9 @@ var core = new Core();
     {
       var record = nlapiCreateRecord(this.recordType);
 
-      for(var field in attrs) {
-        record.setFieldValue(field, attrs[field]);
+      for (var attr in attrs)
+      {
+        record.setFieldValue(attr, attrs[attr]);
       }
 
       nlapiSubmitRecord(record, true);
@@ -425,17 +471,20 @@ var core = new Core();
 
     update: function(id, attrs)
     {
-      var diff = {};
+      var diffs = {};
       var record = nlapiLoadRecord(this.recordType, id);
 
-      for(var field in attrs) {
-        if(record.getFieldValue(field) != attrs[field]) {
-          diff[field] = attrs[field];
+      for (var attr in attrs)
+      {
+        if(record.getFieldValue(attr) != attrs[attr])
+        {
+          diff[attr] = attrs[attr];
         }
       }
 
-      for(var field in diff) {
-        record.setFieldValue(field, diff[field]);
+      for (var diff in diffs)
+      {
+        record.setFieldValue(diff, diffs[diff]);
       }
 
       nlapiSubmitRecord(record, true);

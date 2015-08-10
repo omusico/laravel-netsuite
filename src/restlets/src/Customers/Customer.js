@@ -7,6 +7,18 @@
       'firstname',
       'lastname',
       'phone',
-    ]
+      'addressbook'
+    ],
+
+    fields: {
+      'id'       : 'int',
+      'firstname': 'string',
+      'lastname' : 'string',
+      'phone'    : 'string'
+    },
+
+    sublists: {
+      'addressbook': core.Address
+    }
   });
 })(core);

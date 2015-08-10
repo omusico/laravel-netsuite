@@ -25,7 +25,7 @@
     {
       var record = nlapiLoadRecord(this.recordType, id);
 
-      return record ? record : null;
+      return record ? new this.recordClass(record) : null;
     },
 
     findByExternalId: function(id)
@@ -44,8 +44,9 @@
     {
       var record = nlapiCreateRecord(this.recordType);
 
-      for(var field in attrs) {
-        record.setFieldValue(field, attrs[field]);
+      for (var attr in attrs)
+      {
+        record.setFieldValue(attr, attrs[attr]);
       }
 
       nlapiSubmitRecord(record, true);
@@ -55,17 +56,20 @@
 
     update: function(id, attrs)
     {
-      var diff = {};
+      var diffs = {};
       var record = nlapiLoadRecord(this.recordType, id);
 
-      for(var field in attrs) {
-        if(record.getFieldValue(field) != attrs[field]) {
-          diff[field] = attrs[field];
+      for (var attr in attrs)
+      {
+        if(record.getFieldValue(attr) != attrs[attr])
+        {
+          diff[attr] = attrs[attr];
         }
       }
 
-      for(var field in diff) {
-        record.setFieldValue(field, diff[field]);
+      for (var diff in diffs)
+      {
+        record.setFieldValue(diff, diffs[diff]);
       }
 
       nlapiSubmitRecord(record, true);

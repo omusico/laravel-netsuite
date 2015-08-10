@@ -5,10 +5,14 @@
     {
       target = target || {};
 
-      for (var prop in source) {
-        if (typeof source[prop] === 'object') {
+      for (var prop in source)
+      {
+        if (Object.prototype.toString.call(source[prop]) === '[object Object]')
+        {
           target[prop] = core.Util.extend(target[prop], source[prop]);
-        } else {
+        }
+        else
+        {
           target[prop] = source[prop];
         }
       }

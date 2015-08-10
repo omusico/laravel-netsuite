@@ -1,5 +1,19 @@
 (function(core)
 {
+  core.Address = core.Model.extend(
+  {
+    visible: [
+      'id'
+    ],
+
+    fields: {
+      'id' : 'int'
+    }
+  });
+})(core);
+
+(function(core)
+{
   core.Customer = core.Model.extend(
   {
     visible: [
@@ -7,7 +21,19 @@
       'firstname',
       'lastname',
       'phone',
-    ]
+      'addressbook'
+    ],
+
+    fields: {
+      'id'       : 'int',
+      'firstname': 'string',
+      'lastname' : 'string',
+      'phone'    : 'string'
+    },
+
+    sublists: {
+      'addressbook': core.Address
+    }
   });
 })(core);
 
@@ -42,7 +68,7 @@
 
       if (validator.passes()) {
         var customer = this.customers.findByExternalId(input.get('id'));
-        return customer ? customer : this.notFound();
+        return customer ? customer.toHash() : this.notFound();
       } else {
         return this.badRequest(validator.toHash());
       }
