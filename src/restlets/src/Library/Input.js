@@ -1,4 +1,4 @@
 (function(core)
 {
-  core.Input = core.Model.extend();
+  core.Input = core.Model.extend({});
 })(core);

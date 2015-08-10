@@ -4,9 +4,30 @@
   {
     visible: [],
 
-    constructor: function(attrs)
+    constructor: function(object)
     {
-      this.attrs = attrs || {};
+      this.attrs = {};
+
+      if (typeof object.getAllFields === 'function')
+      {
+        // object.getAllFields().forEach(function(field)
+        // {
+        //   this.attrs[field] = object.getFieldValue(field);
+        // });
+
+        this.attrs = object;
+      }
+      else
+      {
+        for (var key in object)
+        {
+          if (typeof object[key] !== 'function')
+          {
+            this.attrs[key] = object[key];
+          }
+        }
+      }
+
       this.initialize.apply(this, arguments);
     },
 
@@ -14,19 +35,20 @@
 
     set: function(key, value)
     {
-      var mutator = 'set' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
+      var mutator = 'set' + (key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '')) + 'Attribute';
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
     },
 
     get: function(key)
     {
-      var mutator = 'get' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
+      var mutator = 'get' + (key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '')) + 'Attribute';
       return this[mutator] ? this[mutator](this.attrs[key]) : this.attrs[key];
     },
 
     has: function(key)
     {
-      return typeof this[key] !== 'function' && typeof this[key] !== 'undefined'
+      return true;
+      // return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
     },
 
     toHash: function()

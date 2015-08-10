@@ -46,18 +46,13 @@
     {
       core.Log.error(code, message);
 
-      return this.response({
+      return {
         'error':
         {
           'code':    code,
           'message': message
         }
-      });
-    },
-
-    response: function(body)
-    {
-      return JSON.stringify(body);
+      };
     }
   });
 })(core);

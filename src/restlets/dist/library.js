@@ -96,9 +96,30 @@ var core = new Core();
   {
     visible: [],
 
-    constructor: function(attrs)
+    constructor: function(object)
     {
-      this.attrs = attrs || {};
+      this.attrs = {};
+
+      if (typeof object.getAllFields === 'function')
+      {
+        // object.getAllFields().forEach(function(field)
+        // {
+        //   this.attrs[field] = object.getFieldValue(field);
+        // });
+
+        this.attrs = object;
+      }
+      else
+      {
+        for (var key in object)
+        {
+          if (typeof object[key] !== 'function')
+          {
+            this.attrs[key] = object[key];
+          }
+        }
+      }
+
       this.initialize.apply(this, arguments);
     },
 
@@ -106,19 +127,20 @@ var core = new Core();
 
     set: function(key, value)
     {
-      var mutator = 'set' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
+      var mutator = 'set' + (key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '')) + 'Attribute';
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
     },
 
     get: function(key)
     {
-      var mutator = 'get' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
+      var mutator = 'get' + (key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '')) + 'Attribute';
       return this[mutator] ? this[mutator](this.attrs[key]) : this.attrs[key];
     },
 
     has: function(key)
     {
-      return typeof this[key] !== 'function' && typeof this[key] !== 'undefined'
+      return true;
+      // return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
     },
 
     toHash: function()
@@ -157,7 +179,7 @@ var core = new Core();
 
 (function(core)
 {
-  core.Input = core.Model.extend();
+  core.Input = core.Model.extend({});
 })(core);
 
 (function(core)
@@ -166,27 +188,39 @@ var core = new Core();
   {
     constructor: function(input, requiredFields)
     {
+      // our input
       this.input = input || new core.Input();
+
+      // list of required fields
       this.requiredFields = requiredFields || [];
+
+      // array of missing fields
+      this.missingFields = [];
+
       this.initialize.apply(this, arguments);
     },
 
     initialize: function() {},
 
-    missing: function()
+    validate: function()
     {
-      var missing_fields = [];
+      var missingFields = [];
+      var input   = this.input;
 
-      for (var field in this.requiredFields) {
-        if ( ! this.input.has(field)) missing_fields.push(field);
-      }
+      this.requiredFields.forEach(function(field)
+      {
+        if ( ! input.has(field)) missingFields.push(field);
+      });
 
-      return missing_fields;
+      this.missingFields = missingFields;
+      return this;
     },
 
     passes: function()
     {
-      return this.missing().length > 0;
+      if (this.missingFields.length === 0) this.validate();
+
+      return this.missingFields.length === 0;
     },
 
     fails: function()
@@ -198,9 +232,10 @@ var core = new Core();
     {
       var validation = {};
 
-      for (var field in this.missing()) {
+      this.missingFields.forEach(function(field)
+      {
         validation[field] = field + ' is required.';
-      }
+      });
 
       return validation;
     },
@@ -260,18 +295,13 @@ var core = new Core();
     {
       core.Log.error(code, message);
 
-      return this.response({
+      return {
         'error':
         {
           'code':    code,
           'message': message
         }
-      });
-    },
-
-    response: function(body)
-    {
-      return JSON.stringify(body);
+      };
     }
   });
 })(core);
@@ -364,12 +394,14 @@ var core = new Core();
     find: function(id)
     {
       var record = nlapiLoadRecord(this.recordType, id);
-      return record ? new this.recordClass(record) : null;
+
+      return record ? record : null;
     },
 
     findByExternalId: function(id)
     {
       var results = this.search('externalid', id);
+
       return results.length ? this.find(results[0].id) : null;
     },
 

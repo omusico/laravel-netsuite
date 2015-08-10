@@ -4,27 +4,39 @@
   {
     constructor: function(input, requiredFields)
     {
+      // our input
       this.input = input || new core.Input();
+
+      // list of required fields
       this.requiredFields = requiredFields || [];
+
+      // array of missing fields
+      this.missingFields = [];
+
       this.initialize.apply(this, arguments);
     },
 
     initialize: function() {},
 
-    missing: function()
+    validate: function()
     {
-      var missing_fields = [];
+      var missingFields = [];
+      var input   = this.input;
 
-      for (var field in this.requiredFields) {
-        if ( ! this.input.has(field)) missing_fields.push(field);
-      }
+      this.requiredFields.forEach(function(field)
+      {
+        if ( ! input.has(field)) missingFields.push(field);
+      });
 
-      return missing_fields;
+      this.missingFields = missingFields;
+      return this;
     },
 
     passes: function()
     {
-      return this.missing().length > 0;
+      if (this.missingFields.length === 0) this.validate();
+
+      return this.missingFields.length === 0;
     },
 
     fails: function()
@@ -36,9 +48,10 @@
     {
       var validation = {};
 
-      for (var field in this.missing()) {
+      this.missingFields.forEach(function(field)
+      {
         validation[field] = field + ' is required.';
-      }
+      });
 
       return validation;
     },

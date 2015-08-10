@@ -24,12 +24,14 @@
     find: function(id)
     {
       var record = nlapiLoadRecord(this.recordType, id);
-      return record ? new this.recordClass(record) : null;
+
+      return record ? record : null;
     },
 
     findByExternalId: function(id)
     {
       var results = this.search('externalid', id);
+
       return results.length ? this.find(results[0].id) : null;
     },
 
