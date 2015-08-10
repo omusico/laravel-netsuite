@@ -6,8 +6,7 @@
 
     constructor: function(attrs)
     {
-      this.attrs = {};
-      this.set(attrs || {});
+      this.attrs = attrs || {};
       this.initialize.apply(this, arguments);
     },
 
@@ -15,22 +14,8 @@
 
     set: function(key, value)
     {
-      if (arguments.length > 1)
-      {
-        var mutator = 'set' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
-        this.attrs[key] = this[mutator] ? this[mutator](value) : value;
-      }
-      else
-      {
-        var object = key;
-
-        for (var key in object)
-        {
-          var value = object[key];
-          var mutator = 'set' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
-          this.attrs[key] = this[mutator] ? this[mutator](value) : value;
-        }
-      }
+      var mutator = 'set' + (key.charAt(0).toUpperCase() + key.slice(1)) + 'Attribute';
+      this.attrs[key] = this[mutator] ? this[mutator](value) : value;
     },
 
     get: function(key)
@@ -41,7 +26,7 @@
 
     has: function(key)
     {
-      return this.attrs.hasOwnProperty(key);
+      return typeof this[key] !== 'function' && typeof this[key] !== 'undefined'
     },
 
     toHash: function()
@@ -52,14 +37,14 @@
       {
         this.visible.forEach(function(field)
         {
-          attrs[field] = this.get(field);
+          if (this.has(field)) attrs[field] = this.get(field);
         });
       }
       else
       {
         for (var field in this.attrs)
         {
-          attrs[field] = this.get(field);
+          if (this.has(field)) attrs[field] = this.get(field);
         }
       }
 

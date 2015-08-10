@@ -46,7 +46,7 @@ gulp.task('watch', function()
 {
   gulp.watch(library,   ['library']);
   gulp.watch(customers, ['customers']);
-  gulp.watch(buildDir,  ['upload']);
+  gulp.watch(buildDir + '**/*.js',  ['upload']);
 });
 
 gulp.task('default', ['library', 'customers', 'upload']);

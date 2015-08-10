@@ -3,8 +3,6 @@
   core.CustomerRepository = core.Repository.extend(
   {
     recordType: 'customer',
-    recordClass: core.Customer,
-
-    initialize: function() {}
+    recordClass: core.Customer
   });
 })(core);

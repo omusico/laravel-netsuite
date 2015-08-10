@@ -20,7 +20,6 @@
 
       if (validator.passes()) {
         var customer = this.customers.findByExternalId(input.get('id'));
-        core.Log.debug('Got here 1');
         return customer ? customer.toHash() : this.notFound();
       } else {
         return this.badRequest(validator.toHash());
