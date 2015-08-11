@@ -12,14 +12,19 @@
 
     set: function(key, value)
     {
-      var mutator = 'set' + (key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '')) + 'Attribute';
+      key = core.Util.camel_case(key);
+      key = key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '');
+      var mutator = 'set' + key + 'Attribute';
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
     },
 
     get: function(key)
     {
-      var mutator = 'get' + (key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '')) + 'Attribute';
-      return this[mutator] ? this[mutator](this.attrs[key]) : this.attrs[key];
+      var new_key = core.Util.camel_case(key);
+      new_key = new_key.charAt(0).toUpperCase() + (new_key && new_key.length ? new_key.slice(1) : '');
+      var mutator = 'get' + new_key + 'Attribute';
+      var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : null;
+      return this[mutator] ? this[mutator](value) : value;
     },
 
     has: function(key)
@@ -27,30 +32,110 @@
       return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
     },
 
-    toHash: function()
+    parse: function(object)
     {
-      var attrs = {};
+      var attrs     = {};
+      var is_record = typeof object.getFieldValue === 'function';
 
-      if (this.visible.length)
+      // determine if object is record or plain object
+      if (this.fields || this.sublists)
       {
-        var that = this;
-
-        this.visible.forEach(function(field)
+        for (var field in this.fields)
         {
-          if (that.has(field)) attrs[field] = that.get(field);
+          attrs[field] = is_record ? object.getFieldValue(field) : typeof object[field] !== 'undefined' ? object[field] : null;
+
+          // parse attr into correct type
+          switch(this.fields[field])
+          {
+            case 'int':
+              attrs[field] = parseInt(attrs[field]);
+              break;
+            case 'float':
+              attrs[field] = parseFloat(attrs[field]);
+              break;
+            case 'timestampe':
+              attrs[field] = 
+              break;
+            default: // string
+              attrs[field] = attrs[field] ? attrs[field] + '' : null;
+          }
+        }
+
+        for (var sublist in this.sublists)
+        {
+          var count = is_record ? object.getLineItemCount(sublist) : typeof object[sublist] !== 'undefined' ? object[sublist].length : 0;
+
+          if (count)
+          {
+            attrs[sublist] = [];
+
+            for (var i = 1; i <= count; i++)
+            {
+              var item = {};
+
+              if (is_record)
+              {
+                var fields = object.getAllLineItemFields(sublist);
+
+                for (var index in fields)
+                {
+                  item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
+                }
+              }
+              else
+              {
+                item = object[sublist][i];
+              }
+
+              var recordType = this.sublists[sublist];
+              attrs[sublist].push(new recordType(item));
+            }
+          }
+        }
+      }
+      else
+      {
+        for (var key in object)
+        {
+          if (typeof object[key] !== 'function')
+          {
+            attrs[key] = typeof object[key] !== 'undefined' ? object[key] : null;
+          }
+        }
+      }
+
+      return attrs;
+    },
+
+    toHash: function(object)
+    {
+      var attrs  = {};
+      object = object || this;
+
+      if (object.visible && object.visible.length)
+      {
+        object.visible.forEach(function(field)
+        {
+          attrs[field] = object.get(field);
         });
       }
       else
       {
-        for (var attr in this.attrs)
+        for (var attr in object.attrs)
         {
-          if (this.has(attr)) attrs[attr] = this.get(attr);
+          attrs[attr] = object.get(attr);
         }
       }
 
-      for (var sublist in this.sublists)
+      for (var sublist in object.sublists)
       {
-        this.attrs[sublist] = this.attrs.sublist.toHash();
+        if (typeof object.attrs[sublist] !== 'undefined')
+        {
+          for (var i = 0; i < object.attrs[sublist].length; i++)
+          {
+            object.attrs[sublist][i] = object.toHash(object.attrs[sublist][i]);
+          }
+        }
       }
 
       return attrs;
@@ -64,64 +149,6 @@
     toString: function()
     {
       return this.toJSON();
-    },
-
-    parse: function(object)
-    {
-      var attrs = {};
-
-      if (this.fields || this.sublists)
-      {
-        for (var field in this.fields)
-        {
-          attrs[field] = object.getFieldText(field) !== null ? object.getFieldText(field) : object.getFieldValue(field);
-          var type = this.fields[field];
-
-          switch(type)
-          {
-            case 'int':
-              attrs[field] = parseInt(attrs[field]);
-              break;
-            case 'float':
-              attrs[field] = parseFloat(attrs[field]);
-              break;
-            default: // string
-              attrs[field] = attrs[field] + '';
-          }
-        }
-
-        for (var sublist in this.sublists)
-        {
-          var fields     = object.getAllLineItemFields(sublist);
-          var count      = object.getLineItemCount(sublist);
-          attrs[sublist] = [];
-
-          for (var i = 1; i <= count; i++)
-          {
-            var item = {};
-
-            for (var index in fields)
-            {
-              item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
-            }
-
-            var recordType = this.sublists[sublist];
-            attrs[sublist].push(new recordType(item));
-          }
-        }
-      }
-      else
-      {
-        for (var key in object)
-        {
-          if (typeof object[key] !== 'function')
-          {
-            attrs[key] = object[key];
-          }
-        }
-      }
-
-      return attrs;
     }
   });
 })(core);

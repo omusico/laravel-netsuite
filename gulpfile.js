@@ -2,11 +2,14 @@ var gulp   = require('gulp');
 var concat = require('gulp-concat');
 var upload = require('gulp-nsupload');
 
-var buildDir = 'src/restlets/dist/';
-var baseDir  = 'src/restlets/src/';
+var buildDir  = 'src/restlets/dist/';
+var baseDir   = 'src/restlets/src/';
+var vendorDir = 'src/restlets/vendor/';
 
 // ordering matters here
 var library = [
+  vendorDir + 'lodash/lodash.min.js',
+  vendorDir + 'moment/min/moment.min.js',
   baseDir + 'Library/Core.js',
   baseDir + 'Library/Log.js',
   baseDir + 'Library/Util.js',

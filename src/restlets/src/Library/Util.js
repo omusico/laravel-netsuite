@@ -23,6 +23,26 @@
     has: function(obj, key)
     {
       return obj !== null && hasOwnProperty.call(obj, key);
+    },
+
+    snake_case: function(string)
+    {
+      string = string + '';
+
+      return string.replace(/([A-Z])/g, function(match, match2, index, string)
+      {
+        return (index === 0 ? '' : '_') + match.toLowerCase();
+      });
+    },
+
+    camel_case: function(string)
+    {
+      string = string + '';
+
+      return string.replace(/(_\w)/g, function(match, match2, index, string)
+      {
+        return match[1].toUpperCase();
+      });
     }
   };
 })(core);

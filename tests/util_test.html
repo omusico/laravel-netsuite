@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <title>Util Test</title>
+    <script src="../src/restlets/dist/library.js"></script>
+    <script>
+      core.Log.debug('Testing core.Util.snake_case on "CamelCaseCamelCase"', {pass: core.Util.snake_case('CamelCaseCamelCase') === 'camel_case_camel_case'});
+      core.Log.debug('Testing core.Util.camel_case on "snake_case"', {pass: core.Util.camel_case('snake_case_snake_case') === 'snakeCaseSnakeCase'});
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
