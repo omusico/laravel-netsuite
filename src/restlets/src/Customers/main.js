@@ -1,6 +1,8 @@
 try
 {
-  new core.Router().resource('customers', 'CustomersController').start('customers', this);
+  new core.Router()
+          .resource('customers', 'CustomersController')
+          .start('customers', this);
 }
 catch (e)
 {

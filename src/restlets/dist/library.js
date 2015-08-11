@@ -225,7 +225,7 @@ var core = new Core();
   {
     constructor: function(object)
     {
-      this.attrs = this.parse(object);
+      this.attrs = object ? this.parse(object) : {};
       this.initialize.apply(this, arguments);
     },
 
@@ -239,12 +239,13 @@ var core = new Core();
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
     },
 
-    get: function(key)
+    get: function(key, fallback)
     {
+      fallback = fallback || null;
       var new_key = core.Util.camel_case(key);
       new_key = new_key.charAt(0).toUpperCase() + (new_key && new_key.length ? new_key.slice(1) : '');
       var mutator = 'get' + new_key + 'Attribute';
-      var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : null;
+      var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : fallback;
       return this[mutator] ? this[mutator](value) : value;
     },
 
@@ -263,7 +264,11 @@ var core = new Core();
       {
         for (var field in this.fields)
         {
-          attrs[field] = is_record ? object.getFieldValue(field) : typeof object[field] !== 'undefined' ? object[field] : null;
+          attrs[field] = is_record ?
+                         object.getFieldValue(field) :
+                         typeof object[field] !== 'undefined' ?
+                           object[field] :
+                           null;
 
           // parse attr into correct type
           switch(this.fields[field])
@@ -274,17 +279,25 @@ var core = new Core();
             case 'float':
               attrs[field] = parseFloat(attrs[field]);
               break;
-            case 'timestampe':
-              attrs[field] = 
+            case 'timestamp':
+              attrs[field] = moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') != 'Invalid date' ?
+                             moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') :
+                             null;
               break;
             default: // string
-              attrs[field] = attrs[field] ? attrs[field] + '' : null;
+              attrs[field] = attrs[field] ?
+                             attrs[field] + '' :
+                             null;
           }
         }
 
         for (var sublist in this.sublists)
         {
-          var count = is_record ? object.getLineItemCount(sublist) : typeof object[sublist] !== 'undefined' ? object[sublist].length : 0;
+          var count = is_record ?
+                      object.getLineItemCount(sublist) :
+                      typeof object[sublist] !== 'undefined' ?
+                        object[sublist].length :
+                        0;
 
           if (count)
           {
@@ -513,10 +526,7 @@ var core = new Core();
       this.map = {};
     },
 
-    initialize: function()
-    {
-
-    },
+    initialize: function() {},
 
     parseIdentifier: function(identifier)
     {
@@ -558,8 +568,7 @@ var core = new Core();
     {
       for (var method_name in this.map[resource])
       {
-        var controller_method = this.map[resource][method_name];
-        context[method_name] = controller_method;
+        context[method_name] = this.map[resource][method_name];
       }
     }
   });
@@ -581,10 +590,30 @@ var core = new Core();
 
     initialize: function() {},
 
-    search: function(key, value)
+    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
+    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
+    search: function(key, value, operator)
     {
-      var filters = [new nlobjSearchFilter(key, null, 'is', value)];
-      var results = nlapiSearchRecord(this.recordType, null, filters, []);
+      operator = operator || 'is';
+
+      var search_filters = [new nlobjSearchFilter(key, null, operator, value)];
+
+      var columns = _.keys(new this.recordClass().fields);
+
+      var search_columns = _.chain(columns)
+                            .filter(function(column) { return column != 'id'; })
+                            .map(function(column) { return new nlobjSearchColumn(column); })
+                            .value();
+
+      var search_results = nlapiSearchRecord(this.recordType, null, search_filters, search_columns);
+
+      var results = _.map(search_results, function(result)
+      {
+        var attrs = {id: result.id};
+        _.each(columns, function(column) { if(column != 'id') attrs[column] = result.getValue(column); });
+        return attrs;
+      });
+
       return results;
     },
 
@@ -595,11 +624,17 @@ var core = new Core();
       return record ? new this.recordClass(record) : null;
     },
 
-    findByExternalId: function(id)
+    findBySearch: function(key, value, operator)
     {
-      var results = this.search('externalid', id);
+      return this.search(key, value, operator).map(_.bind(function(result)
+      {
+        return new this.recordClass(result);
+      }, this));
+    },
 
-      return results.length ? this.find(results[0].id) : null;
+    findByExternalId: function(externalid)
+    {
+      return this.findBySearch('externalid', externalid).first();
     },
 
     paginate: function(page, per_page)

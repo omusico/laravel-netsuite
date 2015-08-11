@@ -2,17 +2,7 @@
 {
   core.Customer = core.Model.extend(
   {
-    visible: [
-      'customers_id',
-      'customers_firstname',
-      'customers_lastname',
-      'customers_telephone',
-      'customers_email_address',
-      'created_at',
-      'updated_at',
-      'addresses'
-    ],
-
+    // fields to be parsed on input
     fields: {
       'id'               : 'int',
       'firstname'        : 'string',
@@ -23,9 +13,22 @@
       'lastmodifieddate' : 'timestamp'
     },
 
+    // sublists to be parsed on input
     sublists: {
       'addressbook': core.Address
     },
+
+    // fields to be parsed on output
+    visible: [
+      'customers_id',
+      'customers_firstname',
+      'customers_lastname',
+      'customers_telephone',
+      'customers_email_address',
+      'created_at',
+      'updated_at',
+      'addresses'
+    ],
 
     getCustomersIdAttribute: function()
     {
@@ -60,6 +63,11 @@
     getUpdatedAtAttribute: function()
     {
       return this.attrs.lastmodifieddate;
+    },
+
+    getAddressesAttribute: function()
+    {
+      return this.attrs.addressbook;
     }
   });
 })(core);

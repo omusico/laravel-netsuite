@@ -8,10 +8,7 @@
       this.map = {};
     },
 
-    initialize: function()
-    {
-
-    },
+    initialize: function() {},
 
     parseIdentifier: function(identifier)
     {
@@ -53,8 +50,7 @@
     {
       for (var method_name in this.map[resource])
       {
-        var controller_method = this.map[resource][method_name];
-        context[method_name] = controller_method;
+        context[method_name] = this.map[resource][method_name];
       }
     }
   });

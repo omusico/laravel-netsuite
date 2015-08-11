@@ -16,17 +16,7 @@
 {
   core.Customer = core.Model.extend(
   {
-    visible: [
-      'customers_id',
-      'customers_firstname',
-      'customers_lastname',
-      'customers_telephone',
-      'customers_email_address',
-      'created_at',
-      'updated_at',
-      'addresses'
-    ],
-
+    // fields to be parsed on input
     fields: {
       'id'               : 'int',
       'firstname'        : 'string',
@@ -37,9 +27,22 @@
       'lastmodifieddate' : 'timestamp'
     },
 
+    // sublists to be parsed on input
     sublists: {
       'addressbook': core.Address
     },
+
+    // fields to be parsed on output
+    visible: [
+      'customers_id',
+      'customers_firstname',
+      'customers_lastname',
+      'customers_telephone',
+      'customers_email_address',
+      'created_at',
+      'updated_at',
+      'addresses'
+    ],
 
     getCustomersIdAttribute: function()
     {
@@ -74,6 +77,11 @@
     getUpdatedAtAttribute: function()
     {
       return this.attrs.lastmodifieddate;
+    },
+
+    getAddressesAttribute: function()
+    {
+      return this.attrs.addressbook;
     }
   });
 })(core);
@@ -99,7 +107,17 @@
     index: function(datain)
     {
       var input = new core.Input(datain);
-      return this.customers.paginate(input.page, input.per_page);
+
+      // return this.customers.search(input.get('key', 'id'), input.get('value', '8672'), input.get('operator', 'is'));
+
+      var validator = new core.Validator(input, ['key', 'value']);
+
+      if (validator.passes()) {
+        var customers = this.customers.findBySearch(input.get('key'), input.get('value'), input.get('operator', 'is'));
+        return customers.map(function(customer) { return customer.toHash(); });
+      } else {
+        return this.badRequest(validator.toHash());
+      }
     },
 
     show: function(datain)
@@ -158,7 +176,9 @@
 
 try
 {
-  new core.Router().resource('customers', 'CustomersController').start('customers', this);
+  new core.Router()
+          .resource('customers', 'CustomersController')
+          .start('customers', this);
 }
 catch (e)
 {

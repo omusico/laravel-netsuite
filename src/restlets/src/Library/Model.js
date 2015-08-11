@@ -4,7 +4,7 @@
   {
     constructor: function(object)
     {
-      this.attrs = this.parse(object);
+      this.attrs = object ? this.parse(object) : {};
       this.initialize.apply(this, arguments);
     },
 
@@ -18,12 +18,13 @@
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
     },
 
-    get: function(key)
+    get: function(key, fallback)
     {
+      fallback = fallback || null;
       var new_key = core.Util.camel_case(key);
       new_key = new_key.charAt(0).toUpperCase() + (new_key && new_key.length ? new_key.slice(1) : '');
       var mutator = 'get' + new_key + 'Attribute';
-      var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : null;
+      var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : fallback;
       return this[mutator] ? this[mutator](value) : value;
     },
 
@@ -42,7 +43,11 @@
       {
         for (var field in this.fields)
         {
-          attrs[field] = is_record ? object.getFieldValue(field) : typeof object[field] !== 'undefined' ? object[field] : null;
+          attrs[field] = is_record ?
+                         object.getFieldValue(field) :
+                         typeof object[field] !== 'undefined' ?
+                           object[field] :
+                           null;
 
           // parse attr into correct type
           switch(this.fields[field])
@@ -53,17 +58,25 @@
             case 'float':
               attrs[field] = parseFloat(attrs[field]);
               break;
-            case 'timestampe':
-              attrs[field] = 
+            case 'timestamp':
+              attrs[field] = moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') != 'Invalid date' ?
+                             moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') :
+                             null;
               break;
             default: // string
-              attrs[field] = attrs[field] ? attrs[field] + '' : null;
+              attrs[field] = attrs[field] ?
+                             attrs[field] + '' :
+                             null;
           }
         }
 
         for (var sublist in this.sublists)
         {
-          var count = is_record ? object.getLineItemCount(sublist) : typeof object[sublist] !== 'undefined' ? object[sublist].length : 0;
+          var count = is_record ?
+                      object.getLineItemCount(sublist) :
+                      typeof object[sublist] !== 'undefined' ?
+                        object[sublist].length :
+                        0;
 
           if (count)
           {

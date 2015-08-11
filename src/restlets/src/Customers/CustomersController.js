@@ -10,7 +10,17 @@
     index: function(datain)
     {
       var input = new core.Input(datain);
-      return this.customers.paginate(input.page, input.per_page);
+
+      // return this.customers.search(input.get('key', 'id'), input.get('value', '8672'), input.get('operator', 'is'));
+
+      var validator = new core.Validator(input, ['key', 'value']);
+
+      if (validator.passes()) {
+        var customers = this.customers.findBySearch(input.get('key'), input.get('value'), input.get('operator', 'is'));
+        return customers.map(function(customer) { return customer.toHash(); });
+      } else {
+        return this.badRequest(validator.toHash());
+      }
     },
 
     show: function(datain)
