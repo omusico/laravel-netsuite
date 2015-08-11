@@ -63,10 +63,13 @@
                              moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') :
                              null;
               break;
-            default: // string
+            case 'string':
               attrs[field] = attrs[field] ?
                              attrs[field] + '' :
                              null;
+              break;
+            default:
+              // do nothing to the field
           }
         }
 

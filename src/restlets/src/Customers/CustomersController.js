@@ -10,14 +10,12 @@
     index: function(datain)
     {
       var input = new core.Input(datain);
-
-      // return this.customers.search(input.get('key', 'id'), input.get('value', '8672'), input.get('operator', 'is'));
-
       var validator = new core.Validator(input, ['key', 'value']);
 
       if (validator.passes()) {
-        var customers = this.customers.findBySearch(input.get('key'), input.get('value'), input.get('operator', 'is'));
-        return customers.map(function(customer) { return customer.toHash(); });
+        var results = this.customers.where(input.get('key'), input.get('operator', 'is'), input.get('value')).get(['lastmodifieddate']);
+        return results;
+        // return customers.map(function(customer) { return customer.toHash(); });
       } else {
         return this.badRequest(validator.toHash());
       }

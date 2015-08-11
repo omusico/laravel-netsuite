@@ -5,6 +5,8 @@
     recordType: '',
     recordClass: '',
 
+    search_filters: [],
+
     constructor: function()
     {
       if ( ! this.recordType)  throw 'Repository missing recordType';
@@ -16,49 +18,51 @@
 
     // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
     // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
-    search: function(key, value, operator)
+    get: function(columns)
     {
-      operator = operator || 'is';
+      var search_results;
 
-      var search_filters = [new nlobjSearchFilter(key, null, operator, value)];
-
-      var columns = _.keys(new this.recordClass().fields);
-
-      var search_columns = _.chain(columns)
-                            .filter(function(column) { return column != 'id'; })
-                            .map(function(column) { return new nlobjSearchColumn(column); })
-                            .value();
-
-      var search_results = nlapiSearchRecord(this.recordType, null, search_filters, search_columns);
-
-      var results = _.map(search_results, function(result)
+      if (columns && columns.length)
       {
-        var attrs = {id: result.id};
-        _.each(columns, function(column) { if(column != 'id') attrs[column] = result.getValue(column); });
-        return attrs;
-      });
+        var search_columns = _.chain(columns)
+                              .filter(function(column) { return column != 'id'; })
+                              .map(function(column) { return new nlobjSearchColumn(column); })
+                              .value();
 
-      return results;
+        search_results = _(nlapiSearchRecord(this.recordType, null, this.search_filters, search_columns)).map(function(result)
+        {
+          var attrs = {id: result.id};
+          _.each(columns, function(column) { if(column != 'id') attrs[column] = result.getValue(column); });
+          return attrs;
+        });
+      }
+      else
+      {
+        search_results = nlapiSearchRecord(this.recordType, null, this.search_filters, []);
+      }
+
+      // reset filters after search
+      this.search_filters = [];
+
+      return _(search_results);
     },
 
     find: function(id)
     {
       var record = nlapiLoadRecord(this.recordType, id);
-
       return record ? new this.recordClass(record) : null;
     },
 
-    findBySearch: function(key, value, operator)
+    where: function(key, operator, value)
     {
-      return this.search(key, value, operator).map(_.bind(function(result)
-      {
-        return new this.recordClass(result);
-      }, this));
+      this.search_filters = this.search_filters || [];
+      this.search_filters.push(new nlobjSearchFilter(key, null, operator, value));
+      return this;
     },
 
     findByExternalId: function(externalid)
     {
-      return this.findBySearch('externalid', externalid).first();
+      return this.find(this.where('externalid', 'is', externalid).get().first().id);
     },
 
     paginate: function(page, per_page)
