@@ -107,13 +107,23 @@ var Core = function() {};
 
 var core = new Core();
 
-_.mixin({decorate: function(items, func)
-{
-  return _.map(items, function(item)
+_.mixin({
+  decorate: function(items, func)
   {
-    return new func(item);
-  });
-}});
+    return _.map(items, function(item)
+    {
+      return new func(item);
+    });
+  },
+
+  toHash: function(items)
+  {
+    return _.map(items, function(item)
+    {
+      return item.toHash();
+    });
+  }
+});
 
 (function(core)
 {
@@ -178,7 +188,7 @@ _.mixin({decorate: function(items, func)
       return obj !== null && hasOwnProperty.call(obj, key);
     },
 
-    snake_case: function(string)
+    snakeCase: function(string)
     {
       string = string + '';
 
@@ -188,7 +198,7 @@ _.mixin({decorate: function(items, func)
       });
     },
 
-    camel_case: function(string)
+    camelCase: function(string)
     {
       string = string + '';
 
@@ -241,7 +251,7 @@ _.mixin({decorate: function(items, func)
 
     set: function(key, value)
     {
-      key = core.Util.camel_case(key);
+      key = core.Util.camelCase(key);
       key = key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '');
       var mutator = 'set' + key + 'Attribute';
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
@@ -250,9 +260,9 @@ _.mixin({decorate: function(items, func)
     get: function(key, fallback)
     {
       fallback = fallback || null;
-      var new_key = core.Util.camel_case(key);
-      new_key = new_key.charAt(0).toUpperCase() + (new_key && new_key.length ? new_key.slice(1) : '');
-      var mutator = 'get' + new_key + 'Attribute';
+      var newKey = core.Util.camelCase(key);
+      newKey = newKey.charAt(0).toUpperCase() + (newKey && newKey.length ? newKey.slice(1) : '');
+      var mutator = 'get' + newKey + 'Attribute';
       var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : fallback;
       return this[mutator] ? this[mutator](value) : value;
     },
@@ -265,14 +275,14 @@ _.mixin({decorate: function(items, func)
     parse: function(object)
     {
       var attrs     = {};
-      var is_record = typeof object.getFieldValue === 'function';
+      var isRecord = typeof object.getFieldValue === 'function';
 
       // determine if object is record or plain object
       if (this.fields || this.sublists)
       {
         for (var field in this.fields)
         {
-          attrs[field] = is_record ?
+          attrs[field] = isRecord ?
                          object.getFieldValue(field) :
                          typeof object[field] !== 'undefined' ?
                            object[field] :
@@ -304,7 +314,7 @@ _.mixin({decorate: function(items, func)
 
         for (var sublist in this.sublists)
         {
-          var count = is_record ?
+          var count = isRecord ?
                       object.getLineItemCount(sublist) :
                       typeof object[sublist] !== 'undefined' ?
                         object[sublist].length :
@@ -318,7 +328,7 @@ _.mixin({decorate: function(items, func)
             {
               var item = {};
 
-              if (is_record)
+              if (isRecord)
               {
                 var fields = object.getAllLineItemFields(sublist);
 
@@ -542,19 +552,19 @@ _.mixin({decorate: function(items, func)
     parseIdentifier: function(identifier)
     {
       var parts = identifier.split('@');
-      return {controller_name: parts[0], controller_method: parts[1]};
+      return {controllerName: parts[0], controllerMethod: parts[1]};
     },
 
-    buildMethod: function(resource, identifier, http_method)
+    buildMethod: function(resource, identifier, httpMethod)
     {
-      var parsed_identifier   = this.parseIdentifier(identifier);
-      var controller_method   = parsed_identifier.controller_method;
-      var controller_name     = parsed_identifier.controller_name;
-      var controller_instance = new core[parsed_identifier.controller_name]();
+      var parsedIdentifier   = this.parseIdentifier(identifier);
+      var controllerMethod   = parsedIdentifier.controllerMethod;
+      var controllerName     = parsedIdentifier.controllerName;
+      var controllerInstance = new core[parsedIdentifier.controllerName]();
       this.map[resource]      = this.map[resource] || {};
 
       // setup the route map
-      this.map[resource][controller_method] = controller_instance[controller_method].bind(controller_instance);
+      this.map[resource][controllerMethod] = controllerInstance[controllerMethod].bind(controllerInstance);
 
       return this;
     },
@@ -577,9 +587,9 @@ _.mixin({decorate: function(items, func)
 
     start: function(resource, context)
     {
-      for (var method_name in this.map[resource])
+      for (var methodName in this.map[resource])
       {
-        context[method_name] = this.map[resource][method_name];
+        context[methodName] = this.map[resource][methodName];
       }
     }
   });
@@ -591,8 +601,7 @@ _.mixin({decorate: function(items, func)
   {
     recordType: '',
     recordClass: '',
-
-    search_filters: [],
+    searchFilters: [],
 
     constructor: function()
     {
@@ -603,20 +612,25 @@ _.mixin({decorate: function(items, func)
 
     initialize: function() {},
 
-    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
-    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
-    get: function(columns)
+    where: function(key, operator, value)
     {
-      var search_results;
+      this.searchFilters = this.searchFilters || [];
+      this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
+      return this;
+    },
+
+    search: function(columns)
+    {
+      var searchResults;
 
       if (columns && columns.length)
       {
-        var search_columns = _.chain(columns)
+        var searchColumns = _.chain(columns)
                               .filter(function(column) { return column != 'id'; })
                               .map(function(column) { return new nlobjSearchColumn(column); })
                               .value();
 
-        search_results = _(nlapiSearchRecord(this.recordType, null, this.search_filters, search_columns)).map(function(result)
+        searchResults = _(nlapiSearchRecord(this.recordType, null, this.searchFilters, searchColumns)).map(function(result)
         {
           var attrs = {id: result.id};
           _.each(columns, function(column) { if(column != 'id') attrs[column] = result.getValue(column); });
@@ -625,36 +639,46 @@ _.mixin({decorate: function(items, func)
       }
       else
       {
-        search_results = nlapiSearchRecord(this.recordType, null, this.search_filters, []);
+        searchResults = nlapiSearchRecord(this.recordType, null, this.searchFilters, []);
       }
 
       // reset filters after search
-      this.search_filters = [];
+      this.searchFilters = [];
 
-      return _(search_results);
+      return _(searchResults);
     },
 
-    find: function(id)
+    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
+    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
+    get: function(columns)
     {
-      var record = nlapiLoadRecord(this.recordType, id);
-      return record ? new this.recordClass(record) : null;
-    },
+      var results = this.search(columns);
 
-    where: function(key, operator, value)
-    {
-      this.search_filters = this.search_filters || [];
-      this.search_filters.push(new nlobjSearchFilter(key, null, operator, value));
-      return this;
-    },
-
-    findByExternalId: function(externalid)
-    {
-      return this.find(this.where('externalid', 'is', externalid).get().first().id);
+      return results.map(function(result)
+      {
+        return this.find(result.id);
+      }, this);
     },
 
     paginate: function(page, per_page)
     {
 
+    },
+
+    find: function(id)
+    {
+      var record = id ? nlapiLoadRecord(this.recordType, id) : null;
+      return record ? new this.recordClass(record) : null;
+    },
+
+    findByExternalId: function(externalid)
+    {
+      return this.find(this.where('externalid', 'is', externalid).search().first().id);
+    },
+
+    first: function()
+    {
+      return this.find(this.search().first().id);
     },
 
     create: function(attrs)

@@ -25,7 +25,7 @@
       return obj !== null && hasOwnProperty.call(obj, key);
     },
 
-    snake_case: function(string)
+    snakeCase: function(string)
     {
       string = string + '';
 
@@ -35,7 +35,7 @@
       });
     },
 
-    camel_case: function(string)
+    camelCase: function(string)
     {
       string = string + '';
 

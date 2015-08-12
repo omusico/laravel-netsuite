@@ -13,9 +13,7 @@
       var validator = new core.Validator(input, ['key', 'value']);
 
       if (validator.passes()) {
-        var results = this.customers.where(input.get('key'), input.get('operator', 'is'), input.get('value')).get(['lastmodifieddate']);
-        return results;
-        // return customers.map(function(customer) { return customer.toHash(); });
+        return this.customers.where(input.get('key'), input.get('operator', 'is'), input.get('value')).get().toHash();
       } else {
         return this.badRequest(validator.toHash());
       }

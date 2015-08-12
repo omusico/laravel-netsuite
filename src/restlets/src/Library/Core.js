@@ -2,10 +2,20 @@ var Core = function() {};
 
 var core = new Core();
 
-_.mixin({decorate: function(items, func)
-{
-  return _.map(items, function(item)
+_.mixin({
+  decorate: function(items, func)
   {
-    return new func(item);
-  });
-}});
+    return _.map(items, function(item)
+    {
+      return new func(item);
+    });
+  },
+
+  toHash: function(items)
+  {
+    return _.map(items, function(item)
+    {
+      return item.toHash();
+    });
+  }
+});

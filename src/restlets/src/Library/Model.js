@@ -12,7 +12,7 @@
 
     set: function(key, value)
     {
-      key = core.Util.camel_case(key);
+      key = core.Util.camelCase(key);
       key = key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '');
       var mutator = 'set' + key + 'Attribute';
       this.attrs[key] = this[mutator] ? this[mutator](value) : value;
@@ -21,9 +21,9 @@
     get: function(key, fallback)
     {
       fallback = fallback || null;
-      var new_key = core.Util.camel_case(key);
-      new_key = new_key.charAt(0).toUpperCase() + (new_key && new_key.length ? new_key.slice(1) : '');
-      var mutator = 'get' + new_key + 'Attribute';
+      var newKey = core.Util.camelCase(key);
+      newKey = newKey.charAt(0).toUpperCase() + (newKey && newKey.length ? newKey.slice(1) : '');
+      var mutator = 'get' + newKey + 'Attribute';
       var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : fallback;
       return this[mutator] ? this[mutator](value) : value;
     },
@@ -36,14 +36,14 @@
     parse: function(object)
     {
       var attrs     = {};
-      var is_record = typeof object.getFieldValue === 'function';
+      var isRecord = typeof object.getFieldValue === 'function';
 
       // determine if object is record or plain object
       if (this.fields || this.sublists)
       {
         for (var field in this.fields)
         {
-          attrs[field] = is_record ?
+          attrs[field] = isRecord ?
                          object.getFieldValue(field) :
                          typeof object[field] !== 'undefined' ?
                            object[field] :
@@ -75,7 +75,7 @@
 
         for (var sublist in this.sublists)
         {
-          var count = is_record ?
+          var count = isRecord ?
                       object.getLineItemCount(sublist) :
                       typeof object[sublist] !== 'undefined' ?
                         object[sublist].length :
@@ -89,7 +89,7 @@
             {
               var item = {};
 
-              if (is_record)
+              if (isRecord)
               {
                 var fields = object.getAllLineItemFields(sublist);
 

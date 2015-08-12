@@ -13,19 +13,19 @@
     parseIdentifier: function(identifier)
     {
       var parts = identifier.split('@');
-      return {controller_name: parts[0], controller_method: parts[1]};
+      return {controllerName: parts[0], controllerMethod: parts[1]};
     },
 
-    buildMethod: function(resource, identifier, http_method)
+    buildMethod: function(resource, identifier, httpMethod)
     {
-      var parsed_identifier   = this.parseIdentifier(identifier);
-      var controller_method   = parsed_identifier.controller_method;
-      var controller_name     = parsed_identifier.controller_name;
-      var controller_instance = new core[parsed_identifier.controller_name]();
+      var parsedIdentifier   = this.parseIdentifier(identifier);
+      var controllerMethod   = parsedIdentifier.controllerMethod;
+      var controllerName     = parsedIdentifier.controllerName;
+      var controllerInstance = new core[parsedIdentifier.controllerName]();
       this.map[resource]      = this.map[resource] || {};
 
       // setup the route map
-      this.map[resource][controller_method] = controller_instance[controller_method].bind(controller_instance);
+      this.map[resource][controllerMethod] = controllerInstance[controllerMethod].bind(controllerInstance);
 
       return this;
     },
@@ -48,9 +48,9 @@
 
     start: function(resource, context)
     {
-      for (var method_name in this.map[resource])
+      for (var methodName in this.map[resource])
       {
-        context[method_name] = this.map[resource][method_name];
+        context[methodName] = this.map[resource][methodName];
       }
     }
   });

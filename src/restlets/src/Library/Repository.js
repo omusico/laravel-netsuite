@@ -4,8 +4,7 @@
   {
     recordType: '',
     recordClass: '',
-
-    search_filters: [],
+    searchFilters: [],
 
     constructor: function()
     {
@@ -16,20 +15,25 @@
 
     initialize: function() {},
 
-    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
-    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
-    get: function(columns)
+    where: function(key, operator, value)
     {
-      var search_results;
+      this.searchFilters = this.searchFilters || [];
+      this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
+      return this;
+    },
+
+    search: function(columns)
+    {
+      var searchResults;
 
       if (columns && columns.length)
       {
-        var search_columns = _.chain(columns)
+        var searchColumns = _.chain(columns)
                               .filter(function(column) { return column != 'id'; })
                               .map(function(column) { return new nlobjSearchColumn(column); })
                               .value();
 
-        search_results = _(nlapiSearchRecord(this.recordType, null, this.search_filters, search_columns)).map(function(result)
+        searchResults = _(nlapiSearchRecord(this.recordType, null, this.searchFilters, searchColumns)).map(function(result)
         {
           var attrs = {id: result.id};
           _.each(columns, function(column) { if(column != 'id') attrs[column] = result.getValue(column); });
@@ -38,36 +42,46 @@
       }
       else
       {
-        search_results = nlapiSearchRecord(this.recordType, null, this.search_filters, []);
+        searchResults = nlapiSearchRecord(this.recordType, null, this.searchFilters, []);
       }
 
       // reset filters after search
-      this.search_filters = [];
+      this.searchFilters = [];
 
-      return _(search_results);
+      return _(searchResults);
     },
 
-    find: function(id)
+    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
+    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
+    get: function(columns)
     {
-      var record = nlapiLoadRecord(this.recordType, id);
-      return record ? new this.recordClass(record) : null;
-    },
+      var results = this.search(columns);
 
-    where: function(key, operator, value)
-    {
-      this.search_filters = this.search_filters || [];
-      this.search_filters.push(new nlobjSearchFilter(key, null, operator, value));
-      return this;
-    },
-
-    findByExternalId: function(externalid)
-    {
-      return this.find(this.where('externalid', 'is', externalid).get().first().id);
+      return results.map(function(result)
+      {
+        return this.find(result.id);
+      }, this);
     },
 
     paginate: function(page, per_page)
     {
 
+    },
+
+    find: function(id)
+    {
+      var record = id ? nlapiLoadRecord(this.recordType, id) : null;
+      return record ? new this.recordClass(record) : null;
+    },
+
+    findByExternalId: function(externalid)
+    {
+      return this.find(this.where('externalid', 'is', externalid).search().first().id);
+    },
+
+    first: function()
+    {
+      return this.find(this.search().first().id);
     },
 
     create: function(attrs)
