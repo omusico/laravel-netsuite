@@ -152,9 +152,13 @@
       var validator = new core.Validator(input, ['key', 'value']);
 
       if (validator.passes()) {
-        // return nlapiLoadRecord('customer', 8672);
+        // return nlapiLoadRecord('customer', 8672); // testing
 
-        return this.customers.where(input.get('key'), input.get('operator', 'is'), input.get('value')).get().toHash();
+        return this.customers
+                  //  .where('category', 'equalto', 'Nothing')
+                   .where(input.get('key'), input.get('operator', 'is'), input.get('value'))
+                   .paginate(_.keys(new core.Customer().fields), input.get('page', 1), input.get('per_page', 1000))
+                   .toHash();
       } else {
         return this.badRequest(validator.toHash());
       }

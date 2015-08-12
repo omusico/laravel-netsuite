@@ -601,7 +601,11 @@ _.mixin({
   {
     recordType: '',
     recordClass: '',
+
     searchFilters: [],
+    searchColumns: [],
+    searchPerPage: 1000,
+    searchPage   : 1,
 
     constructor: function()
     {
@@ -614,8 +618,24 @@ _.mixin({
 
     where: function(key, operator, value)
     {
-      this.searchFilters = this.searchFilters || [];
-      this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
+      if (this.searchFilters.length) this.searchFilters.push('AND');
+      this.searchFilters.push([key, operator, value]);
+      // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
+      return this;
+    },
+
+    orWhere: function(key, operator, value)
+    {
+      if (this.searchFilters.length) this.searchFilters.push('OR');
+      this.searchFilters.push([key, operator, value]);
+      // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
+      return this;
+    },
+
+    join: function(recordType, column)
+    {
+      this.searchColumns = this.searchColumns || [];
+      this.searchColumns.push(new nlobjSearchColumn(column, recordType));
       return this;
     },
 
@@ -624,6 +644,8 @@ _.mixin({
     search: function(columns)
     {
       var searchResults;
+      var end   = this.searchPage * this.searchPerPage;
+      var start = end - this.searchPerPage;
 
       if (columns && columns.length)
       {
@@ -632,20 +654,35 @@ _.mixin({
                               .map(function(column) { return new nlobjSearchColumn(column); })
                               .value();
 
-        searchResults = _(nlapiSearchRecord(this.recordType, null, this.searchFilters, searchColumns)).map(function(result)
+        this.searchColumns = this.searchColumns.concat(searchColumns);
+
+        var results = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns)
+                      .runSearch()
+                      .getResults(start, end);
+
+        searchResults = _.map(results, function(result)
         {
           var attrs = {id: result.id};
-          _.each(columns, function(column) { if(column != 'id') attrs[column] = result.getValue(column); });
+
+          _.each(this.searchColumns, function(column)
+          {
+            if(column != 'id')
+            {
+              attrs[column.getName()] = result.getValue(column.getName());
+            }
+          });
+
           return attrs;
-        });
+        }, this);
       }
       else
       {
-        searchResults = nlapiSearchRecord(this.recordType, null, this.searchFilters, []);
+        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns).runSearch().getResults(start, end);
       }
 
       // reset filters after search
       this.searchFilters = [];
+      this.searchColumns = [];
 
       // returned as an underscore collection
       return _(searchResults);
@@ -661,9 +698,11 @@ _.mixin({
       }, this);
     },
 
-    paginate: function(page, per_page)
+    paginate: function(columns, page, perPage)
     {
-
+      this.searchPage    = page;
+      this.searchPerPage = perPage;
+      return this.get(columns);
     },
 
     find: function(id)
