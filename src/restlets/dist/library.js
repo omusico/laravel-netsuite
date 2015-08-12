@@ -410,7 +410,62 @@ _.mixin({
 
 (function(core)
 {
-  core.Input = core.Model.extend({});
+  core.Input = core.Model.extend(
+  {
+    all: function()
+    {
+      return this.toHash();
+    },
+
+    only: function()
+    {
+      var only = arguments;
+
+      return _.chain(this.attrs).keys().filter(function(key)
+      {
+        return _.contains(only, key);
+      }).map(function(key)
+      {
+        var object = {};
+        object[key] = this.get(key);
+        return object;
+      }, this)
+      .value();
+    },
+
+    except: function()
+    {
+      var except = arguments;
+
+      return _.chain(this.attrs).keys().filter(function(key)
+      {
+        return ! _.contains(except, key);
+      }).map(function(key)
+      {
+        var object = {};
+        object[key] = this.get(key);
+        return object;
+      }, this)
+      .value();
+    },
+
+    parseDates: function()
+    {
+      _.each(this.attrs, function(attr, key)
+      {
+        var date = moment(attr, "YYYY-MM-DD HH:mm:ss", true);
+
+        // if attr is a valid date in the above format,
+        // then parse it into the netsuite format
+        if (date.isValid())
+        {
+          this.attrs[key] = date.format('MM/DD/YYYY hh:mm A');
+        }
+      }, this);
+
+      return this;
+    }
+  });
 })(core);
 
 (function(core)
@@ -499,12 +554,12 @@ _.mixin({
 
     okay: function(body)
     {
-      return this.response(body || {});
+      return body || {};
     },
 
     created: function(body)
     {
-      return this.response(body || {});
+      return body || {};
     },
 
     notFound: function(message)
@@ -616,22 +671,32 @@ _.mixin({
 
     initialize: function() {},
 
+    // add an and condition
     where: function(key, operator, value)
     {
-      if (this.searchFilters.length) this.searchFilters.push('AND');
+      if (this.searchFilters.length) this.searchFilters.push('and');
       this.searchFilters.push([key, operator, value]);
       // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
+    // add an or condition
     orWhere: function(key, operator, value)
     {
-      if (this.searchFilters.length) this.searchFilters.push('OR');
+      if (this.searchFilters.length) this.searchFilters.push('or');
       this.searchFilters.push([key, operator, value]);
       // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
+    // apply an array of filters
+    filter: function(filters)
+    {
+      _.each(filters, function(filter) { this.where(filter.key, filter.operator, filter.value); }, this);
+      return this;
+    },
+
+    // left join a column to filter on
     join: function(recordType, column)
     {
       this.searchColumns = this.searchColumns || [];
@@ -639,8 +704,7 @@ _.mixin({
       return this;
     },
 
-    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
-    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
+    // execute the search
     search: function(columns)
     {
       var searchResults;
@@ -688,6 +752,7 @@ _.mixin({
       return _(searchResults);
     },
 
+    // execute search and convert to models
     get: function(columns)
     {
       var results = this.search(columns);
@@ -698,6 +763,7 @@ _.mixin({
       }, this);
     },
 
+    // paginate the get method
     paginate: function(columns, page, perPage)
     {
       this.searchPage    = page;
@@ -705,17 +771,20 @@ _.mixin({
       return this.get(columns);
     },
 
+    // find a single record by internal id
     find: function(id)
     {
       var record = id ? nlapiLoadRecord(this.recordType, id) : null;
       return record ? new this.recordClass(record) : null;
     },
 
+    // find a single record by external id
     findByExternalId: function(externalid)
     {
       return this.find(this.where('externalid', 'is', externalid).search().first().id);
     },
 
+    // get the first record from a search
     first: function()
     {
       return this.find(this.search().first().id);

@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <title>Library Test</title>
+    <script src="../src/restlets/dist/library.js"></script>
+    <script>
+      var input = new core.Input({firstname: 'Johnny', lastname: 'Green'});
+      core.Log.debug('core.Input testing only', {pass: _.isEqual(input.only('firstname'), [{firstname: 'Johnny'}])});
+      core.Log.debug('core.Input testing except', {pass: _.isEqual(input.except('firstname'), [{lastname: 'Green'}])});
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

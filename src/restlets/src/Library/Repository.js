@@ -19,22 +19,32 @@
 
     initialize: function() {},
 
+    // add an and condition
     where: function(key, operator, value)
     {
-      if (this.searchFilters.length) this.searchFilters.push('AND');
+      if (this.searchFilters.length) this.searchFilters.push('and');
       this.searchFilters.push([key, operator, value]);
       // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
+    // add an or condition
     orWhere: function(key, operator, value)
     {
-      if (this.searchFilters.length) this.searchFilters.push('OR');
+      if (this.searchFilters.length) this.searchFilters.push('or');
       this.searchFilters.push([key, operator, value]);
       // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
+    // apply an array of filters
+    filter: function(filters)
+    {
+      _.each(filters, function(filter) { this.where(filter.key, filter.operator, filter.value); }, this);
+      return this;
+    },
+
+    // left join a column to filter on
     join: function(recordType, column)
     {
       this.searchColumns = this.searchColumns || [];
@@ -42,8 +52,7 @@
       return this;
     },
 
-    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
-    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
+    // execute the search
     search: function(columns)
     {
       var searchResults;
@@ -91,6 +100,7 @@
       return _(searchResults);
     },
 
+    // execute search and convert to models
     get: function(columns)
     {
       var results = this.search(columns);
@@ -101,6 +111,7 @@
       }, this);
     },
 
+    // paginate the get method
     paginate: function(columns, page, perPage)
     {
       this.searchPage    = page;
@@ -108,17 +119,20 @@
       return this.get(columns);
     },
 
+    // find a single record by internal id
     find: function(id)
     {
       var record = id ? nlapiLoadRecord(this.recordType, id) : null;
       return record ? new this.recordClass(record) : null;
     },
 
+    // find a single record by external id
     findByExternalId: function(externalid)
     {
       return this.find(this.where('externalid', 'is', externalid).search().first().id);
     },
 
+    // get the first record from a search
     first: function()
     {
       return this.find(this.search().first().id);

@@ -9,17 +9,18 @@
 
     index: function(datain)
     {
-      var input = new core.Input(datain);
-      var validator = new core.Validator(input, ['key', 'value']);
+      var input     = new core.Input(datain).parseDates();
+      var validator = new core.Validator(input, []);
 
       if (validator.passes()) {
         // return nlapiLoadRecord('customer', 8672); // testing
 
-        return this.customers
-                  //  .where('category', 'equalto', 'Nothing')
-                   .where(input.get('key'), input.get('operator', 'is'), input.get('value'))
+        // core.Log.debug('filters', input.get('filters'));
+
+        return this.okay(this.customers
+                   .filter(input.get('filters', []))
                    .paginate(_.keys(new core.Customer().fields), input.get('page', 1), input.get('per_page', 1000))
-                   .toHash();
+                   .toHash());
       } else {
         return this.badRequest(validator.toHash());
       }
@@ -32,7 +33,7 @@
 
       if (validator.passes()) {
         var customer = this.customers.findByExternalId(input.get('id'));
-        return customer ? customer.toHash() : this.notFound();
+        return customer ? this.okay(customer.toHash()) : this.notFound();
       } else {
         return this.badRequest(validator.toHash());
       }
@@ -41,11 +42,11 @@
     store: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, ['firstName']);
+      var validator = new core.Validator(input, ['first_name']);
 
       if (validator.passes()) {
         var customer = this.customers.create(input.toHash());
-        return customer.toJSON();
+        return this.created(customer.toHash());
       } else {
         return this.badRequest(validator.toHash());
       }
@@ -58,7 +59,7 @@
 
       if (validator.passes()) {
         var customer = this.customers.update(input.toHash());
-        return customer.toJSON();
+        return this.okay(customer.toHash());
       } else {
         return this.badRequest(validator.toHash());
       }
@@ -71,7 +72,7 @@
 
       if (validator.passes()) {
         this.customers.destroy(input.get('id'));
-        return '[]';
+        return this.okay([]);
       } else {
         return this.badRequest(validator.toHash());
       }

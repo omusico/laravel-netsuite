@@ -19,12 +19,12 @@
 
     okay: function(body)
     {
-      return this.response(body || {});
+      return body || {};
     },
 
     created: function(body)
     {
-      return this.response(body || {});
+      return body || {};
     },
 
     notFound: function(message)

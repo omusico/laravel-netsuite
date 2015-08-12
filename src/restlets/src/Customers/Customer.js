@@ -37,22 +37,22 @@
 
     getCustomersFirstnameAttribute: function()
     {
-      return this.attrs.firstname;
+      return this.attrs.firstname || '';
     },
 
     getCustomersLastnameAttribute: function()
     {
-      return this.attrs.lastname;
+      return this.attrs.lastname || '';
     },
 
     getCustomersTelephoneAttribute: function()
     {
-      return this.attrs.phone;
+      return this.attrs.phone || '';
     },
 
     getCustomersEmailAddressAttribute: function()
     {
-      return this.attrs.email;
+      return this.attrs.email || '';
     },
 
     getCreatedAtAttribute: function()
