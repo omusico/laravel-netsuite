@@ -3,9 +3,15 @@
     <title>Util Test</title>
     <script src="../src/restlets/dist/library.js"></script>
     <script>
-      core.Log.debug('Testing core.Util.snake_case on "CamelCaseCamelCase"', {pass: core.Util.snakeCase('CamelCaseCamelCase') === 'camel_case_camel_case'});
-      core.Log.debug('Testing core.Util.camel_case on "snake_case"', {pass: core.Util.camelCase('snake_case_snake_case') === 'snakeCaseSnakeCase'});
+      core.Log.debug('Testing core.Util.snakeCase', {pass: core.Util.snakeCase('CamelCaseCamelCase') === 'camel_case_camel_case'});
+      core.Log.debug('Testing core.Util.camelCase', {pass: core.Util.camelCase('snake_case_snake_case') === 'snakeCaseSnakeCase'});
       core.Log.debug('Testing underscore decorate mixin', {pass: _.isEqual(_.decorate([{firstname: 'Test', lastname: 'Customer'}], core.Model)[0].toHash(), {firstname: 'Test', lastname: 'Customer'})});
+      core.Log.debug('Testing core.Util.get', {pass: core.Util.get({customer: {name: 'Johnny'}}, 'customer.name') === 'Johnny'});
+      core.Log.debug('Testing core.Util.get', {pass: core.Util.get([['Johnny']], '0.0') === 'Johnny'});
+
+      console.log(core.Util.set({}, 'customer.name', 'Johnny'));
+
+      core.Log.debug('Testing core.Util.set', {pass: _.isEqual(core.Util.set({}, 'customer.name', 'Johnny'), {customer: {name: 'Johnny'}})});
     </script>
   </head>
   <body>

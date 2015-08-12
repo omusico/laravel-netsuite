@@ -15,7 +15,9 @@
       if (validator.passes()) {
         // return nlapiLoadRecord('customer', 8672); // testing
 
-        // core.Log.debug('filters', input.get('filters'));
+        core.Log.debug('filters', input.get('filters'));
+
+        return datain;
 
         return this.okay(this.customers
                    .filter(input.get('filters', []))

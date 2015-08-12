@@ -188,6 +188,24 @@ _.mixin({
       return obj !== null && hasOwnProperty.call(obj, key);
     },
 
+    get: function(object, key)
+    {
+      var index     = key.indexOf('.');
+      var piece     = index !== -1 ? key.substring(0, index) : key;
+      var remainder = index !== -1 ? key.substr(++index) : '';
+      if (typeof object[piece] === 'undefined') return null;
+      return remainder.length ? this.get(object[piece], remainder) : object[piece];
+    },
+
+    set: function(object, key, value)
+    {
+      var index     = key.indexOf('.');
+      var piece     = index !== -1 ? key.substring(0, index) : key;
+      var remainder = index !== -1 ? key.substr(++index) : '';
+      if (typeof object[piece] === 'undefined') object[piece] = {};
+      return remainder.length ? this.set(object[piece], remainder, value) : object;
+    },
+
     snakeCase: function(string)
     {
       string = string + '';
