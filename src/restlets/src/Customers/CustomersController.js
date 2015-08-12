@@ -13,6 +13,8 @@
       var validator = new core.Validator(input, ['key', 'value']);
 
       if (validator.passes()) {
+        // return nlapiLoadRecord('customer', 8672);
+
         return this.customers.where(input.get('key'), input.get('operator', 'is'), input.get('value')).get().toHash();
       } else {
         return this.badRequest(validator.toHash());

@@ -561,7 +561,7 @@ _.mixin({
       var controllerMethod   = parsedIdentifier.controllerMethod;
       var controllerName     = parsedIdentifier.controllerName;
       var controllerInstance = new core[parsedIdentifier.controllerName]();
-      this.map[resource]      = this.map[resource] || {};
+      this.map[resource]     = this.map[resource] || {};
 
       // setup the route map
       this.map[resource][controllerMethod] = controllerInstance[controllerMethod].bind(controllerInstance);
@@ -619,6 +619,8 @@ _.mixin({
       return this;
     },
 
+    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
+    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
     search: function(columns)
     {
       var searchResults;
@@ -645,11 +647,10 @@ _.mixin({
       // reset filters after search
       this.searchFilters = [];
 
+      // returned as an underscore collection
       return _(searchResults);
     },
 
-    // var thirtyDaysAgo = nlapiAddDays(new Date(), -30);
-    // oldSOFilters[0] = new nlobjSearchFilter('trandate', null, 'onorafter', thirtyDaysAgo);
     get: function(columns)
     {
       var results = this.search(columns);

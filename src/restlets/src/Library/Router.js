@@ -22,7 +22,7 @@
       var controllerMethod   = parsedIdentifier.controllerMethod;
       var controllerName     = parsedIdentifier.controllerName;
       var controllerInstance = new core[parsedIdentifier.controllerName]();
-      this.map[resource]      = this.map[resource] || {};
+      this.map[resource]     = this.map[resource] || {};
 
       // setup the route map
       this.map[resource][controllerMethod] = controllerInstance[controllerMethod].bind(controllerInstance);
