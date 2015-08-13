@@ -8,10 +8,8 @@
       core.Log.debug('Testing underscore decorate mixin', {pass: _.isEqual(_.decorate([{firstname: 'Test', lastname: 'Customer'}], core.Model)[0].toHash(), {firstname: 'Test', lastname: 'Customer'})});
       core.Log.debug('Testing core.Util.get', {pass: core.Util.get({customer: {name: 'Johnny'}}, 'customer.name') === 'Johnny'});
       core.Log.debug('Testing core.Util.get', {pass: core.Util.get([['Johnny']], '0.0') === 'Johnny'});
-
-      console.log(core.Util.set({}, 'customer.name', 'Johnny'));
-
       core.Log.debug('Testing core.Util.set', {pass: _.isEqual(core.Util.set({}, 'customer.name', 'Johnny'), {customer: {name: 'Johnny'}})});
+      core.Log.debug('Testing core.Util.set', {pass: _.isEqual(core.Util.set([], '0.0', 'Johnny'), [['Johnny']])});
     </script>
   </head>
   <body>

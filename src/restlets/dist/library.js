@@ -197,13 +197,15 @@ _.mixin({
       return remainder.length ? this.get(object[piece], remainder) : object[piece];
     },
 
-    set: function(object, key, value)
+    set: function(object, key, value, original)
     {
+      original = original || object;
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
-      if (typeof object[piece] === 'undefined') object[piece] = {};
-      return remainder.length ? this.set(object[piece], remainder, value) : object;
+      if ( ! remainder.length) object[piece] = value;
+      if (typeof object[piece] === 'undefined') object[piece] = _.isArray(object) ? [] : {};
+      return remainder.length ? this.set(object[piece], remainder, value, original) : original;
     },
 
     snakeCase: function(string)
