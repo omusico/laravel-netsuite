@@ -13,4 +13,10 @@ class Manager {
     return object_get($this, 'config');
   }
 
+  public function getRepository($name)
+  {
+    $class_name = "Johnnygreen\\LaravelNetSuite\\NetSuite\Repository\\{$name}";
+    return new $class_name($this->config);
+  }
+
 }

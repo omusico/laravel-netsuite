@@ -823,22 +823,20 @@ _.mixin({
     },
 
     // execute search and convert to models
-    get: function(columns)
+    get: function()
     {
-      var results = this.search(columns);
-
-      return results.map(function(result)
+      return this.search().map(function(result)
       {
         return this.find(result.id);
       }, this);
     },
 
     // paginate the get method
-    paginate: function(columns, page, perPage)
+    paginate: function(page, perPage)
     {
       this.searchPage    = page;
       this.searchPerPage = perPage;
-      return this.get(columns);
+      return this.get();
     },
 
     // find a single record by internal id

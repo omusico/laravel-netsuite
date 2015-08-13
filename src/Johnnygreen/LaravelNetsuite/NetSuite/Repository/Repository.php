@@ -1,14 +1,11 @@
-<?php namespace Johnnygreen\LaravelNetSuite\NetSuite;
+<?php namespace Johnnygreen\LaravelNetSuite\NetSuite\Repository;
 
 use Guzzle\Http\Client;
 
-class Repository {
+class Repository implements RepositoryInterface {
 
   // the guzzle instance
   public $client;
-
-  // api resource name
-  // public $resource;
 
   // the model name
   public $model;
@@ -16,10 +13,16 @@ class Repository {
   // config settings
   public $config;
 
-  public function __construct($endpoint = null, $config = [])
+  // script endpoint
+  public $endpoint;
+
+  // search filters
+  public $filters;
+
+  public function __construct($config = [])
   {
     $this->setConfig($config);
-    $this->setClient(new Client($endpoint));
+    $this->setEndpoint($this->endpoint);
   }
 
   public function setConfig($config)
@@ -44,16 +47,6 @@ class Repository {
     return $this->client;
   }
 
-  // public function setResource($resource)
-  // {
-  //   $this->resource = $resource;
-  // }
-  //
-  // public function getResource()
-  // {
-  //   return $this->resource;
-  // }
-
   public function setModel($model)
   {
     $this->model = $model;
@@ -64,10 +57,21 @@ class Repository {
     return $this->model;
   }
 
+  public function setEndpoint($endpoint)
+  {
+    $this->endpoint = $endpoint;
+    $this->setClient(new Client($this->endpoint));
+  }
+
+  public function getEndoint()
+  {
+    return $this->endpoint;
+  }
+
   public function buildAuthorization()
   {
     extract($this->getConfig());
-    return "NLAuth nlauth_account: {$account}, nlauth_email: {$email}, nlauth_signature: {$signature}, nlauth_role: {$role}"
+    return "NLAuth nlauth_account={$account}, nlauth_email={$email}, nlauth_signature={$signature}, nlauth_role={$role}";
   }
 
   // helpers for request / response
@@ -78,9 +82,12 @@ class Repository {
 
     if ($method == 'GET' and ! empty($body))
     {
-      $query = '';
-      $query = http_build_query($body);
-      $url   = "{$url}?{$query}";
+      $query  = http_build_query($body);
+      $pieces = explode('?', $url);
+      $url    = $pieces[0];
+      $query  = "{$pieces[1]}&{$query}";
+      $url    = "{$url}?{$query}";
+      $body   = null;
     }
 
     $this->request = $this->getClient()->createRequest($method, $url, $headers, $body);
@@ -158,4 +165,23 @@ class Repository {
     $total = array_get($this->response()->json(), 'total', 0);
     return $this->convertArrayToPaginator($items, $total, $per_page);
   }
+
+  public function where($key, $operator, $value)
+  {
+    $this->filters[] = compact('key', 'operator', 'value');
+    return $this;
+  }
+
+  public function paginate($per_page = null, $page = null)
+  {
+    $filters = $this->filters;
+    $this->request('GET', $this->endpoint, compact('per_page', 'page', 'filters'));
+    $this->send();
+    return $this->convertResponseToCollection();
+  }
+
+  public function create() {}
+  public function find() {}
+  public function update() {}
+  public function destroy() {}
 }
