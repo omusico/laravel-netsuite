@@ -5,6 +5,7 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
+      'externalid'       : 'int',
       'firstname'        : 'string',
       'lastname'         : 'string',
       'phone'            : 'string',
@@ -20,54 +21,60 @@
 
     // fields to be parsed on output
     visible: [
-      'customers_id',
-      'customers_firstname',
-      'customers_lastname',
-      'customers_telephone',
-      'customers_email_address',
+      'id',
+      'external_id',
+      'firstname',
+      'lastname',
+      'telephone',
+      'email_address',
       'created_at',
       'updated_at',
       'addresses'
     ],
 
-    getCustomersIdAttribute: function()
+    getIdAttribute: function()
     {
-      return this.attrs.id;
+      return core.Util.get(this.attrs, 'id');
     },
 
-    getCustomersFirstnameAttribute: function()
+    getExternalIdAttribute: function()
     {
-      return this.attrs.firstname || '';
+      return core.Util.get(this.attrs, 'externalid');
     },
 
-    getCustomersLastnameAttribute: function()
+    getFirstnameAttribute: function()
     {
-      return this.attrs.lastname || '';
+      return core.Util.get(this.attrs, 'firstname', '');
     },
 
-    getCustomersTelephoneAttribute: function()
+    getLastnameAttribute: function()
     {
-      return this.attrs.phone || '';
+      return core.Util.get(this.attrs, 'lastname', '');
     },
 
-    getCustomersEmailAddressAttribute: function()
+    getTelephoneAttribute: function()
     {
-      return this.attrs.email || '';
+      return core.Util.get(this.attrs, 'phone', '');
+    },
+
+    getEmailAddressAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'email', '');
     },
 
     getCreatedAtAttribute: function()
     {
-      return this.attrs.datecreated;
+      return core.Util.get(this.attrs, 'datecreated');
     },
 
     getUpdatedAtAttribute: function()
     {
-      return this.attrs.lastmodifieddate;
+      return core.Util.get(this.attrs, 'lastmodifieddate');
     },
 
     getAddressesAttribute: function()
     {
-      return this.attrs.addressbook;
+      return core.Util.get(this.attrs, 'addressbook');
     }
   });
 })(core);

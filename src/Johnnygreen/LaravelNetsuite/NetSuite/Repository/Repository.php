@@ -175,13 +175,20 @@ class Repository implements RepositoryInterface {
   public function paginate($per_page = null, $page = null)
   {
     $filters = $this->filters;
-    $this->request('GET', $this->endpoint, compact('per_page', 'page', 'filters'));
+    $this->request('GET', $this->endpoint_batch, compact('per_page', 'page', 'filters'));
     $this->send();
     return $this->convertResponseToCollection();
   }
 
-  public function create() {}
-  public function find() {}
-  public function update() {}
-  public function destroy() {}
+  // this works with external id right now
+  public function find($id)
+  {
+    $this->request('GET', $this->endpoint, compact('id'));
+    $this->send();
+    return $this->convertResponseToModel();
+  }
+
+  public function create($attributes = []) {}
+  public function update($model) {}
+  public function destroy($id) {}
 }

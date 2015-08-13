@@ -14,6 +14,8 @@
 
       if (validator.passes())
       {
+        // return nlapiLoadRecord('customer', 9279);
+
         var customers = this.customers
                             .filter(input.get('filters', []))
                             .paginate(input.get('page', 1), input.get('per_page', 1000));
@@ -33,6 +35,8 @@
 
       if (validator.passes())
       {
+        // return nlapiLoadRecord('customer', 9279);
+
         var customer = this.customers.findByExternalId(input.get('id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }

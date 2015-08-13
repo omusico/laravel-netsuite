@@ -3,9 +3,9 @@
 interface RepositoryInterface {
 
   public function paginate($per_page, $page);
-  public function create();
-  public function find();
-  public function update();
-  public function destroy();
+  public function create($attributes = []);
+  public function find($id);
+  public function update($model);
+  public function destroy($id);
 
 }

@@ -2,54 +2,61 @@
 {
   core.Address = core.Model.extend(
   {
+    fields: {
+      'id'                      : 'int',
+      'addressee_initialvalue'  : 'string',
+      'addr1_initialvalue'      : 'string',
+      'addr2_initialvalue'      : 'string',
+      'zip_initialvalue'        : 'string',
+      'city_initialvalue'       : 'string',
+      'state_initialvalue'      : 'string',
+      'country_initialvalue'    : 'string'
+    },
+
     visible: [
       'id',
-      'entry_street_address',
-      'entry_street_address_2',
-      'entry_postcode',
-      'entry_city',
-      'entry_state',
-      'entry_country'
+      'name',
+      'street_address',
+      'street_address_2',
+      'postcode',
+      'city',
+      'state',
+      'country'
     ],
 
-    fields: {
-      'id'                   : 'int',
-      'addr1_initialvalue'   : 'string',
-      'addr2_initialvalue'   : 'string',
-      'zip_initialvalue'     : 'string',
-      'city_initialvalue'    : 'string',
-      'state_initialvalue'   : 'string',
-      'country_initialvalue' : 'string'
+    getNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'addressee_initialvalue', '');
     },
 
-    getEntryStreetAddressAttribute: function()
+    getStreetAddressAttribute: function()
     {
-      return this.attrs.addr1_initialvalue;
+      return core.Util.get(this.attrs, 'addr1_initialvalue', '');
     },
 
-    getEntryStreetAddress2Attribute: function()
+    getStreetAddress2Attribute: function()
     {
-      return this.attrs.addr2_initialvalue;
+      return core.Util.get(this.attrs, 'addr2_initialvalue', '');
     },
 
-    getEntryPostcodeAttribute: function()
+    getPostcodeAttribute: function()
     {
-      return this.attrs.zip_initialvalue;
+      return core.Util.get(this.attrs, 'zip_initialvalue', '');
     },
 
-    getEntryCityAttribute: function()
+    getCityAttribute: function()
     {
-      return this.attrs.city_initialvalue;
+      return core.Util.get(this.attrs, 'city_initialvalue', '');
     },
 
-    getEntryStateAttribute: function()
+    getStateAttribute: function()
     {
-      return this.attrs.state_initialvalue;
+      return core.Util.get(this.attrs, 'state_initialvalue', '');
     },
 
-    getEntryCountryAttribute: function()
+    getCountryAttribute: function()
     {
-      return this.attrs.country_initialvalue;
+      return core.Util.get(this.attrs, 'country_initialvalue', '');
     }
   });
 })(core);

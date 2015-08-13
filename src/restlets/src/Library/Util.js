@@ -25,7 +25,7 @@
       return obj !== null && hasOwnProperty.call(obj, key);
     },
 
-    get: function(object, key)
+    get: function(object, key, fallback)
     {
       // if object is null, return it
       if (_.isNull(object)) return object;
@@ -38,9 +38,9 @@
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
-      if (typeof object[piece] === 'undefined') return null;
+      if (typeof object[piece] === 'undefined') return _.isString(fallback) ? fallback : fallback || null;
 
-      return remainder.length ? this.get(object[piece], remainder) : object[piece];
+      return remainder.length ? this.get(object[piece], remainder, fallback) : object[piece];
     },
 
     set: function(object, key, value, original)

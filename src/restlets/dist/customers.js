@@ -2,54 +2,61 @@
 {
   core.Address = core.Model.extend(
   {
+    fields: {
+      'id'                      : 'int',
+      'addressee_initialvalue'  : 'string',
+      'addr1_initialvalue'      : 'string',
+      'addr2_initialvalue'      : 'string',
+      'zip_initialvalue'        : 'string',
+      'city_initialvalue'       : 'string',
+      'state_initialvalue'      : 'string',
+      'country_initialvalue'    : 'string'
+    },
+
     visible: [
       'id',
-      'entry_street_address',
-      'entry_street_address_2',
-      'entry_postcode',
-      'entry_city',
-      'entry_state',
-      'entry_country'
+      'name',
+      'street_address',
+      'street_address_2',
+      'postcode',
+      'city',
+      'state',
+      'country'
     ],
 
-    fields: {
-      'id'                   : 'int',
-      'addr1_initialvalue'   : 'string',
-      'addr2_initialvalue'   : 'string',
-      'zip_initialvalue'     : 'string',
-      'city_initialvalue'    : 'string',
-      'state_initialvalue'   : 'string',
-      'country_initialvalue' : 'string'
+    getNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'addressee_initialvalue', '');
     },
 
-    getEntryStreetAddressAttribute: function()
+    getStreetAddressAttribute: function()
     {
-      return this.attrs.addr1_initialvalue;
+      return core.Util.get(this.attrs, 'addr1_initialvalue', '');
     },
 
-    getEntryStreetAddress2Attribute: function()
+    getStreetAddress2Attribute: function()
     {
-      return this.attrs.addr2_initialvalue;
+      return core.Util.get(this.attrs, 'addr2_initialvalue', '');
     },
 
-    getEntryPostcodeAttribute: function()
+    getPostcodeAttribute: function()
     {
-      return this.attrs.zip_initialvalue;
+      return core.Util.get(this.attrs, 'zip_initialvalue', '');
     },
 
-    getEntryCityAttribute: function()
+    getCityAttribute: function()
     {
-      return this.attrs.city_initialvalue;
+      return core.Util.get(this.attrs, 'city_initialvalue', '');
     },
 
-    getEntryStateAttribute: function()
+    getStateAttribute: function()
     {
-      return this.attrs.state_initialvalue;
+      return core.Util.get(this.attrs, 'state_initialvalue', '');
     },
 
-    getEntryCountryAttribute: function()
+    getCountryAttribute: function()
     {
-      return this.attrs.country_initialvalue;
+      return core.Util.get(this.attrs, 'country_initialvalue', '');
     }
   });
 })(core);
@@ -61,6 +68,7 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
+      'externalid'       : 'int',
       'firstname'        : 'string',
       'lastname'         : 'string',
       'phone'            : 'string',
@@ -76,54 +84,60 @@
 
     // fields to be parsed on output
     visible: [
-      'customers_id',
-      'customers_firstname',
-      'customers_lastname',
-      'customers_telephone',
-      'customers_email_address',
+      'id',
+      'external_id',
+      'firstname',
+      'lastname',
+      'telephone',
+      'email_address',
       'created_at',
       'updated_at',
       'addresses'
     ],
 
-    getCustomersIdAttribute: function()
+    getIdAttribute: function()
     {
-      return this.attrs.id;
+      return core.Util.get(this.attrs, 'id');
     },
 
-    getCustomersFirstnameAttribute: function()
+    getExternalIdAttribute: function()
     {
-      return this.attrs.firstname || '';
+      return core.Util.get(this.attrs, 'externalid');
     },
 
-    getCustomersLastnameAttribute: function()
+    getFirstnameAttribute: function()
     {
-      return this.attrs.lastname || '';
+      return core.Util.get(this.attrs, 'firstname', '');
     },
 
-    getCustomersTelephoneAttribute: function()
+    getLastnameAttribute: function()
     {
-      return this.attrs.phone || '';
+      return core.Util.get(this.attrs, 'lastname', '');
     },
 
-    getCustomersEmailAddressAttribute: function()
+    getTelephoneAttribute: function()
     {
-      return this.attrs.email || '';
+      return core.Util.get(this.attrs, 'phone', '');
+    },
+
+    getEmailAddressAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'email', '');
     },
 
     getCreatedAtAttribute: function()
     {
-      return this.attrs.datecreated;
+      return core.Util.get(this.attrs, 'datecreated');
     },
 
     getUpdatedAtAttribute: function()
     {
-      return this.attrs.lastmodifieddate;
+      return core.Util.get(this.attrs, 'lastmodifieddate');
     },
 
     getAddressesAttribute: function()
     {
-      return this.attrs.addressbook;
+      return core.Util.get(this.attrs, 'addressbook');
     }
   });
 })(core);
@@ -163,6 +177,8 @@
 
       if (validator.passes())
       {
+        // return nlapiLoadRecord('customer', 9279);
+
         var customers = this.customers
                             .filter(input.get('filters', []))
                             .paginate(input.get('page', 1), input.get('per_page', 1000));
@@ -182,6 +198,8 @@
 
       if (validator.passes())
       {
+        // return nlapiLoadRecord('customer', 9279);
+
         var customer = this.customers.findByExternalId(input.get('id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
