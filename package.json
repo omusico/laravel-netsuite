@@ -20,8 +20,10 @@
   },
   "homepage": "https://github.com/johnnygreen/laravel-netsuite",
   "dependencies": {
+    "chai": "^3.2.0",
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
-    "gulp-nsupload": "^1.2.6"
+    "gulp-nsupload": "^1.2.6",
+    "mocha": "^2.2.5"
   }
 }

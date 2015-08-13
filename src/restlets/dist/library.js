@@ -190,6 +190,7 @@ _.mixin({
 
     get: function(object, key)
     {
+      if (_.isNull(object)) return null;
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
@@ -203,14 +204,34 @@ _.mixin({
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
-      if ( ! remainder.length) object[piece] = value;
-      if (typeof object[piece] === 'undefined') object[piece] = _.isArray(object) ? [] : {};
+
+      // if there is an incorrect pairing, ignore the request
+      if ( ! _.isArray(object) || (_.isArray(object) && ! _.isNaN(parseInt(piece))))
+      {
+        // if the attr is unprepared, prepare it
+        // prepare an object for a key, and an array for an integer
+        if (typeof object[piece] === 'undefined')
+        {
+          object[piece] = (_.isArray(object) && !_.isString(piece)) || ( _.isArray(object) && ! _.isNaN(parseInt(remainder))) ? [] : {};
+        }
+
+        // if there is no other remainder, we've
+        // made it to the end, set the value
+        if ( ! remainder.length)
+        {
+          object[piece] = value;
+        }
+      }
+
       return remainder.length ? this.set(object[piece], remainder, value, original) : original;
     },
 
     snakeCase: function(string)
     {
       string = string + '';
+
+      // ignore snake_case input
+      if (string.indexOf('_') !== -1) return string;
 
       return string.replace(/([A-Z])/g, function(match, match2, index, string)
       {
