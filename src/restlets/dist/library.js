@@ -528,7 +528,6 @@ _.mixin({
 
         if (newKey.indexOf('.') !== -1)
         {
-          core.Log.debug('testing', core.Util.set(this.attrs, newKey, value));
           this.attrs = core.Util.set(this.attrs, newKey, value);
           this.unset(key);
         }
