@@ -91,6 +91,11 @@
             expect(core.Util.set([], '0.name', 'Johnny')).to.eql([{name: 'Johnny'}]);
           });
 
+          it('should set a value on a deeply nested mixed array object', function()
+          {
+            expect(core.Util.set({}, 'filters.0.name', 'Johnny')).to.eql({filters: [{name: 'Johnny'}]});
+          });
+
           it('should set a value on a mixed array object with existing values', function()
           {
             expect(core.Util.set([{email: 'test@example.com'}], '0.name', 'Johnny')).to.eql([{name: 'Johnny', email: 'test@example.com'}]);

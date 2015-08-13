@@ -27,11 +27,19 @@
 
     get: function(object, key)
     {
-      if (_.isNull(object)) return null;
+      // if object is null, return it
+      if (_.isNull(object)) return object;
+
+      // if we are already working with a flattened
+      // array with dot notation, return the key
+      if (typeof object[key] !== 'undefined') return object[key];
+
+      // proceed with trying to find value
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
       if (typeof object[piece] === 'undefined') return null;
+
       return remainder.length ? this.get(object[piece], remainder) : object[piece];
     },
 
@@ -49,7 +57,7 @@
         // prepare an object for a key, and an array for an integer
         if (typeof object[piece] === 'undefined')
         {
-          object[piece] = (_.isArray(object) && !_.isString(piece)) || ( _.isArray(object) && ! _.isNaN(parseInt(remainder))) ? [] : {};
+          object[piece] = (_.isArray(object) && !_.isString(piece)) || ! _.isNaN(parseInt(remainder)) ? [] : {};
         }
 
         // if there is no other remainder, we've

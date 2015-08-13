@@ -158,21 +158,19 @@
 
     index: function(datain)
     {
-      var input     = new core.Input(datain).parseDates();
+      var input     = new core.Input(datain).parseDates().parseArrays();
       var validator = new core.Validator(input, []);
 
-      if (validator.passes()) {
-        // return nlapiLoadRecord('customer', 8672); // testing
+      if (validator.passes())
+      {
+        var customers = this.customers
+                            .filter(input.get('filters', []))
+                            .paginate(_.keys(new core.Customer().fields), input.get('page', 1), input.get('per_page', 1000));
 
-        core.Log.debug('filters', input.get('filters'));
-
-        return datain;
-
-        return this.okay(this.customers
-                   .filter(input.get('filters', []))
-                   .paginate(_.keys(new core.Customer().fields), input.get('page', 1), input.get('per_page', 1000))
-                   .toHash());
-      } else {
+        return this.okay(customers.toHash());
+      }
+      else
+      {
         return this.badRequest(validator.toHash());
       }
     },

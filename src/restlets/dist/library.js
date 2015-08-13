@@ -190,11 +190,19 @@ _.mixin({
 
     get: function(object, key)
     {
-      if (_.isNull(object)) return null;
+      // if object is null, return it
+      if (_.isNull(object)) return object;
+
+      // if we are already working with a flattened
+      // array with dot notation, return the key
+      if (typeof object[key] !== 'undefined') return object[key];
+
+      // proceed with trying to find value
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
       if (typeof object[piece] === 'undefined') return null;
+
       return remainder.length ? this.get(object[piece], remainder) : object[piece];
     },
 
@@ -212,7 +220,7 @@ _.mixin({
         // prepare an object for a key, and an array for an integer
         if (typeof object[piece] === 'undefined')
         {
-          object[piece] = (_.isArray(object) && !_.isString(piece)) || ( _.isArray(object) && ! _.isNaN(parseInt(remainder))) ? [] : {};
+          object[piece] = (_.isArray(object) && !_.isString(piece)) || ! _.isNaN(parseInt(remainder)) ? [] : {};
         }
 
         // if there is no other remainder, we've
@@ -311,6 +319,11 @@ _.mixin({
     has: function(key)
     {
       return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
+    },
+
+    unset: function(key)
+    {
+      if (this.has(key)) delete this.attrs[key];
     },
 
     parse: function(object)
@@ -492,15 +505,32 @@ _.mixin({
 
     parseDates: function()
     {
-      _.each(this.attrs, function(attr, key)
+      _.each(this.attrs, function(value, key)
       {
-        var date = moment(attr, "YYYY-MM-DD HH:mm:ss", true);
+        var date = moment(value, "YYYY-MM-DD HH:mm:ss", true);
 
         // if attr is a valid date in the above format,
         // then parse it into the netsuite format
         if (date.isValid())
         {
           this.attrs[key] = date.format('MM/DD/YYYY hh:mm A');
+        }
+      }, this);
+
+      return this;
+    },
+
+    parseArrays: function()
+    {
+      _.each(this.attrs, function(value, key)
+      {
+        var newKey = key.replace('][', '.').replace('[', '.').replace(']', '');
+
+        if (newKey.indexOf('.') !== -1)
+        {
+          core.Log.debug('testing', core.Util.set(this.attrs, newKey, value));
+          this.attrs = core.Util.set(this.attrs, newKey, value);
+          this.unset(key);
         }
       }, this);
 

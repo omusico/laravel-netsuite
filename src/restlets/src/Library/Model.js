@@ -33,6 +33,11 @@
       return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
     },
 
+    unset: function(key)
+    {
+      if (this.has(key)) delete this.attrs[key];
+    },
+
     parse: function(object)
     {
       var attrs     = {};
