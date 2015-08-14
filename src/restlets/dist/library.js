@@ -877,45 +877,74 @@ _.mixin({
       return this.find(this.search().first().id);
     },
 
-    create: function(attrs)
+    create: function(model)
     {
       var record = nlapiCreateRecord(this.recordType);
-      var model  = new this.recordClass().set(attrs);
 
       _.each(model.attrs, function(value, key)
       {
         record.setFieldValue(key, value);
       });
 
+      // _.each(model.sublists)
+
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
     },
 
-    update: function(id, attrs)
+    update: function(model)
     {
       var diffs = {};
-      var record = nlapiLoadRecord(this.recordType, id);
+      var record = nlapiLoadRecord(this.recordType, model.attrs.id);
 
-      for (var attr in attrs)
+      _.each(model.attrs, function(value, key)
       {
-        if(record.getFieldValue(attr) != attrs[attr])
-        {
-          diff[attr] = attrs[attr];
-        }
-      }
+        if(record.getFieldValue(key) != value) record.setFieldValue(key, value);
+      });
 
-      for (var diff in diffs)
-      {
-        record.setFieldValue(diff, diffs[diff]);
-      }
+      // for (var sublist in this.sublists)
+      // {
+      //   var count = isRecord ?
+      //               object.getLineItemCount(sublist) :
+      //               typeof object[sublist] !== 'undefined' ?
+      //                 object[sublist].length :
+      //                 0;
+      //
+      //   if (count)
+      //   {
+      //     attrs[sublist] = [];
+      //
+      //     for (var i = 1; i <= count; i++)
+      //     {
+      //       var item = {};
+      //
+      //       if (isRecord)
+      //       {
+      //         var fields = object.getAllLineItemFields(sublist);
+      //
+      //         for (var index in fields)
+      //         {
+      //           item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
+      //         }
+      //       }
+      //       else
+      //       {
+      //         item = object[sublist][i];
+      //       }
+      //
+      //       var recordType = this.sublists[sublist];
+      //       attrs[sublist].push(new recordType(item));
+      //     }
+      //   }
+      // }
 
       nlapiSubmitRecord(record, true);
 
-      return new this.recordClass(record);
+      return model;
     },
 
-    destroy: function(id)
+    destroy: function(model)
     {
       nlapiDeleteRecord(this.recordType, id);
     }
