@@ -2,11 +2,6 @@
 {
   core.Input = core.Model.extend(
   {
-    all: function()
-    {
-      return this.toHash();
-    },
-
     only: function()
     {
       var only = arguments;
@@ -39,6 +34,11 @@
       .value();
     },
 
+    all: function()
+    {
+      return this.toHash();
+    },
+
     parseDates: function()
     {
       _.each(this.attrs, function(value, key)
@@ -60,7 +60,7 @@
     {
       _.each(this.attrs, function(value, key)
       {
-        var newKey = key.replace('][', '.').replace('[', '.').replace(']', '');
+        var newKey = key.replace('[', '.').replace(']', '');
 
         if (newKey.indexOf('.') !== -1)
         {

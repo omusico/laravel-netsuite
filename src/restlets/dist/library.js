@@ -300,30 +300,50 @@ _.mixin({
 
     set: function(key, value)
     {
-      key = core.Util.camelCase(key);
-      key = key.charAt(0).toUpperCase() + (key && key.length ? key.slice(1) : '');
-      var mutator = 'set' + key + 'Attribute';
-      this.attrs[key] = this[mutator] ? this[mutator](value) : value;
+      if (arguments.length === 1)
+      {
+        _.each(key, function(value, key) { this.set(key, value); }, this);
+      }
+      else
+      {
+        this.attrs[key] = this.mutate('set', key, value);
+      }
+
+      return this;
     },
 
     get: function(key, fallback)
     {
       fallback = fallback || null;
-      var newKey = core.Util.camelCase(key);
-      newKey = newKey.charAt(0).toUpperCase() + (newKey && newKey.length ? newKey.slice(1) : '');
-      var mutator = 'get' + newKey + 'Attribute';
-      var value   = typeof this.attrs[key] !== 'undefined' ? this.attrs[key] : fallback;
-      return this[mutator] ? this[mutator](value) : value;
+      var value = this.has(key) ? this.attrs[key] : fallback;
+      return this.mutate('get', key, value);
     },
 
     has: function(key)
     {
-      return typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function';
+      return this.mutate('has', key);
     },
 
     unset: function(key)
     {
       if (this.has(key)) delete this.attrs[key];
+      return this;
+    },
+
+    mutate: function(prefix, key, value)
+    {
+      var newKey = core.Util.camelCase(key);
+      newKey = newKey.charAt(0).toUpperCase() + (newKey.length > 1 ? newKey.slice(1) : '');
+      var mutator = prefix + newKey + 'Attribute';
+
+      if (prefix === 'has')
+      {
+        return this[mutator] ? this[mutator](key) : (typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function');
+      }
+      else
+      {
+        return this[mutator] ? this[mutator](value) : value;
+      }
     },
 
     parse: function(object)
@@ -466,11 +486,6 @@ _.mixin({
 {
   core.Input = core.Model.extend(
   {
-    all: function()
-    {
-      return this.toHash();
-    },
-
     only: function()
     {
       var only = arguments;
@@ -503,6 +518,11 @@ _.mixin({
       .value();
     },
 
+    all: function()
+    {
+      return this.toHash();
+    },
+
     parseDates: function()
     {
       _.each(this.attrs, function(value, key)
@@ -524,7 +544,7 @@ _.mixin({
     {
       _.each(this.attrs, function(value, key)
       {
-        var newKey = key.replace('][', '.').replace('[', '.').replace(']', '');
+        var newKey = key.replace('[', '.').replace(']', '');
 
         if (newKey.indexOf('.') !== -1)
         {

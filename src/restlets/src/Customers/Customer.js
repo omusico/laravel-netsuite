@@ -21,43 +21,43 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
-      'external_id',
-      'firstname',
-      'lastname',
-      'telephone',
-      'email_address',
+      'customers_id',
+      'customers_external_id',
+      'customers_firstname',
+      'customers_lastname',
+      'customers_telephone',
+      'customers_email_address',
       'created_at',
       'updated_at',
       'addresses'
     ],
 
-    getIdAttribute: function()
+    getCustomersIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'id');
     },
 
-    getExternalIdAttribute: function()
+    getCustomersExternalIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },
 
-    getFirstnameAttribute: function()
+    getCustomersFirstnameAttribute: function()
     {
       return core.Util.get(this.attrs, 'firstname', '');
     },
 
-    getLastnameAttribute: function()
+    getCustomersLastnameAttribute: function()
     {
       return core.Util.get(this.attrs, 'lastname', '');
     },
 
-    getTelephoneAttribute: function()
+    getCustomersTelephoneAttribute: function()
     {
       return core.Util.get(this.attrs, 'phone', '');
     },
 
-    getEmailAddressAttribute: function()
+    getCustomersEmailAddressAttribute: function()
     {
       return core.Util.get(this.attrs, 'email', '');
     },
@@ -76,5 +76,7 @@
     {
       return core.Util.get(this.attrs, 'addressbook');
     }
+
+    set
   });
 })(core);

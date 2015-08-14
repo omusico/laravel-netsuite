@@ -1,13 +1,17 @@
 <html>
   <head>
     <title>Library Test</title>
+    <link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css" media="screen" />
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script>mocha.setup('bdd'); var expect = chai.expect;</script>
     <script src="../src/restlets/dist/library.js"></script>
-    <script>
-      var input = new core.Input({firstname: 'Johnny', lastname: 'Green'});
-      core.Log.debug('core.Input testing only', {pass: _.isEqual(input.only('firstname'), [{firstname: 'Johnny'}])});
-      core.Log.debug('core.Input testing except', {pass: _.isEqual(input.except('firstname'), [{lastname: 'Green'}])});
-    </script>
   </head>
   <body>
+    <div id="mocha"></div>
+    <script src="library/util.js"></script>
+    <script src="library/input.js"></script>
+    <script src="library/model.js"></script>
+    <script>mocha.run();</script>
   </body>
 </html>
