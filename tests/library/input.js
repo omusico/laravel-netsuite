@@ -6,7 +6,7 @@ describe('core.Input', function()
   {
     it('it should return only the input keys present in the arguments', function()
     {
-      expect(input.only('firstname')).to.deep.equal([{firstname: 'Johnny'}]);
+      expect(input.only('firstname')).to.deep.equal({firstname: 'Johnny'});
     });
   });
 
@@ -14,7 +14,7 @@ describe('core.Input', function()
   {
     it('it should return only the input keys not present in the arguments', function()
     {
-      expect(input.except('firstname')).to.deep.equal([{lastname: 'Green'}]);
+      expect(input.except('firstname')).to.deep.equal({lastname: 'Green'});
     });
   });
 });

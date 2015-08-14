@@ -75,8 +75,41 @@
     getAddressesAttribute: function()
     {
       return core.Util.get(this.attrs, 'addressbook');
-    }
+    },
 
-    set
+    setCustomersIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'id', value);
+    },
+
+    setCustomersExternalIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'externalid', value);
+    },
+
+    setCustomersFirstnameAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'firstname', value);
+    },
+
+    setCustomersLastnameAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'lastname', value);
+    },
+
+    setCustomersTelephoneAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'phone', value + '');
+    },
+
+    setCustomersEmailAddressAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'email', value);
+    },
+
+    setCustomersCategoryIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'category', value);
+    }
   });
 })(core);

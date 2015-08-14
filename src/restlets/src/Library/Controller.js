@@ -32,9 +32,9 @@
       return this.error(404, message || 'Not Found');
     },
 
-    badRequest: function(missing)
+    badRequest: function(message)
     {
-      return this.error(400, missing || 'Bad Request');
+      return this.error(400, message || 'Bad Request');
     },
 
     internalServerError: function(message)

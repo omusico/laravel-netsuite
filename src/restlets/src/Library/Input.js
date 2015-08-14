@@ -4,34 +4,12 @@
   {
     only: function()
     {
-      var only = arguments;
-
-      return _.chain(this.attrs).keys().filter(function(key)
-      {
-        return _.contains(only, key);
-      }).map(function(key)
-      {
-        var object = {};
-        object[key] = this.get(key);
-        return object;
-      }, this)
-      .value();
+      return _.pick(this.attrs, arguments);
     },
 
     except: function()
     {
-      var except = arguments;
-
-      return _.chain(this.attrs).keys().filter(function(key)
-      {
-        return ! _.contains(except, key);
-      }).map(function(key)
-      {
-        var object = {};
-        object[key] = this.get(key);
-        return object;
-      }, this)
-      .value();
+      return _.omit(this.attrs, arguments);
     },
 
     all: function()

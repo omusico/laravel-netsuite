@@ -488,34 +488,12 @@ _.mixin({
   {
     only: function()
     {
-      var only = arguments;
-
-      return _.chain(this.attrs).keys().filter(function(key)
-      {
-        return _.contains(only, key);
-      }).map(function(key)
-      {
-        var object = {};
-        object[key] = this.get(key);
-        return object;
-      }, this)
-      .value();
+      return _.pick(this.attrs, arguments);
     },
 
     except: function()
     {
-      var except = arguments;
-
-      return _.chain(this.attrs).keys().filter(function(key)
-      {
-        return ! _.contains(except, key);
-      }).map(function(key)
-      {
-        var object = {};
-        object[key] = this.get(key);
-        return object;
-      }, this)
-      .value();
+      return _.omit(this.attrs, arguments);
     },
 
     all: function()
@@ -562,17 +540,13 @@ _.mixin({
 {
   core.Validator = core.Base.extend(
   {
-    constructor: function(input, requiredFields)
+    constructor: function(input)
     {
-      // our input
-      this.input = input || new core.Input();
-
-      // list of required fields
-      this.requiredFields = requiredFields || [];
-
-      // array of missing fields
-      this.missingFields = [];
-
+      this.input     = input;
+      this.passed    = false;
+      this.validated = false;
+      this.requiredFieldGroups = _.rest(arguments);
+      this.missingFieldGroups = [];
       this.initialize.apply(this, arguments);
     },
 
@@ -580,23 +554,38 @@ _.mixin({
 
     validate: function()
     {
-      var missingFields = [];
-      var input   = this.input;
-
-      this.requiredFields.forEach(function(field)
+      // check each test suite
+      var tests = _.map(this.requiredFieldGroups, function(fieldGroup, index)
       {
-        if ( ! input.has(field)) missingFields.push(field);
-      });
+        // check each field in each test suite
+        return _.every(fieldGroup, function(value, field)
+        {
+          var passed = this.input.has(field);
 
-      this.missingFields = missingFields;
+          if ( ! passed)
+          {
+            if (typeof this.missingFieldGroups[index] === 'undefined')
+            {
+              this.missingFieldGroups[index] = [];
+            }
+
+            // add field to the missing fields hash
+            this.missingFieldGroups[index].push(field);
+          }
+
+          return passed;
+        }, this);
+      }, this);
+
+      this.passed = _.some(tests);
+
       return this;
     },
 
     passes: function()
     {
-      if (this.missingFields.length === 0) this.validate();
-
-      return this.missingFields.length === 0;
+      if ( ! this.validated) this.validate();
+      return this.passed === true;
     },
 
     fails: function()
@@ -606,12 +595,20 @@ _.mixin({
 
     toHash: function()
     {
-      var validation = {};
+      var validation = [];
 
-      this.missingFields.forEach(function(field)
+      _.each(this.missingFieldGroups, function(fieldGroup, index)
       {
-        validation[field] = field + ' is required.';
-      });
+        if (typeof validation[index] === 'undefined')
+        {
+          validation[index] = {};
+        }
+
+        _.each(fieldGroup, function(field)
+        {
+          validation[index][field] = field + ' is required.';
+        });
+      }, this);
 
       return validation;
     },
@@ -657,9 +654,9 @@ _.mixin({
       return this.error(404, message || 'Not Found');
     },
 
-    badRequest: function(missing)
+    badRequest: function(message)
     {
-      return this.error(400, missing || 'Bad Request');
+      return this.error(400, message || 'Bad Request');
     },
 
     internalServerError: function(message)
@@ -831,7 +828,9 @@ _.mixin({
       }
       else
       {
-        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns).runSearch().getResults(start, end);
+        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns)
+                        .runSearch()
+                        .getResults(start, end);
       }
 
       // reset filters after search
@@ -881,15 +880,16 @@ _.mixin({
     create: function(attrs)
     {
       var record = nlapiCreateRecord(this.recordType);
+      var model  = new this.recordClass().set(attrs);
 
-      for (var attr in attrs)
+      _.each(model.attrs, function(value, key)
       {
-        record.setFieldValue(attr, attrs[attr]);
-      }
+        record.setFieldValue(key, value);
+      });
 
-      nlapiSubmitRecord(record, true);
-
-      return new this.recordClass(record);
+      var id = nlapiSubmitRecord(record, true);
+      model.set('id', parseInt(id));
+      return model;
     },
 
     update: function(id, attrs)

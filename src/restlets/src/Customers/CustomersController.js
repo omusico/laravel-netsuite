@@ -10,34 +10,23 @@
     index: function(datain)
     {
       var input     = new core.Input(datain).parseDates().parseArrays();
-      var validator = new core.Validator(input, []);
+      var customers = this.customers
+                          .filter(input.get('filters', []))
+                          .paginate(input.get('page', 1), input.get('per_page', 10));
 
-      if (validator.passes())
-      {
-        // return nlapiLoadRecord('customer', 9279);
-
-        var customers = this.customers
-                            .filter(input.get('filters', []))
-                            .paginate(input.get('page', 1), input.get('per_page', 1000));
-
-        return this.okay(customers.toHash());
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
+      return this.okay(customers.toHash());
     },
 
     show: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, ['id']);
+      var validator = new core.Validator(input, {id: 'required'}, {customers_id : 'required'});
 
       if (validator.passes())
       {
         // return nlapiLoadRecord('customer', 9279);
 
-        var customer = this.customers.findByExternalId(input.get('id'));
+        var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
       else
@@ -48,12 +37,34 @@
 
     store: function(datain)
     {
-      var input     = new core.Input(datain);
-      var validator = new core.Validator(input, ['first_name']);
+      var input = new core.Input(datain);
+
+      var validator = new core.Validator(input, {
+        'customers_id'           : 'required',
+        'customers_firstname'    : 'required',
+        'customers_lastname'     : 'required',
+        'customers_telephone'    : 'required',
+        'customers_email_address': 'required'
+      });
 
       if (validator.passes())
       {
-        var customer = this.customers.create(input.toHash());
+        // set defaults
+        var attrs = _.defaults(input.only(
+          'customers_id',
+          'customers_firstname',
+          'customers_lastname',
+          'customers_telephone',
+          'customers_email_address'
+        ), {
+          category   : 3,    // Retail
+          pricelevel : 5,    // Retail Pricing
+          isperson   : true, // Individual
+          taxable    : true  // Taxable
+        });
+
+        var customer = this.customers.create(attrs);
+
         return this.created(customer.toHash());
       }
       else
@@ -64,24 +75,24 @@
 
     update: function(datain)
     {
-      var input     = new core.Input(datain);
-      var validator = new core.Validator(input, ['id']);
-
-      if (validator.passes())
-      {
-        var customer = this.customers.update(input.toHash());
-        return this.okay(customer.toHash());
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
+      // var input     = new core.Input(datain);
+      // var validator = new core.Validator(input);
+      //
+      // if (validator.passes())
+      // {
+      //   var customer = this.customers.update(input.toHash());
+      //   return this.okay(customer.toHash());
+      // }
+      // else
+      // {
+      //   return this.badRequest(validator.toHash());
+      // }
     },
 
     destroy: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, ['id']);
+      var validator = new core.Validator(input, {id: 'required'}, {customers_id : 'required'});
 
       if (validator.passes())
       {

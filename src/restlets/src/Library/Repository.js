@@ -89,7 +89,9 @@
       }
       else
       {
-        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns).runSearch().getResults(start, end);
+        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns)
+                        .runSearch()
+                        .getResults(start, end);
       }
 
       // reset filters after search
@@ -139,15 +141,16 @@
     create: function(attrs)
     {
       var record = nlapiCreateRecord(this.recordType);
+      var model  = new this.recordClass().set(attrs);
 
-      for (var attr in attrs)
+      _.each(model.attrs, function(value, key)
       {
-        record.setFieldValue(attr, attrs[attr]);
-      }
+        record.setFieldValue(key, value);
+      });
 
-      nlapiSubmitRecord(record, true);
-
-      return new this.recordClass(record);
+      var id = nlapiSubmitRecord(record, true);
+      model.set('id', parseInt(id));
+      return model;
     },
 
     update: function(id, attrs)

@@ -2,17 +2,13 @@
 {
   core.Validator = core.Base.extend(
   {
-    constructor: function(input, requiredFields)
+    constructor: function(input)
     {
-      // our input
-      this.input = input || new core.Input();
-
-      // list of required fields
-      this.requiredFields = requiredFields || [];
-
-      // array of missing fields
-      this.missingFields = [];
-
+      this.input     = input;
+      this.passed    = false;
+      this.validated = false;
+      this.requiredFieldGroups = _.rest(arguments);
+      this.missingFieldGroups = [];
       this.initialize.apply(this, arguments);
     },
 
@@ -20,23 +16,38 @@
 
     validate: function()
     {
-      var missingFields = [];
-      var input   = this.input;
-
-      this.requiredFields.forEach(function(field)
+      // check each test suite
+      var tests = _.map(this.requiredFieldGroups, function(fieldGroup, index)
       {
-        if ( ! input.has(field)) missingFields.push(field);
-      });
+        // check each field in each test suite
+        return _.every(fieldGroup, function(value, field)
+        {
+          var passed = this.input.has(field);
 
-      this.missingFields = missingFields;
+          if ( ! passed)
+          {
+            if (typeof this.missingFieldGroups[index] === 'undefined')
+            {
+              this.missingFieldGroups[index] = [];
+            }
+
+            // add field to the missing fields hash
+            this.missingFieldGroups[index].push(field);
+          }
+
+          return passed;
+        }, this);
+      }, this);
+
+      this.passed = _.some(tests);
+
       return this;
     },
 
     passes: function()
     {
-      if (this.missingFields.length === 0) this.validate();
-
-      return this.missingFields.length === 0;
+      if ( ! this.validated) this.validate();
+      return this.passed === true;
     },
 
     fails: function()
@@ -46,12 +57,20 @@
 
     toHash: function()
     {
-      var validation = {};
+      var validation = [];
 
-      this.missingFields.forEach(function(field)
+      _.each(this.missingFieldGroups, function(fieldGroup, index)
       {
-        validation[field] = field + ' is required.';
-      });
+        if (typeof validation[index] === 'undefined')
+        {
+          validation[index] = {};
+        }
+
+        _.each(fieldGroup, function(field)
+        {
+          validation[index][field] = field + ' is required.';
+        });
+      }, this);
 
       return validation;
     },
