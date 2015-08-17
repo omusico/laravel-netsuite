@@ -56,6 +56,19 @@ describe('core.Util', function()
     {
       expect(core.Util.get({name: 'Johnny'}, '0.name')).to.equal(null);
     });
+
+    it('should return fallback when value is undefined and fallback is not undefined', function()
+    {
+      expect(core.Util.get({}, 'name', 'Johnny')).to.equal('Johnny');
+      expect(core.Util.get({}, 'name', null)).to.equal(null);
+      expect(core.Util.get({}, 'name', false)).to.equal(false);
+      expect(core.Util.get({}, 'name', '')).to.equal('');
+      expect(core.Util.get({}, 'name', [])).to.deep.equal([]);
+      expect(core.Util.get({}, 'name', {})).to.deep.equal({});
+      expect(core.Util.get({}, 'name', 0)).to.equal(0);
+      expect(core.Util.get({}, 'name', 1)).to.equal(1);
+      expect(core.Util.get({}, 'name', true)).to.equal(true);
+    });
   });
 
   describe('#set', function()

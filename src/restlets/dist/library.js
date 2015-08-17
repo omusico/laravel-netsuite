@@ -195,13 +195,13 @@ _.mixin({
 
       // if we are already working with a flattened
       // array with dot notation, return the key
-      if (typeof object[key] !== 'undefined') return object[key];
+      if (typeof object[key] !== 'undefined') return object[key] || (_.isUndefined(fallback) ? null : fallback);
 
       // proceed with trying to find value
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
-      if (typeof object[piece] === 'undefined') return _.isString(fallback) ? fallback : fallback || null;
+      if (typeof object[piece] === 'undefined') return _.isUndefined(fallback) ? null : fallback;
 
       return remainder.length ? this.get(object[piece], remainder, fallback) : object[piece];
     },
@@ -266,13 +266,10 @@ _.mixin({
   core.Base.extend = function(protoProps, staticProps)
   {
     var parent = this;
-    var child;
 
-    if (protoProps && core.Util.has(protoProps, 'constructor')) {
-      child = protoProps.constructor;
-    } else {
-      child = function() { return parent.apply(this, arguments); };
-    }
+    var child = (protoProps && core.Util.has(protoProps, 'constructor')) ?
+                protoProps.constructor :
+                function() { return parent.apply(this, arguments); };
 
     core.Util.extend(child, parent);
     if(staticProps) core.Util.extend(child, staticProps);
@@ -280,7 +277,6 @@ _.mixin({
     Surrogate.prototype = parent.prototype;
     child.prototype = new Surrogate();
     if (protoProps) core.Util.extend(child.prototype, protoProps);
-    child.__super__ = parent.prototype;
 
     return child;
   };
@@ -290,6 +286,8 @@ _.mixin({
 {
   core.Model = core.Base.extend(
   {
+    recordType : '',
+
     constructor: function(object)
     {
       this.attrs = object ? this.parse(object) : {};
@@ -354,16 +352,12 @@ _.mixin({
       // determine if object is record or plain object
       if (this.fields || this.sublists)
       {
-        for (var field in this.fields)
+        _.each(this.fields, function(type, field)
         {
-          attrs[field] = isRecord ?
-                         object.getFieldValue(field) :
-                         typeof object[field] !== 'undefined' ?
-                           object[field] :
-                           null;
+          attrs[field] = isRecord ? object.getFieldValue(field) : core.Util.get(object, field);
 
           // parse attr into correct type
-          switch(this.fields[field])
+          switch(type)
           {
             case 'int':
               attrs[field] = parseInt(attrs[field]);
@@ -377,63 +371,86 @@ _.mixin({
                              null;
               break;
             case 'string':
-              attrs[field] = attrs[field] ?
-                             attrs[field] + '' :
-                             null;
+              attrs[field] = attrs[field] ? attrs[field] + '' : null;
               break;
             default:
               // do nothing to the field
           }
-        }
+        });
 
-        for (var sublist in this.sublists)
+        _.each(this.sublists, function(recordType, sublist)
         {
-          var count = isRecord ?
-                      object.getLineItemCount(sublist) :
-                      typeof object[sublist] !== 'undefined' ?
-                        object[sublist].length :
-                        0;
+          var count = isRecord ? object.getLineItemCount(sublist) : core.Util.get(object, sublist, []).length;
 
           if (count)
           {
             attrs[sublist] = [];
 
-            for (var i = 1; i <= count; i++)
+            _.each(_.range(1, count + 1), function(i)
             {
               var item = {};
 
               if (isRecord)
               {
-                var fields = object.getAllLineItemFields(sublist);
-
-                for (var index in fields)
+                _.each(new recordType().fields, function(value, key)
                 {
-                  item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
-                }
+                  item[key] = object.getLineItemValue(sublist, key, i);
+                });
               }
               else
               {
                 item = object[sublist][i];
               }
 
-              var recordType = this.sublists[sublist];
               attrs[sublist].push(new recordType(item));
-            }
+            });
           }
-        }
+        });
       }
       else
       {
-        for (var key in object)
+        _.each(object, function(value, key)
         {
           if (typeof object[key] !== 'function')
           {
-            attrs[key] = typeof object[key] !== 'undefined' ? object[key] : null;
+            attrs[key] = core.Util.get(object, key);
           }
-        }
+        });
       }
 
       return attrs;
+    },
+
+    toRecord: function(object)
+    {
+      object = object || this;
+
+      var record = nlapiCreateRecord(this.recordType);
+
+      _.each(this.fields, function(field)
+      {
+        if (this.has(field))
+        {
+          record.setFieldValue(field, core.Util.get(this.attrs, field));
+        }
+      }, this);
+
+      _.each(this.sublists, function(className, sublist)
+      {
+        _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
+        {
+          index++;
+          var model = new className();
+          model.set(item);
+
+          _.each(model.fields, function(value, key)
+          {
+            record.setLineItemValue(sublist, key, index, value);
+          });
+        });
+      });
+
+      return record;
     },
 
     toHash: function(object)
@@ -441,30 +458,37 @@ _.mixin({
       var attrs  = {};
       object = object || this;
 
+      // for (var sublist in object.sublists)
+      // {
+      //   if (typeof object.attrs[sublist] !== 'undefined')
+      //   {
+      //     for (var i = 0; i < object.attrs[sublist].length; i++)
+      //     {
+      //       object.attrs[sublist][i] = object.toHash(object.attrs[sublist][i]);
+      //     }
+      //   }
+      // }
+
       if (object.visible && object.visible.length)
       {
-        object.visible.forEach(function(field)
+        // var sublists = _.keys(object.sublists || {});
+
+        _.each(object.visible, function(field)
         {
           attrs[field] = object.get(field);
         });
       }
       else
       {
-        for (var attr in object.attrs)
-        {
-          attrs[attr] = object.get(attr);
-        }
-      }
+        // _.each(core.Util.get(object, 'fields', {}), function(type, field)
+        // {
+        //   attrs[field] = object.get(field);
+        // });
 
-      for (var sublist in object.sublists)
-      {
-        if (typeof object.attrs[sublist] !== 'undefined')
-        {
-          for (var i = 0; i < object.attrs[sublist].length; i++)
-          {
-            object.attrs[sublist][i] = object.toHash(object.attrs[sublist][i]);
-          }
-        }
+        // _.each(core.Util.get(object, 'sublists' {}), function(recordType, field)
+        // {
+        //   attrs[field] = object.toHash(object.get(field));
+        // });
       }
 
       return attrs;
@@ -522,7 +546,7 @@ _.mixin({
     {
       _.each(this.attrs, function(value, key)
       {
-        var newKey = key.replace('[', '.').replace(']', '');
+        var newKey = key.replace('[', '.', 'g').replace(']', '', 'g');
 
         if (newKey.indexOf('.') !== -1)
         {
@@ -659,22 +683,17 @@ _.mixin({
       return this.error(400, message || 'Bad Request');
     },
 
-    internalServerError: function(message)
+    internalServerError: function(exception)
     {
+      var message = _.isString(exception) ? exception : exception.message;
+
       return this.error(500, message || 'Internal Server Error');
     },
 
     error: function(code, message)
     {
       core.Log.error(code, message);
-
-      return {
-        'error':
-        {
-          'code':    code,
-          'message': message
-        }
-      };
+      return {'error': {'code': code, 'message': message}};
     }
   });
 })(core);
@@ -741,18 +760,16 @@ _.mixin({
 {
   core.Repository = core.Base.extend(
   {
-    recordType: '',
-    recordClass: '',
-
-    searchFilters: [],
-    searchColumns: [],
-    searchPerPage: 1000,
-    searchPage   : 1,
+    recordClass   : '',
+    searchFilters : [],
+    searchColumns : [],
+    searchPerPage : 1000,
+    searchPage    : 1,
 
     constructor: function()
     {
-      if ( ! this.recordType)  throw 'Repository missing recordType';
       if ( ! this.recordClass) throw 'Repository missing recordClass';
+      this.recordType = new this.recordClass().recordType; // set recordType from recordClass
       this.initialize.apply(this, arguments);
     },
 
@@ -763,7 +780,6 @@ _.mixin({
     {
       if (this.searchFilters.length) this.searchFilters.push('and');
       this.searchFilters.push([key, operator, value]);
-      // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
@@ -772,7 +788,6 @@ _.mixin({
     {
       if (this.searchFilters.length) this.searchFilters.push('or');
       this.searchFilters.push([key, operator, value]);
-      // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
@@ -861,33 +876,26 @@ _.mixin({
     // find a single record by internal id
     find: function(id)
     {
-      var record = id ? nlapiLoadRecord(this.recordType, id) : null;
+      var record = id ? nlapiLoadRecord(this.recordType, parseInt(id)) : null;
       return record ? new this.recordClass(record) : null;
     },
 
     // find a single record by external id
     findByExternalId: function(externalid)
     {
-      return this.find(this.where('externalid', 'is', externalid).search().first().id);
+      return this.where('externalid', 'is', parseInt(externalid)).first();
     },
 
     // get the first record from a search
     first: function()
     {
-      return this.find(this.search().first().id);
+      var first = this.search().first();
+      return first ? this.find(first.id) : null;
     },
 
     create: function(model)
     {
-      var record = nlapiCreateRecord(this.recordType);
-
-      _.each(model.attrs, function(value, key)
-      {
-        record.setFieldValue(key, value);
-      });
-
-      // _.each(model.sublists)
-
+      var record = model.toRecord();
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
@@ -946,7 +954,8 @@ _.mixin({
 
     destroy: function(model)
     {
-      nlapiDeleteRecord(this.recordType, id);
+      var id = nlapiDeleteRecord(this.recordType, model.get('id'));
+      return model.get('id') === parseInt(id);
     }
   });
 })(core);

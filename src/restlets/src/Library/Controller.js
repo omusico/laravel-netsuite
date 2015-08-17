@@ -37,22 +37,17 @@
       return this.error(400, message || 'Bad Request');
     },
 
-    internalServerError: function(message)
+    internalServerError: function(exception)
     {
+      var message = _.isString(exception) ? exception : exception.message;
+
       return this.error(500, message || 'Internal Server Error');
     },
 
     error: function(code, message)
     {
       core.Log.error(code, message);
-
-      return {
-        'error':
-        {
-          'code':    code,
-          'message': message
-        }
-      };
+      return {'error': {'code': code, 'message': message}};
     }
   });
 })(core);

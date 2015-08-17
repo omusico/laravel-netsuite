@@ -2,6 +2,8 @@
 {
   core.Model = core.Base.extend(
   {
+    recordType : '',
+
     constructor: function(object)
     {
       this.attrs = object ? this.parse(object) : {};
@@ -66,16 +68,12 @@
       // determine if object is record or plain object
       if (this.fields || this.sublists)
       {
-        for (var field in this.fields)
+        _.each(this.fields, function(type, field)
         {
-          attrs[field] = isRecord ?
-                         object.getFieldValue(field) :
-                         typeof object[field] !== 'undefined' ?
-                           object[field] :
-                           null;
+          attrs[field] = isRecord ? object.getFieldValue(field) : core.Util.get(object, field);
 
           // parse attr into correct type
-          switch(this.fields[field])
+          switch(type)
           {
             case 'int':
               attrs[field] = parseInt(attrs[field]);
@@ -89,63 +87,86 @@
                              null;
               break;
             case 'string':
-              attrs[field] = attrs[field] ?
-                             attrs[field] + '' :
-                             null;
+              attrs[field] = attrs[field] ? attrs[field] + '' : null;
               break;
             default:
               // do nothing to the field
           }
-        }
+        });
 
-        for (var sublist in this.sublists)
+        _.each(this.sublists, function(recordType, sublist)
         {
-          var count = isRecord ?
-                      object.getLineItemCount(sublist) :
-                      typeof object[sublist] !== 'undefined' ?
-                        object[sublist].length :
-                        0;
+          var count = isRecord ? object.getLineItemCount(sublist) : core.Util.get(object, sublist, []).length;
 
           if (count)
           {
             attrs[sublist] = [];
 
-            for (var i = 1; i <= count; i++)
+            _.each(_.range(1, count + 1), function(i)
             {
               var item = {};
 
               if (isRecord)
               {
-                var fields = object.getAllLineItemFields(sublist);
-
-                for (var index in fields)
+                _.each(new recordType().fields, function(value, key)
                 {
-                  item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
-                }
+                  item[key] = object.getLineItemValue(sublist, key, i);
+                });
               }
               else
               {
                 item = object[sublist][i];
               }
 
-              var recordType = this.sublists[sublist];
               attrs[sublist].push(new recordType(item));
-            }
+            });
           }
-        }
+        });
       }
       else
       {
-        for (var key in object)
+        _.each(object, function(value, key)
         {
           if (typeof object[key] !== 'function')
           {
-            attrs[key] = typeof object[key] !== 'undefined' ? object[key] : null;
+            attrs[key] = core.Util.get(object, key);
           }
-        }
+        });
       }
 
       return attrs;
+    },
+
+    toRecord: function(object)
+    {
+      object = object || this;
+
+      var record = nlapiCreateRecord(this.recordType);
+
+      _.each(this.fields, function(field)
+      {
+        if (this.has(field))
+        {
+          record.setFieldValue(field, core.Util.get(this.attrs, field));
+        }
+      }, this);
+
+      _.each(this.sublists, function(className, sublist)
+      {
+        _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
+        {
+          index++;
+          var model = new className();
+          model.set(item);
+
+          _.each(model.fields, function(value, key)
+          {
+            record.setLineItemValue(sublist, key, index, value);
+          });
+        });
+      });
+
+      return record;
     },
 
     toHash: function(object)
@@ -153,30 +174,37 @@
       var attrs  = {};
       object = object || this;
 
+      // for (var sublist in object.sublists)
+      // {
+      //   if (typeof object.attrs[sublist] !== 'undefined')
+      //   {
+      //     for (var i = 0; i < object.attrs[sublist].length; i++)
+      //     {
+      //       object.attrs[sublist][i] = object.toHash(object.attrs[sublist][i]);
+      //     }
+      //   }
+      // }
+
       if (object.visible && object.visible.length)
       {
-        object.visible.forEach(function(field)
+        // var sublists = _.keys(object.sublists || {});
+
+        _.each(object.visible, function(field)
         {
           attrs[field] = object.get(field);
         });
       }
       else
       {
-        for (var attr in object.attrs)
-        {
-          attrs[attr] = object.get(attr);
-        }
-      }
+        // _.each(core.Util.get(object, 'fields', {}), function(type, field)
+        // {
+        //   attrs[field] = object.get(field);
+        // });
 
-      for (var sublist in object.sublists)
-      {
-        if (typeof object.attrs[sublist] !== 'undefined')
-        {
-          for (var i = 0; i < object.attrs[sublist].length; i++)
-          {
-            object.attrs[sublist][i] = object.toHash(object.attrs[sublist][i]);
-          }
-        }
+        // _.each(core.Util.get(object, 'sublists' {}), function(recordType, field)
+        // {
+        //   attrs[field] = object.toHash(object.get(field));
+        // });
       }
 
       return attrs;

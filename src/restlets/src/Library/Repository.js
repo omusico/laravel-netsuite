@@ -2,18 +2,16 @@
 {
   core.Repository = core.Base.extend(
   {
-    recordType: '',
-    recordClass: '',
-
-    searchFilters: [],
-    searchColumns: [],
-    searchPerPage: 1000,
-    searchPage   : 1,
+    recordClass   : '',
+    searchFilters : [],
+    searchColumns : [],
+    searchPerPage : 1000,
+    searchPage    : 1,
 
     constructor: function()
     {
-      if ( ! this.recordType)  throw 'Repository missing recordType';
       if ( ! this.recordClass) throw 'Repository missing recordClass';
+      this.recordType = new this.recordClass().recordType; // set recordType from recordClass
       this.initialize.apply(this, arguments);
     },
 
@@ -24,7 +22,6 @@
     {
       if (this.searchFilters.length) this.searchFilters.push('and');
       this.searchFilters.push([key, operator, value]);
-      // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
@@ -33,7 +30,6 @@
     {
       if (this.searchFilters.length) this.searchFilters.push('or');
       this.searchFilters.push([key, operator, value]);
-      // this.searchFilters.push(new nlobjSearchFilter(key, null, operator, value));
       return this;
     },
 
@@ -122,33 +118,26 @@
     // find a single record by internal id
     find: function(id)
     {
-      var record = id ? nlapiLoadRecord(this.recordType, id) : null;
+      var record = id ? nlapiLoadRecord(this.recordType, parseInt(id)) : null;
       return record ? new this.recordClass(record) : null;
     },
 
     // find a single record by external id
     findByExternalId: function(externalid)
     {
-      return this.find(this.where('externalid', 'is', externalid).search().first().id);
+      return this.where('externalid', 'is', parseInt(externalid)).first();
     },
 
     // get the first record from a search
     first: function()
     {
-      return this.find(this.search().first().id);
+      var first = this.search().first();
+      return first ? this.find(first.id) : null;
     },
 
     create: function(model)
     {
-      var record = nlapiCreateRecord(this.recordType);
-
-      _.each(model.attrs, function(value, key)
-      {
-        record.setFieldValue(key, value);
-      });
-
-      // _.each(model.sublists)
-
+      var record = model.toRecord();
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
@@ -207,7 +196,8 @@
 
     destroy: function(model)
     {
-      nlapiDeleteRecord(this.recordType, id);
+      var id = nlapiDeleteRecord(this.recordType, model.get('id'));
+      return model.get('id') === parseInt(id);
     }
   });
 })(core);

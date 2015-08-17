@@ -32,13 +32,13 @@
 
       // if we are already working with a flattened
       // array with dot notation, return the key
-      if (typeof object[key] !== 'undefined') return object[key];
+      if (typeof object[key] !== 'undefined') return object[key] || (_.isUndefined(fallback) ? null : fallback);
 
       // proceed with trying to find value
       var index     = key.indexOf('.');
       var piece     = index !== -1 ? key.substring(0, index) : key;
       var remainder = index !== -1 ? key.substr(++index) : '';
-      if (typeof object[piece] === 'undefined') return _.isString(fallback) ? fallback : fallback || null;
+      if (typeof object[piece] === 'undefined') return _.isUndefined(fallback) ? null : fallback;
 
       return remainder.length ? this.get(object[piece], remainder, fallback) : object[piece];
     },

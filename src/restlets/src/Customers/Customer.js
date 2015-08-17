@@ -2,6 +2,8 @@
 {
   core.Customer = core.Model.extend(
   {
+    recordType: 'customer',
+
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
@@ -16,13 +18,13 @@
 
     // sublists to be parsed on input
     sublists: {
-      'addressbook': core.Address
+      'addressbook' : core.Address
     },
 
     // fields to be parsed on output
     visible: [
+      'id',
       'customers_id',
-      'customers_external_id',
       'customers_firstname',
       'customers_lastname',
       'customers_telephone',
@@ -33,11 +35,6 @@
     ],
 
     getCustomersIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    getCustomersExternalIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },
@@ -74,7 +71,8 @@
 
     getAddressesAttribute: function()
     {
-      return core.Util.get(this.attrs, 'addressbook');
+      var addresses = core.Util.get(this.attrs, 'addressbook', []);
+      return _.map(addresses, function(address) { return address.toHash(); });
     },
 
     setCustomersIdAttribute: function(value)

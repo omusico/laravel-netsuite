@@ -37,10 +37,10 @@
 
     store: function(datain)
     {
-      var input = new core.Input(datain);
+      var input = new core.Input(datain).parseArrays();
 
       var validator = new core.Validator(input, {
-        'customers_id'           : 'required',
+        // 'customers_id'           : 'required',
         'customers_firstname'    : 'required',
         'customers_lastname'     : 'required',
         'customers_telephone'    : 'required',
@@ -55,12 +55,13 @@
           'customers_firstname',
           'customers_lastname',
           'customers_telephone',
-          'customers_email_address'
+          'customers_email_address',
+          'addresses'
         ), {
-          category   : 3,    // Retail
-          pricelevel : 5,    // Retail Pricing
-          isperson   : true, // Individual
-          taxable    : true  // Taxable
+          category:   3,   // Retail
+          pricelevel: 5,   // Retail Pricing
+          isperson:   'T', // Individual
+          taxable:    'T'  // Taxable
         });
 
         var customer = this.customers.create(attrs);
@@ -96,8 +97,20 @@
 
       if (validator.passes())
       {
-        this.customers.destroy(input.get('id'));
-        return this.okay([]);
+        try
+        {
+          var success = input.has('id') ?
+                        this.customers.destroy(input.get('id')) :
+                        this.customers.destroyByExternalId(input.get('customers_id'));
+
+          // returns are ignored for delete requests?
+          // return success ? this.okay([]) : this.notFound();
+        }
+        catch(e)
+        {
+          // returns are ignored for delete requests?
+          this.internalServerError(e);
+        }
       }
       else
       {

@@ -38,7 +38,7 @@
     {
       _.each(this.attrs, function(value, key)
       {
-        var newKey = key.replace('[', '.').replace(']', '');
+        var newKey = key.replace('[', '.', 'g').replace(']', '', 'g');
 
         if (newKey.indexOf('.') !== -1)
         {
