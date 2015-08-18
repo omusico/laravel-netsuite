@@ -14,9 +14,7 @@
         "guzzlehttp/guzzle": "~5.0"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
-        ],
+        "classmap": [],
         "psr-0": {
             "Johnnygreen\\LaravelNetSuite\\": "src/"
         }
