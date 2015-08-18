@@ -19,19 +19,6 @@ describe('core.Model', function()
     return this.has('email');
   };
 
-  describe('#toHash', function()
-  {
-    it('should return visible keys only', function()
-    {
-      expect(_.keys(model.toHash())).to.deep.equal(model.visible);
-    });
-
-    it('should mutate output when a get mutator is present', function()
-    {
-      expect(model.toHash().firstname).to.equal('JOHNNY');
-    });
-  });
-
   describe('#get', function()
   {
     it('should return the value from the attributes using a key', function()
@@ -96,6 +83,19 @@ describe('core.Model', function()
     {
       model.set('test', true).unset('test');
       expect(model.attrs.test).to.equal(undefined);
+    });
+  });
+
+  describe('#toHash', function()
+  {
+    it('should return visible keys only', function()
+    {
+      expect(_.keys(model.toHash())).to.deep.equal(model.visible);
+    });
+
+    it('should mutate output when a get mutator is present', function()
+    {
+      expect(model.toHash().firstname).to.equal('JOHNNY');
     });
   });
 });

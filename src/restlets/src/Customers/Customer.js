@@ -13,7 +13,8 @@
       'phone'            : 'string',
       'email'            : 'string',
       'datecreated'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'lastmodifieddate' : 'timestamp',
+      'category'         : 'int'
     },
 
     // sublists to be parsed on input
@@ -78,11 +79,6 @@
 
     setCustomersIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'id', value);
-    },
-
-    setCustomersExternalIdAttribute: function(value)
-    {
       core.Util.set(this.attrs, 'externalid', value);
     },
 
@@ -109,6 +105,18 @@
     setCustomersCategoryIdAttribute: function(value)
     {
       core.Util.set(this.attrs, 'category', value);
+    },
+
+    setAddressesAttribute: function(value)
+    {
+      var addresses = _.map(value, function(address)
+      {
+        var model = new this.sublists.addressbook();
+        model.set(address);
+        return model;
+      }, this);
+
+      core.Util.set(this.attrs, 'addressbook', addresses);
     }
   });
 })(core);

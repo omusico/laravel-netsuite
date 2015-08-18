@@ -68,14 +68,14 @@
     setEntryFirstnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
-      if (name !== "") name = value + ' ' + name;
+      name = _.isString(name) ? value + ' ' + name : value;
       return core.Util.set(this.attrs, 'addressee', name);
     },
 
     setEntryLastnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
-      if (name !== "") name = name + ' ' + name;
+      name = _.isString(name) ? name + ' ' + value : value;
       return core.Util.set(this.attrs, 'addressee', name);
     },
 
@@ -126,7 +126,8 @@
       'phone'            : 'string',
       'email'            : 'string',
       'datecreated'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'lastmodifieddate' : 'timestamp',
+      'category'         : 'int'
     },
 
     // sublists to be parsed on input
@@ -191,11 +192,6 @@
 
     setCustomersIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'id', value);
-    },
-
-    setCustomersExternalIdAttribute: function(value)
-    {
       core.Util.set(this.attrs, 'externalid', value);
     },
 
@@ -222,6 +218,18 @@
     setCustomersCategoryIdAttribute: function(value)
     {
       core.Util.set(this.attrs, 'category', value);
+    },
+
+    setAddressesAttribute: function(value)
+    {
+      var addresses = _.map(value, function(address)
+      {
+        var model = new this.sublists.addressbook();
+        model.set(address);
+        return model;
+      }, this);
+
+      core.Util.set(this.attrs, 'addressbook', addresses);
     }
   });
 })(core);
@@ -295,11 +303,7 @@
       if (validator.passes())
       {
         // return nlapiLoadRecord('customer', 9279);
-
         var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
-
-        core.Log.debug('customer', customer);
-
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
       else
@@ -338,7 +342,6 @@
         });
 
         var customer = this.customers.create(attrs);
-
         return this.created(customer.toHash());
       }
       else

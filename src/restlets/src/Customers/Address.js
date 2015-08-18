@@ -68,14 +68,14 @@
     setEntryFirstnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
-      if (name !== "") name = value + ' ' + name;
+      name = _.isString(name) ? value + ' ' + name : value;
       return core.Util.set(this.attrs, 'addressee', name);
     },
 
     setEntryLastnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
-      if (name !== "") name = name + ' ' + name;
+      name = _.isString(name) ? name + ' ' + value : value;
       return core.Util.set(this.attrs, 'addressee', name);
     },
 

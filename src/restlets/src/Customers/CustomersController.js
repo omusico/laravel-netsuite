@@ -25,11 +25,7 @@
       if (validator.passes())
       {
         // return nlapiLoadRecord('customer', 9279);
-
         var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
-
-        core.Log.debug('customer', customer);
-
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
       else
@@ -68,7 +64,6 @@
         });
 
         var customer = this.customers.create(attrs);
-
         return this.created(customer.toHash());
       }
       else

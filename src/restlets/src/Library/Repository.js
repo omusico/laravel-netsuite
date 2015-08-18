@@ -118,14 +118,14 @@
     // find a single record by internal id
     find: function(id)
     {
-      var record = id ? nlapiLoadRecord(this.recordType, parseInt(id)) : null;
+      var record = id ? nlapiLoadRecord(this.recordType, id) : null;
       return record ? new this.recordClass(record) : null;
     },
 
     // find a single record by external id
     findByExternalId: function(externalid)
     {
-      return this.where('externalid', 'is', parseInt(externalid)).first();
+      return this.where('externalid', 'is', externalid).first();
     },
 
     // get the first record from a search
@@ -137,7 +137,7 @@
 
     create: function(model)
     {
-      var record = model.toRecord();
+      var record = model.toNewRecord();
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;

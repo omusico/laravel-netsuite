@@ -287,9 +287,6 @@ _.mixin({
   core.Model = core.Base.extend(
   {
     recordType : '',
-    fields     : {},
-    sublists   : {},
-    visible    : [],
 
     constructor: function(object, options)
     {
@@ -297,7 +294,10 @@ _.mixin({
         parse: true
       });
 
-      this.attrs = object && options.parse ? this.parse(object) : {};
+      this.attrs    = (object && options.parse) ? this.parse(object) : {};
+      this.fields   = this.fields   || {};
+      this.sublists = this.sublists || {};
+      this.visible  = this.visible  || [];
       this.initialize.apply(this, arguments);
     },
 
@@ -346,7 +346,7 @@ _.mixin({
 
       if (prefix === 'has')
       {
-        return this[mutator] ? this[mutator](key) : (typeof this.attrs[key] !== 'undefined' && typeof this.attrs[key] !== 'function');
+        return this[mutator] ? this[mutator](key) : _.has(this.attrs, key);
       }
       else
       {
@@ -431,13 +431,13 @@ _.mixin({
       return attrs;
     },
 
-    toRecord: function(object)
+    toNewRecord: function(object)
     {
       object = object || this;
 
       var record = nlapiCreateRecord(this.recordType);
 
-      _.each(this.fields, function(field)
+      _.each(this.fields, function(type, field)
       {
         if (this.has(field))
         {
@@ -445,20 +445,21 @@ _.mixin({
         }
       }, this);
 
-      _.each(this.sublists, function(className, sublist)
+      _.each(this.sublists, function(recordClass, sublist)
       {
         _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
         {
-          index++;
-          var model = new className();
-          model.set(item);
+          index++; // sublists are 1 based
 
-          _.each(model.fields, function(value, key)
+          _.each(item.fields, function(type, field)
           {
-            record.setLineItemValue(sublist, key, index, value);
+            if (item.has(field))
+            {
+              record.setLineItemValue(sublist, field, index, item.get(field));
+            }
           });
-        });
-      });
+        }, this);
+      }, this);
 
       return record;
     },
@@ -886,14 +887,14 @@ _.mixin({
     // find a single record by internal id
     find: function(id)
     {
-      var record = id ? nlapiLoadRecord(this.recordType, parseInt(id)) : null;
+      var record = id ? nlapiLoadRecord(this.recordType, id) : null;
       return record ? new this.recordClass(record) : null;
     },
 
     // find a single record by external id
     findByExternalId: function(externalid)
     {
-      return this.where('externalid', 'is', parseInt(externalid)).first();
+      return this.where('externalid', 'is', externalid).first();
     },
 
     // get the first record from a search
@@ -905,7 +906,7 @@ _.mixin({
 
     create: function(model)
     {
-      var record = model.toRecord();
+      var record = model.toNewRecord();
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
