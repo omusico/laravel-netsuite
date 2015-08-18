@@ -14,9 +14,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase {
 
   public function testBuildAuthentication()
   {
-    echo "YEAHHH";
-
-    // $this->
+    $this->assertTrue(true);
     // buildAuthorization()
   }
 

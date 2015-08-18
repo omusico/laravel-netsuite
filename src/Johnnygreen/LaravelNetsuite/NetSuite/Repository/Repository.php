@@ -1,6 +1,6 @@
 <?php namespace Johnnygreen\LaravelNetSuite\NetSuite\Repository;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 class Repository implements RepositoryInterface {
 
@@ -22,7 +22,7 @@ class Repository implements RepositoryInterface {
   public function __construct($config = [])
   {
     $this->setConfig($config);
-    $this->setEndpoint($this->endpoint);
+    if ( ! is_null($this->endpoint)) $this->setEndpoint($this->endpoint);
   }
 
   public function setConfig($config)
