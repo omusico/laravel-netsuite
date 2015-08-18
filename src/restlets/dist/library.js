@@ -287,10 +287,17 @@ _.mixin({
   core.Model = core.Base.extend(
   {
     recordType : '',
+    fields     : {},
+    sublists   : {},
+    visible    : [],
 
-    constructor: function(object)
+    constructor: function(object, options)
     {
-      this.attrs = object ? this.parse(object) : {};
+      options = _.defaults(options || {}, {
+        parse: true
+      });
+
+      this.attrs = object && options.parse ? this.parse(object) : {};
       this.initialize.apply(this, arguments);
     },
 
@@ -300,7 +307,10 @@ _.mixin({
     {
       if (arguments.length === 1)
       {
-        _.each(key, function(value, key) { this.set(key, value); }, this);
+        _.each(key, function(value, key)
+        {
+          this.set(key, value);
+        }, this);
       }
       else
       {
@@ -458,37 +468,37 @@ _.mixin({
       var attrs  = {};
       object = object || this;
 
-      // for (var sublist in object.sublists)
-      // {
-      //   if (typeof object.attrs[sublist] !== 'undefined')
-      //   {
-      //     for (var i = 0; i < object.attrs[sublist].length; i++)
-      //     {
-      //       object.attrs[sublist][i] = object.toHash(object.attrs[sublist][i]);
-      //     }
-      //   }
-      // }
-
-      if (object.visible && object.visible.length)
+      if (object.visible.length)
       {
-        // var sublists = _.keys(object.sublists || {});
+        var sublists = _.keys(object.sublists || {});
 
         _.each(object.visible, function(field)
         {
           attrs[field] = object.get(field);
+
+          if (_.contains(sublists, field))
+          {
+            _.each(attrs[field], function(item, index)
+            {
+              attrs[field][index] = object.toHash(item);
+            });
+          }
         });
       }
       else
       {
-        // _.each(core.Util.get(object, 'fields', {}), function(type, field)
-        // {
-        //   attrs[field] = object.get(field);
-        // });
+        _.each(object.fields, function(type, field)
+        {
+          attrs[field] = object.get(field);
+        });
 
-        // _.each(core.Util.get(object, 'sublists' {}), function(recordType, field)
-        // {
-        //   attrs[field] = object.toHash(object.get(field));
-        // });
+        _.each(object.sublists, function(recordType, field)
+        {
+          _.each(attrs[field], function(item, index)
+          {
+            attrs[field][index] = object.toHash(item);
+          });
+        });
       }
 
       return attrs;
