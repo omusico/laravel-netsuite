@@ -72,9 +72,12 @@
 
     getAddressesAttribute: function()
     {
-      // return core.Util.get(this.attrs, 'addressbook', []);
       var addresses = core.Util.get(this.attrs, 'addressbook', []);
-      return _.map(addresses, function(address) { return address.toHash(); });
+
+      return _.map(addresses, function(address)
+      {
+        return address.toHash();
+      });
     },
 
     setCustomersIdAttribute: function(value)

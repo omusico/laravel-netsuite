@@ -1,6 +1,6 @@
 <?php namespace Johnnygreen\LaravelNetSuite\NetSuite\Repository;
 
-use GuzzleHttp\Client;
+use Guzzle\Http\Client;
 
 class Repository implements RepositoryInterface {
 
@@ -172,6 +172,11 @@ class Repository implements RepositoryInterface {
     return $this;
   }
 
+  public function first()
+  {
+    return $this->paginate(1, 1)->first();
+  }
+
   public function paginate($per_page = null, $page = null)
   {
     $filters = $this->filters;
@@ -180,10 +185,17 @@ class Repository implements RepositoryInterface {
     return $this->convertResponseToCollection();
   }
 
-  // this works with external id right now
   public function find($id)
   {
     $this->request('GET', $this->endpoint, compact('id'));
+    $this->send();
+    return $this->convertResponseToModel();
+  }
+
+  // $external_id should be an array (i.e. ['customers_id' => 8672])
+  public function findByExternalId($external_id)
+  {
+    $this->request('GET', $this->endpoint, $external_id);
     $this->send();
     return $this->convertResponseToModel();
   }
