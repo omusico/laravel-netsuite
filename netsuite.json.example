@@ -1,7 +1,7 @@
 {
-  "domain": "",
-  "account": 0,
-  "email": "",
+  "domain"  : "",
+  "account" : 0,
+  "email"   : "",
   "password": "",
-  "script": 0
+  "script"  : 0
 }
