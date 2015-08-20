@@ -196,14 +196,22 @@ class Repository implements RepositoryInterface {
     return $collection;
   }
 
-  public function chunk($per_page = 20)
+  public function chunk($per_page = 20, $func = null)
   {
     $page = 1;
 
     do
     {
       $items = $this->paginate($per_page, $page++);
-      yield $items;
+
+      if ( ! is_null($func))
+      {
+        $func($items);
+      }
+      else
+      {
+        yield $items;
+      }
     }
     while( ! $items->isEmpty());
   }
@@ -228,7 +236,18 @@ class Repository implements RepositoryInterface {
     return $this->convertResponseToModel();
   }
 
-  public function create($attributes = []) {}
-  public function update($model) {}
-  public function destroy($id) {}
+  public function create($attributes = [])
+  {
+
+  }
+
+  public function update($model)
+  {
+
+  }
+
+  public function destroy($id)
+  {
+
+  }
 }

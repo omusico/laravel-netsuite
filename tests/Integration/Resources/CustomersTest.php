@@ -2,12 +2,14 @@
 
 class CustomersTest extends \TestCase {
 
-  public function testSearch()
+  public function setUp()
   {
-    $customers_id = 8672;
-    $customers = \NetSuite::getRepository('Customer');
-    $customer  = $customers->where('externalid', 'is', $customers_id)->first();
-    $this->assertEquals($customers_id, $customer->customers_id);
+    parent::setUp();
+  }
+
+  public function testStore()
+  {
+
   }
 
   public function testShow()
@@ -23,6 +25,24 @@ class CustomersTest extends \TestCase {
     $customers    = \NetSuite::getRepository('Customer');
     $customer     = $customers->findByExternalId(compact('customers_id'));
     $this->assertEquals($customers_id, $customer->customers_id);
+  }
+
+  public function testSearch()
+  {
+    $customers_id = 8672;
+    $customers = \NetSuite::getRepository('Customer');
+    $customer  = $customers->where('externalid', 'is', $customers_id)->first();
+    $this->assertEquals($customers_id, $customer->customers_id);
+  }
+
+  public function testUpdate()
+  {
+
+  }
+
+  public function testDestroy()
+  {
+
   }
 
 }
