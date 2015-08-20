@@ -172,17 +172,45 @@ class Repository implements RepositoryInterface {
     return $this;
   }
 
-  public function first()
-  {
-    return $this->paginate(1, 1)->first();
-  }
-
   public function paginate($per_page = null, $page = null)
   {
     $filters = $this->filters;
     $this->request('GET', $this->endpoint_batch, compact('per_page', 'page', 'filters'));
     $this->send();
     return $this->convertResponseToCollection();
+  }
+
+  public function get()
+  {
+    $per_page   = 10;
+    $page       = 1;
+    $collection = $this->convertArrayToCollection([]);
+
+    do
+    {
+      $items = $this->paginate($per_page, $page++);
+      $collection = $collection->merge($items);
+    }
+    while( ! $items->isEmpty());
+
+    return $collection;
+  }
+
+  public function chunk($per_page = 20)
+  {
+    $page = 1;
+
+    do
+    {
+      $items = $this->paginate($per_page, $page++);
+      yield $items;
+    }
+    while( ! $items->isEmpty());
+  }
+
+  public function first()
+  {
+    return $this->paginate(1, 1)->first();
   }
 
   public function find($id)
