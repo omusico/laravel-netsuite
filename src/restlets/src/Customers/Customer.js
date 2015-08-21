@@ -7,7 +7,7 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
-      'externalid'       : 'int',
+      'externalid'       : 'string',
       'firstname'        : 'string',
       'lastname'         : 'string',
       'phone'            : 'string',

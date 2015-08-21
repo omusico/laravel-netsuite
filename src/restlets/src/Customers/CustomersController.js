@@ -25,6 +25,16 @@
       if (validator.passes())
       {
         // return nlapiLoadRecord('customer', 9279);
+
+        // var record = nlapiLoadRecord('customer', input.get('id'));
+        // record.setFieldValue('externalid', '1000001');
+        //
+        // nlapiSubmitRecord(record);
+        //
+        // return 'WOOT';
+
+        // return this.customers.where('externalid', 'is', input.get('customers_id')).first();
+
         var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
@@ -64,6 +74,9 @@
         });
 
         var customer = this.customers.create(attrs);
+
+        // return customer;
+
         return this.created(customer.toHash());
       }
       else

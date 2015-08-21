@@ -20,6 +20,7 @@
     {
       var model = new this.recordClass();
       model.set(attrs);
+      // return model.toNewRecord();
       return core.Repository.prototype.create.call(this, model);
     },
 

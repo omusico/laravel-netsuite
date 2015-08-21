@@ -90,7 +90,7 @@ class Repository implements RepositoryInterface {
       $body   = null;
     }
 
-    $this->request = $this->getClient()->createRequest($method, $url, $headers, $body);
+    $this->request = $this->getClient()->createRequest($method, $url, $headers, json_encode($body));
     $this->request->setHeader('Authorization', $this->buildAuthorization());
     $this->request->setHeader('Content-Type', 'application/json');
     $this->request->setHeader('Accept',       'application/json');
@@ -238,16 +238,22 @@ class Repository implements RepositoryInterface {
 
   public function create($attributes = [])
   {
-
+    $this->request('POST', $this->endpoint, $attributes);
+    $this->send();
+    return $this->convertResponseToModel();
   }
 
-  public function update($model)
+  public function update($attributes)
   {
-
+    $this->request('PUT', $this->endpoint, $attributes);
+    $this->send();
+    return $this->convertResponseToModel();
   }
 
   public function destroy($id)
   {
-
+    $this->request('DELETE', $this->endpoint, compact('id'));
+    $this->send();
+    return $this->responseOkay();
   }
 }

@@ -1,48 +1,81 @@
 <?php namespace Resources;
 
+use Johnnygreen\LaravelNetSuite\NetSuite\Customer;
+
 class CustomersTest extends \TestCase {
 
   public function setUp()
   {
-    parent::setUp();
+    $this->repository = \NetSuite::getRepository('Customer');
   }
 
   public function testStore()
   {
+    $attributes = [
+      'customers_id'            => 1000001,
+      'customers_firstname'     => 'Test',
+      'customers_lastname'      => 'Customer',
+      'customers_telephone'     => '123-123-1234',
+      'customers_email_address' => 'test@mzwallace.com'
+    ];
 
+    $model = $this->repository->create($attributes);
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $model);
+
+    foreach($attributes as $key => $value)
+    {
+      $this->assertEquals($value, $model->$key);
+    }
+
+    return $model;
   }
 
-  public function testShow()
+  /**
+   * @depends testStore
+   */
+  public function testShow($model)
   {
     // test the show endpoint with internal id
-    $id        = 9279;
-    $customers = \NetSuite::getRepository('Customer');
-    $customer  = $customers->find($id);
-    $this->assertEquals($id, $customer->id);
+    $customer = $this->repository->find($model->id);
+    $this->assertEquals($model->id, $customer->id);
+
+    echo "<pre>".print_r($model, true)."</pre>"; exit;
 
     // test the show endpoint with external id
-    $customers_id = 8672;
-    $customers    = \NetSuite::getRepository('Customer');
-    $customer     = $customers->findByExternalId(compact('customers_id'));
-    $this->assertEquals($customers_id, $customer->customers_id);
+    $customer = $this->repository->findByExternalId(['customers_id' => $model->customers_id]);
+    $this->assertEquals($model->customers_id, $customer->customers_id);
+    return $model;
   }
 
-  public function testSearch()
+  /**
+   * @depends testShow
+   */
+  public function testSearch($model)
   {
-    $customers_id = 8672;
-    $customers = \NetSuite::getRepository('Customer');
-    $customer  = $customers->where('externalid', 'is', $customers_id)->first();
-    $this->assertEquals($customers_id, $customer->customers_id);
+    $customer = $this->repository->where('externalid', 'is', $model->customers_id)->first();
+    $this->assertEquals($model->customers_id, $customer->customers_id);
+    return $model;
   }
 
-  public function testUpdate()
+  /**
+   * @depends testSearch
+   */
+  public function testUpdate($model)
   {
-
+    // $model->customers_firstname = '';
+    // $customer = $this->repository->update($model);
+    // $this->assertEquals($model->customers_firstname, $customer->customers_firstname);
+    return $model;
   }
 
-  public function testDestroy()
+  /**
+   * @depends testUpdate
+   */
+  public function testDestroy($model)
   {
-
+    $this->repository->destroy($model->id);
+    $customer = $this->repository->find($model->id);
+    $this->assertNull($customer);
   }
 
 }

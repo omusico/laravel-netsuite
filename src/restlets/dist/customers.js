@@ -120,7 +120,7 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
-      'externalid'       : 'int',
+      'externalid'       : 'string',
       'firstname'        : 'string',
       'lastname'         : 'string',
       'phone'            : 'string',
@@ -185,9 +185,12 @@
 
     getAddressesAttribute: function()
     {
-      // return core.Util.get(this.attrs, 'addressbook', []);
       var addresses = core.Util.get(this.attrs, 'addressbook', []);
-      return _.map(addresses, function(address) { return address.toHash(); });
+
+      return _.map(addresses, function(address)
+      {
+        return address.toHash();
+      });
     },
 
     setCustomersIdAttribute: function(value)
@@ -256,6 +259,7 @@
     {
       var model = new this.recordClass();
       model.set(attrs);
+      // return model.toNewRecord();
       return core.Repository.prototype.create.call(this, model);
     },
 
@@ -303,6 +307,16 @@
       if (validator.passes())
       {
         // return nlapiLoadRecord('customer', 9279);
+
+        // var record = nlapiLoadRecord('customer', input.get('id'));
+        // record.setFieldValue('externalid', '1000001');
+        //
+        // nlapiSubmitRecord(record);
+        //
+        // return 'WOOT';
+
+        // return this.customers.where('externalid', 'is', input.get('customers_id')).first();
+
         var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
@@ -342,6 +356,9 @@
         });
 
         var customer = this.customers.create(attrs);
+
+        // return customer;
+
         return this.created(customer.toHash());
       }
       else
