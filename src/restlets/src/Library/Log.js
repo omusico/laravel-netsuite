@@ -19,7 +19,7 @@
 
     debug: function(title, details)
     {
-      log('DEBUG', title, details);
+      if (core.debug) log('DEBUG', title, details);
     },
 
     error: function(title, details)

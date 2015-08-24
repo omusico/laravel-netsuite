@@ -2,19 +2,21 @@
 {
   core.Model = core.Base.extend(
   {
-    recordType : '',
+    recordType: '',
 
-    constructor: function(object, options)
+    constructor: function(attrs, options)
     {
       options = _.defaults(options || {}, {
         parse: true
       });
 
-      this.attrs    = (object && options.parse) ? this.parse(object) : {};
-      this.fields   = this.fields   || {};
-      this.sublists = this.sublists || {};
-      this.visible  = this.visible  || [];
-      this.initialize.apply(this, arguments);
+      this.fields     = this.fields     || {};
+      this.sublists   = this.sublists   || {};
+      this.visible    = this.visible    || [];
+      this.recordType = this.recordType || '';
+
+      this.attrs = (attrs && options.parse) ? this.parse(attrs) : {};
+      this.initialize.apply(this, [attrs, options]);
     },
 
     initialize: function() {},
@@ -73,10 +75,11 @@
     parse: function(object)
     {
       var attrs     = {};
-      var isRecord = typeof object.getFieldValue === 'function';
 
       // determine if object is record or plain object
-      if (this.fields || this.sublists)
+      var isRecord = typeof object.getFieldValue === 'function';
+
+      if ( ! _.isEmpty(this.fields))
       {
         _.each(this.fields, function(type, field)
         {
@@ -103,7 +106,20 @@
               // do nothing to the field
           }
         });
+      }
+      else
+      {
+        _.each(object, function(value, key)
+        {
+          if (typeof object[key] !== 'function')
+          {
+            attrs[key] = core.Util.get(object, key);
+          }
+        });
+      }
 
+      if ( ! _.isEmpty(this.sublists))
+      {
         _.each(this.sublists, function(recordType, sublist)
         {
           var count = isRecord ? object.getLineItemCount(sublist) : core.Util.get(object, sublist, []).length;
@@ -133,16 +149,6 @@
           }
         });
       }
-      else
-      {
-        _.each(object, function(value, key)
-        {
-          if (typeof object[key] !== 'function')
-          {
-            attrs[key] = core.Util.get(object, key);
-          }
-        });
-      }
 
       return attrs;
     },
@@ -157,6 +163,7 @@
       {
         if (this.has(field))
         {
+          var value = core.Util.get(this.attrs, field);
           record.setFieldValue(field, core.Util.get(this.attrs, field));
         }
       }, this);
@@ -204,10 +211,20 @@
       }
       else
       {
-        _.each(object.fields, function(type, field)
+        if (object.fields.length)
         {
-          attrs[field] = object.get(field);
-        });
+          _.each(object.fields, function(type, field)
+          {
+            attrs[field] = object.get(field);
+          });
+        }
+        else
+        {
+          _.each(object.attrs, function(value, key)
+          {
+            attrs[key] = object.get(key);
+          });
+        }
 
         _.each(object.sublists, function(recordType, field)
         {
@@ -228,7 +245,7 @@
 
     toString: function()
     {
-      return this.toJSON();
+      return this.toHash();
     }
   });
 })(core);

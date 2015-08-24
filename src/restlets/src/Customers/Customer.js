@@ -7,14 +7,17 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
-      'externalid'       : 'string',
+      'externalid'       : 'string', // this must be a string or it will add a .0 to the end, you got me...
       'firstname'        : 'string',
       'lastname'         : 'string',
       'phone'            : 'string',
       'email'            : 'string',
       'datecreated'      : 'timestamp',
       'lastmodifieddate' : 'timestamp',
-      'category'         : 'int'
+      'category'         : 'int',
+      'pricelevel'       : 'int',
+      'isperson'         : 'string',
+      'taxable'          : 'string'
     },
 
     // sublists to be parsed on input

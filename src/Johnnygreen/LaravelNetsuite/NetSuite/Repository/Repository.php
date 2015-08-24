@@ -80,7 +80,7 @@ class Repository implements RepositoryInterface {
   {
     $method = strtoupper($method);
 
-    if ($method == 'GET' and ! empty($body))
+    if (in_array($method, ['GET', 'DELETE']) and ! empty($body))
     {
       $query  = http_build_query($body);
       $pieces = explode('?', $url);
@@ -253,6 +253,14 @@ class Repository implements RepositoryInterface {
   public function destroy($id)
   {
     $this->request('DELETE', $this->endpoint, compact('id'));
+    $this->send();
+    return $this->responseOkay();
+  }
+
+  // $external_id should be an array (i.e. ['customers_id' => 8672])
+  public function destroyByExternalId($external_id)
+  {
+    $this->request('DELETE', $this->endpoint, $external_id);
     $this->send();
     return $this->responseOkay();
   }

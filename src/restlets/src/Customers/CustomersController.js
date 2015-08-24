@@ -24,17 +24,6 @@
 
       if (validator.passes())
       {
-        // return nlapiLoadRecord('customer', 9279);
-
-        // var record = nlapiLoadRecord('customer', input.get('id'));
-        // record.setFieldValue('externalid', '1000001');
-        //
-        // nlapiSubmitRecord(record);
-        //
-        // return 'WOOT';
-
-        // return this.customers.where('externalid', 'is', input.get('customers_id')).first();
-
         var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
@@ -49,7 +38,6 @@
       var input = new core.Input(datain).parseArrays();
 
       var validator = new core.Validator(input, {
-        // 'customers_id'           : 'required',
         'customers_firstname'    : 'required',
         'customers_lastname'     : 'required',
         'customers_telephone'    : 'required',
@@ -74,8 +62,6 @@
         });
 
         var customer = this.customers.create(attrs);
-
-        // return customer;
 
         return this.created(customer.toHash());
       }
@@ -119,13 +105,14 @@
         }
         catch(e)
         {
-          // returns are ignored for delete requests?
+          // return this.internalServerError(e); // returns are ignored for delete requests?
           this.internalServerError(e);
         }
       }
       else
       {
-        return this.badRequest(validator.toHash());
+        // return this.badRequest(validator.toHash()); // returns are ignored for delete requests?
+        this.badRequest(validator.toHash());
       }
     }
   });

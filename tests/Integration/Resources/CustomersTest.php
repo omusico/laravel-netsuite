@@ -12,22 +12,24 @@ class CustomersTest extends \TestCase {
   public function testStore()
   {
     $attributes = [
-      'customers_id'            => 1000001,
+      'customers_id'            => '1000001',
       'customers_firstname'     => 'Test',
       'customers_lastname'      => 'Customer',
       'customers_telephone'     => '123-123-1234',
       'customers_email_address' => 'test@mzwallace.com'
     ];
 
-    $model = $this->repository->create($attributes);
-    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $model);
+    $customer = $this->repository->create($attributes);
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
 
     foreach($attributes as $key => $value)
     {
-      $this->assertEquals($value, $model->$key);
+      $this->assertEquals($value, $customer->$key);
     }
 
-    return $model;
+    // $customer = new Customer(['id' => 51387, 'customers_id' => '1000001']);
+
+    return $customer;
   }
 
   /**
@@ -37,12 +39,12 @@ class CustomersTest extends \TestCase {
   {
     // test the show endpoint with internal id
     $customer = $this->repository->find($model->id);
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
     $this->assertEquals($model->id, $customer->id);
-
-    echo "<pre>".print_r($model, true)."</pre>"; exit;
 
     // test the show endpoint with external id
     $customer = $this->repository->findByExternalId(['customers_id' => $model->customers_id]);
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $model);
     $this->assertEquals($model->customers_id, $customer->customers_id);
     return $model;
   }
@@ -53,6 +55,7 @@ class CustomersTest extends \TestCase {
   public function testSearch($model)
   {
     $customer = $this->repository->where('externalid', 'is', $model->customers_id)->first();
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
     $this->assertEquals($model->customers_id, $customer->customers_id);
     return $model;
   }
@@ -64,6 +67,7 @@ class CustomersTest extends \TestCase {
   {
     // $model->customers_firstname = '';
     // $customer = $this->repository->update($model);
+    // $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
     // $this->assertEquals($model->customers_firstname, $customer->customers_firstname);
     return $model;
   }
@@ -73,7 +77,9 @@ class CustomersTest extends \TestCase {
    */
   public function testDestroy($model)
   {
-    $this->repository->destroy($model->id);
+    $success = $this->repository->destroy($model->id);
+    $this->assertTrue($success);
+
     $customer = $this->repository->find($model->id);
     $this->assertNull($customer);
   }

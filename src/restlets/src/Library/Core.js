@@ -1,6 +1,7 @@
-var Core = function() {};
 
-var core = new Core();
+var core = function() {};
+
+core.debug = true;
 
 _.mixin({
   decorate: function(items, func)

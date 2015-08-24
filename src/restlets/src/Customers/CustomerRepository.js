@@ -11,7 +11,7 @@
       return this.where('category', 'is', category_id);
     },
 
-    lastModifiedAfter: function(date)
+    lastModifiedOnOrAfter: function(date)
     {
       return this.where('lastmodifieddate', 'onorafter', date);
     },
@@ -19,8 +19,8 @@
     create: function(attrs)
     {
       var model = new this.recordClass();
-      model.set(attrs);
-      // return model.toNewRecord();
+      model.set(attrs); // mutate input
+      model.attrs = model.parse(model.attrs); // parse input
       return core.Repository.prototype.create.call(this, model);
     },
 
@@ -37,6 +37,5 @@
       if ( ! model) return false;
       return core.Repository.prototype.destroy.call(this, model);
     }
-
   });
 })(core);

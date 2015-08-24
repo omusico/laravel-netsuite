@@ -120,14 +120,17 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
-      'externalid'       : 'string',
+      'externalid'       : 'string', // this must be a string or it will add a .0 to the end, you got me...
       'firstname'        : 'string',
       'lastname'         : 'string',
       'phone'            : 'string',
       'email'            : 'string',
       'datecreated'      : 'timestamp',
       'lastmodifieddate' : 'timestamp',
-      'category'         : 'int'
+      'category'         : 'int',
+      'pricelevel'       : 'int',
+      'isperson'         : 'string',
+      'taxable'          : 'string'
     },
 
     // sublists to be parsed on input
@@ -250,7 +253,7 @@
       return this.where('category', 'is', category_id);
     },
 
-    lastModifiedAfter: function(date)
+    lastModifiedOnOrAfter: function(date)
     {
       return this.where('lastmodifieddate', 'onorafter', date);
     },
@@ -258,8 +261,8 @@
     create: function(attrs)
     {
       var model = new this.recordClass();
-      model.set(attrs);
-      // return model.toNewRecord();
+      model.set(attrs); // mutate input
+      model.attrs = model.parse(model.attrs); // parse input
       return core.Repository.prototype.create.call(this, model);
     },
 
@@ -276,7 +279,6 @@
       if ( ! model) return false;
       return core.Repository.prototype.destroy.call(this, model);
     }
-
   });
 })(core);
 
@@ -306,17 +308,6 @@
 
       if (validator.passes())
       {
-        // return nlapiLoadRecord('customer', 9279);
-
-        // var record = nlapiLoadRecord('customer', input.get('id'));
-        // record.setFieldValue('externalid', '1000001');
-        //
-        // nlapiSubmitRecord(record);
-        //
-        // return 'WOOT';
-
-        // return this.customers.where('externalid', 'is', input.get('customers_id')).first();
-
         var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
@@ -331,7 +322,6 @@
       var input = new core.Input(datain).parseArrays();
 
       var validator = new core.Validator(input, {
-        // 'customers_id'           : 'required',
         'customers_firstname'    : 'required',
         'customers_lastname'     : 'required',
         'customers_telephone'    : 'required',
@@ -356,8 +346,6 @@
         });
 
         var customer = this.customers.create(attrs);
-
-        // return customer;
 
         return this.created(customer.toHash());
       }
@@ -401,13 +389,14 @@
         }
         catch(e)
         {
-          // returns are ignored for delete requests?
+          // return this.internalServerError(e); // returns are ignored for delete requests?
           this.internalServerError(e);
         }
       }
       else
       {
-        return this.badRequest(validator.toHash());
+        // return this.badRequest(validator.toHash()); // returns are ignored for delete requests?
+        this.badRequest(validator.toHash());
       }
     }
   });

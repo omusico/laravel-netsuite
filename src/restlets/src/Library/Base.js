@@ -1,21 +1,22 @@
 (function (core)
 {
-  core.Base = function(attrs) {};
+  core.Base = function() {};
 
   core.Base.extend = function(protoProps, staticProps)
   {
     var parent = this;
+    var child;
 
-    var child = (protoProps && core.Util.has(protoProps, 'constructor')) ?
-                protoProps.constructor :
-                function() { return parent.apply(this, arguments); };
+    child = (protoProps && _.has(protoProps, 'constructor')) ?
+            protoProps.constructor :
+            function() { return parent.apply(this, arguments); };
 
-    core.Util.extend(child, parent);
-    if(staticProps) core.Util.extend(child, staticProps);
+    _.extend(child, parent, staticProps);
     var Surrogate = function() { this.constructor = child; };
     Surrogate.prototype = parent.prototype;
     child.prototype = new Surrogate();
-    if (protoProps) core.Util.extend(child.prototype, protoProps);
+    if (protoProps) _.extend(child.prototype, protoProps);
+    child.__super__ = parent.prototype;
 
     return child;
   };
