@@ -19,6 +19,11 @@ class Repository implements RepositoryInterface {
   // search filters
   public $filters;
 
+  public $request;
+
+  public $response;
+
+
   public function __construct($config = [])
   {
     $this->setConfig($config);
@@ -189,29 +194,33 @@ class Repository implements RepositoryInterface {
     do
     {
       $items = $this->paginate($per_page, $page++);
-      $collection = $collection->merge($items);
+      $collection = $collection->merge($this->convertArrayToCollection($items));
     }
     while( ! $items->isEmpty());
 
     return $collection;
   }
 
-  public function chunk($per_page = 20, $func = null)
+  public function yieldChunk($per_page = 20)
   {
     $page = 1;
 
     do
     {
       $items = $this->paginate($per_page, $page++);
+      yield $items;
+    }
+    while( ! $items->isEmpty());
+  }
 
-      if ( ! is_null($func))
-      {
-        $func($items);
-      }
-      else
-      {
-        yield $items;
-      }
+  public function chunk($per_page = 20, $callback)
+  {
+    $page = 1;
+
+    do
+    {
+      $items = $this->paginate($per_page, $page++);
+      $callback($items);
     }
     while( ! $items->isEmpty());
   }

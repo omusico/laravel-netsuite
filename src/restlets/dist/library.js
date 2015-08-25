@@ -826,17 +826,16 @@ _.mixin({
       var searchResults;
       var end   = this.searchPage * this.searchPerPage;
       var start = end - this.searchPerPage;
+      var hasColumns = columns && columns.length;
 
-      if (columns && columns.length)
+      var searchColumns = _.chain(hasColumns ? this.searchColumns.concat(columns) : this.searchColumns)
+                           .filter(function(column) { return column != 'id'; })
+                           .map(function(column) { return new nlobjSearchColumn(column); })
+                           .value();
+
+      if (hasColumns)
       {
-        var searchColumns = _.chain(columns)
-                              .filter(function(column) { return column != 'id'; })
-                              .map(function(column) { return new nlobjSearchColumn(column); })
-                              .value();
-
-        this.searchColumns = this.searchColumns.concat(searchColumns);
-
-        var results = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns)
+        var results = nlapiCreateSearch(this.recordType, this.searchFilters, searchColumns)
                       .runSearch()
                       .getResults(start, end);
 
@@ -857,14 +856,13 @@ _.mixin({
       }
       else
       {
-        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, this.searchColumns)
+        searchResults = nlapiCreateSearch(this.recordType, this.searchFilters, searchColumns)
                         .runSearch()
                         .getResults(start, end);
       }
 
       // reset filters after search
       this.searchFilters = [];
-      this.searchColumns = [];
 
       // returned as an underscore collection
       return _(searchResults);
@@ -875,7 +873,8 @@ _.mixin({
     {
       return this.search().map(function(result)
       {
-        return this.find(result.id);
+        return result;
+        // return this.find(result.id);
       }, this);
     },
 

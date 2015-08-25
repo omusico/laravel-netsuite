@@ -4,6 +4,11 @@
   {
     recordClass: core.Customer,
 
+    searchColumns: [
+      'datecreated',
+      'lastmodifieddate'
+    ],
+
     // scopes
 
     byCategoryId: function(category_id)
