@@ -21,7 +21,7 @@
       var parsedIdentifier   = this.parseIdentifier(identifier);
       var controllerMethod   = parsedIdentifier.controllerMethod;
       var controllerName     = parsedIdentifier.controllerName;
-      var controllerInstance = new core[parsedIdentifier.controllerName]();
+      var controllerInstance = new core[controllerName]();
       this.map[resource]     = this.map[resource] || {};
 
       // setup the route map

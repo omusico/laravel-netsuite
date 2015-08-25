@@ -272,18 +272,20 @@ _.mixin({
   {
     recordType: '',
 
+    attrs   : {},
+    fields  : {},
+    sublists: {},
+    visible : [],
+
     constructor: function(attrs, options)
     {
       options = _.defaults(options || {}, {
-        parse: true
+        parse : true,
+        mutate: false
       });
 
-      this.fields     = this.fields     || {};
-      this.sublists   = this.sublists   || {};
-      this.visible    = this.visible    || [];
-      this.recordType = this.recordType || '';
-
-      this.attrs = (attrs && options.parse) ? this.parse(attrs) : {};
+      if (attrs && options.mutate) this.set(attrs); else this.attrs = attrs;
+      if (attrs && options.parse) this.attrs = this.parse(this.attrs);
       this.initialize.apply(this, [attrs, options]);
     },
 
@@ -357,10 +359,10 @@ _.mixin({
           switch(type)
           {
             case 'int':
-              attrs[field] = parseInt(attrs[field]);
+              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseInt(attrs[field]);
               break;
             case 'float':
-              attrs[field] = parseFloat(attrs[field]);
+              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseFloat(attrs[field]);
               break;
             case 'timestamp':
               attrs[field] = moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') != 'Invalid date' ?
@@ -368,7 +370,7 @@ _.mixin({
                              null;
               break;
             case 'string':
-              attrs[field] = attrs[field] ? attrs[field] + '' : null;
+              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : attrs[field] + '';
               break;
             default:
               // do nothing to the field
@@ -733,7 +735,7 @@ _.mixin({
       var parsedIdentifier   = this.parseIdentifier(identifier);
       var controllerMethod   = parsedIdentifier.controllerMethod;
       var controllerName     = parsedIdentifier.controllerName;
-      var controllerInstance = new core[parsedIdentifier.controllerName]();
+      var controllerInstance = new core[controllerName]();
       this.map[resource]     = this.map[resource] || {};
 
       // setup the route map

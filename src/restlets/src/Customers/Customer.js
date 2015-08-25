@@ -117,8 +117,7 @@
     {
       var addresses = _.map(value, function(address)
       {
-        var model = new this.sublists.addressbook();
-        model.set(address);
+        var model = new this.sublists.addressbook(address, {mutate: true});
         return model;
       }, this);
 

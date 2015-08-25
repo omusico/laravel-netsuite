@@ -18,9 +18,7 @@
 
     create: function(attrs)
     {
-      var model = new this.recordClass();
-      model.set(attrs); // mutate input
-      model.attrs = model.parse(model.attrs); // parse input
+      var model = new this.recordClass(attrs, {mutate: true});
       return core.Repository.prototype.create.call(this, model);
     },
 

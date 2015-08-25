@@ -26,6 +26,10 @@ var customers = [
   baseDir + 'Customers/**/*.js'
 ];
 
+var bootstraps = [
+  baseDir + 'Bootstraps/**/*.js'
+];
+
 gulp.task('library', function()
 {
   gulp.src(library)
@@ -40,16 +44,24 @@ gulp.task('customers', function()
       .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('bootstraps', function()
+{
+  gulp.src(bootstraps)
+      .pipe(gulp.dest(buildDir));
+});
+
 gulp.task('upload', function()
 {
-  gulp.src(buildDir + '**/*.js').pipe(upload(require('./netsuite.json')));
+  gulp.src(buildDir + '**/*.js')
+      .pipe(upload(require('./netsuite.json')));
 });
 
 gulp.task('watch', function()
 {
-  gulp.watch(library,   ['library']);
-  gulp.watch(customers, ['customers']);
+  gulp.watch(library,    ['library']);
+  gulp.watch(customers,  ['customers']);
+  gulp.watch(bootstraps, ['bootstraps']);
   gulp.watch(buildDir + '**/*.js',  ['upload']);
 });
 
-gulp.task('default', ['library', 'customers', 'upload']);
+gulp.task('default', ['library', 'customers', 'bootstraps', 'upload']);

@@ -230,8 +230,7 @@
     {
       var addresses = _.map(value, function(address)
       {
-        var model = new this.sublists.addressbook();
-        model.set(address);
+        var model = new this.sublists.addressbook(address, {mutate: true});
         return model;
       }, this);
 
@@ -260,9 +259,7 @@
 
     create: function(attrs)
     {
-      var model = new this.recordClass();
-      model.set(attrs); // mutate input
-      model.attrs = model.parse(model.attrs); // parse input
+      var model = new this.recordClass(attrs, {mutate: true});
       return core.Repository.prototype.create.call(this, model);
     },
 
@@ -401,14 +398,3 @@
     }
   });
 })(core);
-
-try
-{
-  new core.Router()
-          .resource('customers', 'CustomersController')
-          .start('customers', this);
-}
-catch (e)
-{
-  new core.Controller().internalServerError(e.message);
-}
