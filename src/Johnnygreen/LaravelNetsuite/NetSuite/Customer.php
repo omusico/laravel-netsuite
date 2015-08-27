@@ -1,6 +1,5 @@
 <?php namespace Johnnygreen\LaravelNetSuite\NetSuite;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model {
@@ -21,6 +20,11 @@ class Customer extends Model {
 	{
 		return 'Y-m-d H:i:s';
 	}
+
+  public function isNew()
+  {
+    return is_null($this->id);
+  }
 
   public function getName()
   {

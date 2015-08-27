@@ -919,10 +919,12 @@ _.mixin({
       var diffs = {};
       var record = nlapiLoadRecord(this.recordType, model.attrs.id);
 
-      _.each(model.attrs, function(value, key)
+      _.each(model.getChanged(), function(value, key)
       {
-        if(record.getFieldValue(key) != value) record.setFieldValue(key, value);
+        record.setFieldValue(key, value);
       });
+
+
 
       // for (var sublist in this.sublists)
       // {

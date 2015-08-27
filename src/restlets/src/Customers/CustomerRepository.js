@@ -27,6 +27,14 @@
       return core.Repository.prototype.create.call(this, model);
     },
 
+    update: function(attrs)
+    {
+      var model = this.find(attrs.id);
+      if ( ! model) return false;
+      model.set(attrs);
+      return core.Repository.prototype.update.call(this, model);
+    },
+
     destroy: function(id)
     {
       var model = this.find(id);

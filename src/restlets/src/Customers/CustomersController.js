@@ -38,10 +38,11 @@
       var input = new core.Input(datain).parseArrays();
 
       var validator = new core.Validator(input, {
-        'customers_firstname'    : 'required',
-        'customers_lastname'     : 'required',
-        'customers_telephone'    : 'required',
-        'customers_email_address': 'required'
+        customers_id           : 'required',
+        customers_firstname    : 'required',
+        customers_lastname     : 'required',
+        customers_telephone    : 'required',
+        customers_email_address: 'required'
       });
 
       if (validator.passes())
@@ -55,10 +56,10 @@
           'customers_email_address',
           'addresses'
         ), {
-          category:   3,   // Retail
+          category  : 3,   // Retail
           pricelevel: 5,   // Retail Pricing
-          isperson:   'T', // Individual
-          taxable:    'T'  // Taxable
+          isperson  : 'T', // Individual
+          taxable   : 'T'  // Taxable
         });
 
         var customer = this.customers.create(attrs);
@@ -73,18 +74,36 @@
 
     update: function(datain)
     {
-      // var input     = new core.Input(datain);
-      // var validator = new core.Validator(input);
-      //
-      // if (validator.passes())
-      // {
-      //   var customer = this.customers.update(input.toHash());
-      //   return this.okay(customer.toHash());
-      // }
-      // else
-      // {
-      //   return this.badRequest(validator.toHash());
-      // }
+      var input     = new core.Input(datain);
+      var validator = new core.Validator(input, {
+        id                     : 'required',
+        customers_id           : 'required',
+        customers_firstname    : 'required',
+        customers_lastname     : 'required',
+        customers_telephone    : 'required',
+        customers_email_address: 'required'
+      });
+
+      if (validator.passes())
+      {
+        // set defaults
+        var attrs = input.only(
+          'id',
+          'customers_id',
+          'customers_firstname',
+          'customers_lastname',
+          'customers_telephone',
+          'customers_email_address',
+          'addresses'
+        );
+
+        var customer = this.customers.update(attrs);
+        return this.okay(customer.toHash());
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
     },
 
     destroy: function(datain)
