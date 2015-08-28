@@ -205,16 +205,43 @@
     {
       var record = nlapiLoadRecord(this.recordType, this.attrs.id);
 
-      _.each(this.getChanged(), function(value, key)
+      _.each(_.omit(this.fields, 'id'), function(value, key)
       {
-        record.setFieldValue(key, value);
-      });
+        record.setFieldValue(key, this.get(key));
+      }, this);
 
-      _.each(this.sublists, function(sublist)
+      _.each(this.sublists, function(recordClass, sublist)
       {
-        // search record sublist for one with id that matches and update
-        // or if doesn't match create a new sublist item
-      });
+
+        // remove any item in record and not in sent sublist
+        _.times(record.getLineItemCount(sublist), function(index)
+        {
+          index++; // sublists are 1 based
+
+          var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
+              foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), { id: id });
+
+          // remove that one
+          if (! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
+
+        }, this);
+
+        // update/add the rest
+        _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
+        {
+          index++; // sublists are 1 based
+
+          _.each(item.fields, function(type, field)
+          {
+            if (item.has(field))
+            {
+              record.setLineItemValue(sublist, field, index, item.get(field));
+            }
+          });
+        }, this);
+      }, this);
+
+      return record;
     },
 
     toHash: function(object)
@@ -270,12 +297,12 @@
 
     toJSON: function()
     {
-      return JSON.stringify(this.toHash());
+      return this.toHash();
     },
 
     toString: function()
     {
-      return this.toHash();
+      return JSON.stringify(this.toHash());
     }
   });
 })(core);
