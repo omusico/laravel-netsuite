@@ -23,7 +23,11 @@ var library = [
 ];
 
 var customers = [
-  baseDir + 'Customers/**/*.js'
+  baseDir + 'Customers/Address.js',
+  baseDir + 'Customers/Customer.js',
+  baseDir + 'Customers/CustomerSearchResult.js',
+  baseDir + 'Customers/CustomerRepository.js',
+  baseDir + 'Customers/CustomersController.js'
 ];
 
 var bootstraps = [

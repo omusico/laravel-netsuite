@@ -65,12 +65,14 @@
 
     getCreatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'datecreated');
+      var value = core.Util.get(this.attrs, 'datecreated');
+      return moment(value, this.timeFormat).format('YYYY-MM-DD HH:mm:ss');
     },
 
     getUpdatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'lastmodifieddate');
+      var value = core.Util.get(this.attrs, 'lastmodifieddate');
+      return moment(value, this.timeFormat).format('YYYY-MM-DD HH:mm:ss');
     },
 
     getAddressesAttribute: function()
@@ -108,9 +110,16 @@
       core.Util.set(this.attrs, 'email', value);
     },
 
-    setCustomersCategoryIdAttribute: function(value)
+    setCreatedAtAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'category', value);
+      value = moment(value, 'YYYY-MM-DD HH:mm:ss').format(this.timeFormat);
+      core.Util.set(this.attrs, 'datecreated', value);
+    },
+
+    setUpdatedAtAttribute: function(value)
+    {
+      value = moment(value, 'YYYY-MM-DD HH:mm:ss').format(this.timeFormat);
+      core.Util.set(this.attrs, 'lastmodifieddate', value);
     },
 
     setAddressesAttribute: function(value)

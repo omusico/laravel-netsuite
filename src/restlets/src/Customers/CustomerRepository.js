@@ -3,8 +3,10 @@
   core.CustomerRepository = core.Repository.extend(
   {
     recordClass: core.Customer,
+    searchClass: core.CustomerSearchResult,
 
     searchColumns: [
+      'externalid',
       'datecreated',
       'lastmodifieddate'
     ],
@@ -21,10 +23,27 @@
       return this.where('lastmodifieddate', 'onorafter', date);
     },
 
+    get: function()
+    {
+      var results = core.Repository.prototype.get.call(this);
+
+      return results.map(function(result)
+      {
+        return new this.searchClass(result);
+      }, this);
+    },
+
     create: function(attrs)
     {
       var model = new this.recordClass(attrs, {mutate: true});
-      return core.Repository.prototype.create.call(this, model);
+
+      // this model will have id set on it, but might be missing some sublist ids
+      model = core.Repository.prototype.create.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
     },
 
     update: function(attrs)
@@ -32,7 +51,14 @@
       var model = this.find(attrs.id);
       if ( ! model) return false;
       model.set(attrs);
-      return core.Repository.prototype.update.call(this, model);
+
+      // this model might be missing some sublist ids
+      model = core.Repository.prototype.update.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
     },
 
     destroy: function(id)

@@ -136,7 +136,7 @@
 
     create: function(model)
     {
-      var record = model.toNewRecord();
+      var record = model.toCreateRecord();
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
@@ -144,54 +144,9 @@
 
     update: function(model)
     {
-      var diffs = {};
-      var record = nlapiLoadRecord(this.recordType, model.attrs.id);
 
-      _.each(model.getChanged(), function(value, key)
-      {
-        record.setFieldValue(key, value);
-      });
-
-
-
-      // for (var sublist in this.sublists)
-      // {
-      //   var count = isRecord ?
-      //               object.getLineItemCount(sublist) :
-      //               typeof object[sublist] !== 'undefined' ?
-      //                 object[sublist].length :
-      //                 0;
-      //
-      //   if (count)
-      //   {
-      //     attrs[sublist] = [];
-      //
-      //     for (var i = 1; i <= count; i++)
-      //     {
-      //       var item = {};
-      //
-      //       if (isRecord)
-      //       {
-      //         var fields = object.getAllLineItemFields(sublist);
-      //
-      //         for (var index in fields)
-      //         {
-      //           item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
-      //         }
-      //       }
-      //       else
-      //       {
-      //         item = object[sublist][i];
-      //       }
-      //
-      //       var recordType = this.sublists[sublist];
-      //       attrs[sublist].push(new recordType(item));
-      //     }
-      //   }
-      // }
-
-      nlapiSubmitRecord(record, true);
-
+      var record = model.toUpdateRecord();
+      var id = nlapiSubmitRecord(record, true);
       return model;
     },
 

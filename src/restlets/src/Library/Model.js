@@ -3,6 +3,7 @@
   core.Model = core.Base.extend(
   {
     recordType: '',
+    timeFormat: 'M/DD/YYYY h:mm a',
 
     attrs   : {},
     fields  : {},
@@ -80,12 +81,24 @@
 
       // determine if object is record or plain object
       var isRecord = typeof object.getFieldValue === 'function';
+      var isSearch = typeof object.getValue === 'function';
 
       if ( ! _.isEmpty(this.fields))
       {
         _.each(this.fields, function(type, field)
         {
-          attrs[field] = isRecord ? object.getFieldValue(field) : core.Util.get(object, field);
+          if (field == 'id' && (isRecord || isSearch))
+          {
+            attrs[field] = object.getId();
+          }
+          else
+          {
+            attrs[field] = isRecord ?
+              object.getFieldValue(field) :
+              isSearch ?
+                object.getValue(field) :
+                core.Util.get(object, field);
+          }
 
           // parse attr into correct type
           switch(type)
@@ -97,9 +110,8 @@
               attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseFloat(attrs[field]);
               break;
             case 'timestamp':
-              attrs[field] = moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') != 'Invalid date' ?
-                             moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') :
-                             null;
+              var date = moment(attrs[field], 'M/DD/YYYY h:mm a', true);
+              attrs[field] = date.isValid() ? attrs[field] : null;
               break;
             case 'string':
               attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : attrs[field] + '';
@@ -155,7 +167,7 @@
       return attrs;
     },
 
-    toNewRecord: function(object)
+    toCreateRecord: function(object)
     {
       object = object || this;
 
@@ -187,6 +199,22 @@
       }, this);
 
       return record;
+    },
+
+    toUpdateRecord: function()
+    {
+      var record = nlapiLoadRecord(this.recordType, this.attrs.id);
+
+      _.each(model.getChanged(), function(value, key)
+      {
+        record.setFieldValue(key, value);
+      });
+
+      _.each(model.sublists, function(sublist)
+      {
+        // search record sublist for one with id that matches and update
+        // or if doesn't match create a new sublist item
+      });
     },
 
     toHash: function(object)

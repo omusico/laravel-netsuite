@@ -271,6 +271,7 @@ _.mixin({
   core.Model = core.Base.extend(
   {
     recordType: '',
+    timeFormat: 'M/DD/YYYY h:mm a',
 
     attrs   : {},
     fields  : {},
@@ -348,12 +349,24 @@ _.mixin({
 
       // determine if object is record or plain object
       var isRecord = typeof object.getFieldValue === 'function';
+      var isSearch = typeof object.getValue === 'function';
 
       if ( ! _.isEmpty(this.fields))
       {
         _.each(this.fields, function(type, field)
         {
-          attrs[field] = isRecord ? object.getFieldValue(field) : core.Util.get(object, field);
+          if (field == 'id' && (isRecord || isSearch))
+          {
+            attrs[field] = object.getId();
+          }
+          else
+          {
+            attrs[field] = isRecord ?
+              object.getFieldValue(field) :
+              isSearch ?
+                object.getValue(field) :
+                core.Util.get(object, field);
+          }
 
           // parse attr into correct type
           switch(type)
@@ -365,9 +378,8 @@ _.mixin({
               attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseFloat(attrs[field]);
               break;
             case 'timestamp':
-              attrs[field] = moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') != 'Invalid date' ?
-                             moment(attrs[field]).format('YYYY-MM-DD HH:mm:ss') :
-                             null;
+              var date = moment(attrs[field], 'M/DD/YYYY h:mm a', true);
+              attrs[field] = date.isValid() ? attrs[field] : null;
               break;
             case 'string':
               attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : attrs[field] + '';
@@ -423,7 +435,7 @@ _.mixin({
       return attrs;
     },
 
-    toNewRecord: function(object)
+    toCreateRecord: function(object)
     {
       object = object || this;
 
@@ -455,6 +467,22 @@ _.mixin({
       }, this);
 
       return record;
+    },
+
+    toUpdateRecord: function()
+    {
+      var record = nlapiLoadRecord(this.recordType, this.attrs.id);
+
+      _.each(model.getChanged(), function(value, key)
+      {
+        record.setFieldValue(key, value);
+      });
+
+      _.each(model.sublists, function(sublist)
+      {
+        // search record sublist for one with id that matches and update
+        // or if doesn't match create a new sublist item
+      });
     },
 
     toHash: function(object)
@@ -543,13 +571,13 @@ _.mixin({
     {
       _.each(this.attrs, function(value, key)
       {
-        var date = moment(value, "YYYY-MM-DD HH:mm:ss", true);
+        var date = moment(value, 'YYYY-MM-DD HH:mm:ss', true);
 
         // if attr is a valid date in the above format,
         // then parse it into the netsuite format
         if (date.isValid())
         {
-          this.attrs[key] = date.format('MM/DD/YYYY hh:mm A');
+          this.attrs[key] = date.format('MM/DD/YYYY hh:mm a');
         }
       }, this);
 
@@ -908,7 +936,7 @@ _.mixin({
 
     create: function(model)
     {
-      var record = model.toNewRecord();
+      var record = model.toCreateRecord();
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
@@ -916,54 +944,9 @@ _.mixin({
 
     update: function(model)
     {
-      var diffs = {};
-      var record = nlapiLoadRecord(this.recordType, model.attrs.id);
 
-      _.each(model.getChanged(), function(value, key)
-      {
-        record.setFieldValue(key, value);
-      });
-
-
-
-      // for (var sublist in this.sublists)
-      // {
-      //   var count = isRecord ?
-      //               object.getLineItemCount(sublist) :
-      //               typeof object[sublist] !== 'undefined' ?
-      //                 object[sublist].length :
-      //                 0;
-      //
-      //   if (count)
-      //   {
-      //     attrs[sublist] = [];
-      //
-      //     for (var i = 1; i <= count; i++)
-      //     {
-      //       var item = {};
-      //
-      //       if (isRecord)
-      //       {
-      //         var fields = object.getAllLineItemFields(sublist);
-      //
-      //         for (var index in fields)
-      //         {
-      //           item[fields[index]] = object.getLineItemValue(sublist, fields[index], i);
-      //         }
-      //       }
-      //       else
-      //       {
-      //         item = object[sublist][i];
-      //       }
-      //
-      //       var recordType = this.sublists[sublist];
-      //       attrs[sublist].push(new recordType(item));
-      //     }
-      //   }
-      // }
-
-      nlapiSubmitRecord(record, true);
-
+      var record = model.toUpdateRecord();
+      var id = nlapiSubmitRecord(record, true);
       return model;
     },
 

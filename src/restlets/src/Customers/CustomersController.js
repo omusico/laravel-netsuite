@@ -14,7 +14,7 @@
                           .filter(input.get('filters', []))
                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
-      return this.okay(customers);
+      return this.okay(customers.toHash());
     },
 
     show: function(datain)
