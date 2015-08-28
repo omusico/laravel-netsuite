@@ -205,12 +205,12 @@
     {
       var record = nlapiLoadRecord(this.recordType, this.attrs.id);
 
-      _.each(model.getChanged(), function(value, key)
+      _.each(this.getChanged(), function(value, key)
       {
         record.setFieldValue(key, value);
       });
 
-      _.each(model.sublists, function(sublist)
+      _.each(this.sublists, function(sublist)
       {
         // search record sublist for one with id that matches and update
         // or if doesn't match create a new sublist item
