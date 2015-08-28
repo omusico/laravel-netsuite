@@ -179,13 +179,13 @@
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format('YYYY-MM-DD HH:mm:ss');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format('YYYY-MM-DD HH:mm:ss');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
     },
 
     getAddressesAttribute: function()
@@ -225,13 +225,13 @@
 
     setCreatedAtAttribute: function(value)
     {
-      value = moment(value, 'YYYY-MM-DD HH:mm:ss').format(this.timeFormat);
+      value = moment(value, core.Util.timeFormat).format(this.timeFormat);
       core.Util.set(this.attrs, 'datecreated', value);
     },
 
     setUpdatedAtAttribute: function(value)
     {
-      value = moment(value, 'YYYY-MM-DD HH:mm:ss').format(this.timeFormat);
+      value = moment(value, core.Util.timeFormat).format(this.timeFormat);
       core.Util.set(this.attrs, 'lastmodifieddate', value);
     },
 
@@ -276,13 +276,13 @@
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format('YYYY-MM-DD HH:mm:ss');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format('YYYY-MM-DD HH:mm:ss');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
     }
   });
 })(core);

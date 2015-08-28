@@ -21,13 +21,13 @@
     {
       _.each(this.attrs, function(value, key)
       {
-        var date = moment(value, 'YYYY-MM-DD HH:mm:ss', true);
+        var date = moment(value, core.Util.timeFormat, true);
 
         // if attr is a valid date in the above format,
         // then parse it into the netsuite format
         if (date.isValid())
         {
-          this.attrs[key] = date.format('MM/DD/YYYY hh:mm a');
+          this.attrs[key] = date.format(this.timeFormat);
         }
       }, this);
 
