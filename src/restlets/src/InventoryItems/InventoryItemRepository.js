@@ -5,11 +5,11 @@
     recordClass: core.InventoryItem,
     searchClass: core.InventoryItemSearchResult,
 
-    // searchColumns: [
-    //   'externalid',
-    //   'datecreated',
-    //   'lastmodifieddate'
-    // ],
+    searchColumns: [
+      'externalid',
+      'created',
+      'modified'
+    ],
 
     get: function()
     {
