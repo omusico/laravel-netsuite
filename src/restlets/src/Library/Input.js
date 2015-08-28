@@ -21,7 +21,7 @@
     {
       _.each(this.attrs, function(value, key)
       {
-        var date = moment(value, 'YYYY-MM-DD HH:mm:ss', true);
+        var date = moment(value, core.Util.timeFormat, true);
 
         // if attr is a valid date in the above format,
         // then parse it into the netsuite format

@@ -2,6 +2,8 @@
 {
   core.Util = {
 
+    timeFormat: 'YYYY-MM-DD HH:mm:ss',
+
     has: function(obj, key)
     {
       return obj !== null && hasOwnProperty.call(obj, key);
