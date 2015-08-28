@@ -30,6 +30,13 @@ var customers = [
   baseDir + 'Customers/CustomersController.js'
 ];
 
+var inventoryItems = [
+  baseDir + 'InventoryItems/InventoryItem.js',
+  baseDir + 'InventoryItems/InventoryItemSearchResult.js',
+  baseDir + 'InventoryItems/InventoryItemRepository.js',
+  baseDir + 'InventoryItems/InventoryItemsController.js'
+];
+
 var bootstraps = [
   baseDir + 'Bootstraps/**/*.js'
 ];
@@ -48,6 +55,13 @@ gulp.task('customers', function()
       .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('inventoryItems', function()
+{
+  gulp.src(inventoryItems)
+      .pipe(concat('inventory_items.js'))
+      .pipe(gulp.dest(buildDir));
+});
+
 gulp.task('bootstraps', function()
 {
   gulp.src(bootstraps)
@@ -62,10 +76,11 @@ gulp.task('upload', function()
 
 gulp.task('watch', function()
 {
-  gulp.watch(library,    ['library']);
-  gulp.watch(customers,  ['customers']);
-  gulp.watch(bootstraps, ['bootstraps']);
+  gulp.watch(library,               ['library']);
+  gulp.watch(customers,             ['customers']);
+  gulp.watch(inventoryItems,        ['inventoryItems']);
+  gulp.watch(bootstraps,            ['bootstraps']);
   gulp.watch(buildDir + '**/*.js',  ['upload']);
 });
 
-gulp.task('default', ['library', 'customers', 'bootstraps', 'upload']);
+gulp.task('default', ['library', 'customers', 'inventoryItems', 'bootstraps', 'upload']);
