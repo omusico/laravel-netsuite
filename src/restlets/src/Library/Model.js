@@ -110,7 +110,7 @@
               attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseFloat(attrs[field]);
               break;
             case 'timestamp':
-              var date = moment(attrs[field], 'M/DD/YYYY h:mm a', true);
+              var date = moment(attrs[field], this.timeFormat, true);
               attrs[field] = date.isValid() ? attrs[field] : null;
               break;
             case 'string':

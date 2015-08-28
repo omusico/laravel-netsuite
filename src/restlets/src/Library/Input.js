@@ -27,7 +27,7 @@
         // then parse it into the netsuite format
         if (date.isValid())
         {
-          this.attrs[key] = date.format('MM/DD/YYYY hh:mm a');
+          this.attrs[key] = date.format(this.timeFormat);
         }
       }, this);
 
