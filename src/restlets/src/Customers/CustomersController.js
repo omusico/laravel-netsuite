@@ -74,7 +74,7 @@
 
     update: function(datain)
     {
-      var input     = new core.Input(datain);
+      var input     = new core.Input(datain).parseArrays();
       var validator = new core.Validator(input, {
         id                     : 'required',
         customers_id           : 'required',
@@ -86,7 +86,7 @@
 
       if (validator.passes())
       {
-        // set defaults
+        // get what we need
         var attrs = input.only(
           'id',
           'customers_id',
