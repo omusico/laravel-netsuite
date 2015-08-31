@@ -399,13 +399,20 @@ _.mixin({
       }
       else
       {
-        _.each(object, function(value, key)
+        if (isRecord || isSearch)
         {
-          if (typeof object[key] !== 'function')
+          core.Log.debug('fields', object.getAllFields());
+        }
+        else
+        {
+          _.each(object, function(value, key)
           {
-            attrs[key] = core.Util.get(object, key);
-          }
-        });
+            if (typeof object[key] !== 'function')
+            {
+              attrs[key] = core.Util.get(object, key);
+            }
+          });
+        }
       }
 
       if ( ! _.isEmpty(this.sublists))
@@ -424,6 +431,8 @@ _.mixin({
 
               if (isRecord)
               {
+                core.Log.debug('sublist fields', object.getAllLineItemFields(sublist));
+
                 _.each(new recordType().fields, function(value, key)
                 {
                   item[key] = object.getLineItemValue(sublist, key, i);

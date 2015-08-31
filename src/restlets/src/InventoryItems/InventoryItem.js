@@ -74,7 +74,7 @@
 
     getPriceListsAttribute: function()
     {
-      var priceLists = core.Util.get(this.attrs, 'pricelists', []);
+      var priceLists = core.Util.get(this.attrs, 'price', []);
 
       return _.map(priceLists, function(priceList)
       {

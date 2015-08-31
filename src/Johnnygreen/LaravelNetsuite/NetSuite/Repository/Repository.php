@@ -20,7 +20,6 @@ class Repository implements RepositoryInterface {
   public $filters;
 
   public $request;
-
   public $response;
 
 

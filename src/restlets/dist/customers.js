@@ -140,7 +140,7 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
+      'ns_id',
       'customers_id',
       'customers_firstname',
       'customers_lastname',
@@ -150,6 +150,11 @@
       'updated_at',
       'addresses'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getCustomersIdAttribute: function()
     {
@@ -196,6 +201,11 @@
       {
         return address.toHash();
       });
+    },
+
+    setNsIdAttribute: function()
+    {
+      core.Util.set(this.attrs, 'id', value);
     },
 
     setCustomersIdAttribute: function(value)

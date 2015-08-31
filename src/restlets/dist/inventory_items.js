@@ -34,10 +34,10 @@
     recordType: '',
 
     // fields to be parsed on input
-    fields: {
-      'currency'  : 'int',
-      'pricelist' : 'object'
-    },
+    // fields: {
+    //   'currency'  : 'object',
+    //   'pricelist' : 'object'
+    // },
 
     visible: [
       'pricelist',
@@ -45,9 +45,9 @@
       'currency_name'
     ],
 
-    getPriceAttribute: function()
+    getPricelistAttribute: function()
     {
-      core.Log.debug('prices', core.Util.get(this.attrs, 'pricelist'));
+      core.Log.debug('prices', this.attrs);
 
       return core.Util.get(this.attrs, 'pricelist');
     },
@@ -140,7 +140,7 @@
 
     getPriceListsAttribute: function()
     {
-      var priceLists = core.Util.get(this.attrs, 'pricelists', []);
+      var priceLists = core.Util.get(this.attrs, 'price', []);
 
       return _.map(priceLists, function(priceList)
       {
