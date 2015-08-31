@@ -65,10 +65,10 @@ class CustomersTest extends \TestCase {
    */
   public function testUpdate($model)
   {
-    // $model->customers_firstname = '';
-    // $customer = $this->repository->update($model);
-    // $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
-    // $this->assertEquals($model->customers_firstname, $customer->customers_firstname);
+    $model->customers_firstname = 'UpdatedTest';
+    $customer = $this->repository->update($model);
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
+    $this->assertEquals($model->customers_firstname, $customer->customers_firstname);
     return $model;
   }
 
