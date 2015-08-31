@@ -125,12 +125,12 @@
       'lastname'         : 'string',
       'phone'            : 'string',
       'email'            : 'string',
-      'datecreated'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp',
       'category'         : 'int',
       'pricelevel'       : 'int',
       'isperson'         : 'string',
-      'taxable'          : 'string'
+      'taxable'          : 'string',
+      'datecreated'      : 'timestamp',
+      'lastmodifieddate' : 'timestamp'
     },
 
     // sublists to be parsed on input

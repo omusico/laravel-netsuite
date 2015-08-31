@@ -5,37 +5,91 @@
     recordType: 'inventoryitem',
 
     // fields to be parsed on input
-    // fields: {
-    //   'id'               : 'int',
-    //   'externalid'       : 'string', // this must be a string or it will add a .0 to the end, you got me...
-    //   'firstname'        : 'string',
-    //   'lastname'         : 'string',
-    //   'phone'            : 'string',
-    //   'email'            : 'string',
-    //   'datecreated'      : 'timestamp',
-    //   'lastmodifieddate' : 'timestamp',
-    //   'category'         : 'int',
-    //   'pricelevel'       : 'int',
-    //   'isperson'         : 'string',
-    //   'taxable'          : 'string'
-    // },
+    fields: {
+      'id'               : 'int',
+      'externalid'       : 'string',
+      'displayname'      : 'string',
+      'salesdescription' : 'string',
+      'pricinggroup'     : 'object',
+      'createddate'      : 'timestamp',
+      'lastmodifieddate' : 'timestamp'
+    },
 
     // sublists to be parsed on input
-    // sublists: {
-    //   'addressbook' : core.Address
-    // },
+    sublists: {
+      'locations' : core.InventoryItemLocation,
+      'price'     : core.InventoryItemPriceList
+    },
 
     // fields to be parsed on output
-    // visible: [
-    //   'id',
-    //   'customers_id',
-    //   'customers_firstname',
-    //   'customers_lastname',
-    //   'customers_telephone',
-    //   'customers_email_address',
-    //   'created_at',
-    //   'updated_at',
-    //   'addresses'
-    // ],
+    visible: [
+      'id',
+      'name',
+      'model_number',
+      'products_id',
+      'created_at',
+      'updated_at',
+
+      // relations
+      'price_lists',
+      'inventory_locations'
+    ],
+
+    getNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'salesdescription');
+    },
+
+    getModelNumberAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'displayname');
+    },
+
+    getProductsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'externalid');
+    },
+
+    getCreatedAtAttribute: function()
+    {
+      var value = core.Util.get(this.attrs, 'createddate');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    },
+
+    getUpdatedAtAttribute: function()
+    {
+      var value = core.Util.get(this.attrs, 'lastmodifieddate');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    },
+
+    getAddressesAttribute: function()
+    {
+      var addresses = core.Util.get(this.attrs, 'addressbook', []);
+
+      return _.map(addresses, function(address)
+      {
+        return address.toHash();
+      });
+    },
+
+    getPriceListsAttribute: function()
+    {
+      var priceLists = core.Util.get(this.attrs, 'pricelists', []);
+
+      return _.map(priceLists, function(priceList)
+      {
+        return priceList.toHash();
+      });
+    },
+
+    getInventoryLocationsAttribute: function()
+    {
+      var locations = core.Util.get(this.attrs, 'locations', []);
+
+      return _.map(locations, function(location)
+      {
+        return location.toHash();
+      });
+    },
   });
 })(core);

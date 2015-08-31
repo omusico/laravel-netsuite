@@ -1,42 +1,162 @@
 (function(core)
 {
+  core.InventoryItemLocation = core.Model.extend(
+  {
+    recordType: '',
+
+    // fields to be parsed on input
+    fields: {
+      'location_display'  : 'string',
+      'quantityavailable' : 'int'
+    },
+
+    visible: [
+      'name',
+      'quantity'
+    ],
+
+    getNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'location_display');
+    },
+
+    getQuantityAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'quantityavailable');
+    },
+  });
+})(core);
+
+(function(core)
+{
+  core.InventoryItemPriceList = core.Model.extend(
+  {
+    recordType: '',
+
+    // fields to be parsed on input
+    fields: {
+      'currency'  : 'int',
+      'pricelist' : 'object'
+    },
+
+    visible: [
+      'pricelist',
+      'currency_id',
+      'currency_name'
+    ],
+
+    getPriceAttribute: function()
+    {
+      core.Log.debug('prices', core.Util.get(this.attrs, 'pricelist'));
+
+      return core.Util.get(this.attrs, 'pricelist');
+    },
+
+    getCurrencyIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'currency.internalid');
+    },
+
+    getCurrencyNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'currency.name');
+    }
+  });
+})(core);
+
+(function(core)
+{
   core.InventoryItem = core.Model.extend(
   {
     recordType: 'inventoryitem',
 
     // fields to be parsed on input
-    // fields: {
-    //   'id'               : 'int',
-    //   'externalid'       : 'string', // this must be a string or it will add a .0 to the end, you got me...
-    //   'firstname'        : 'string',
-    //   'lastname'         : 'string',
-    //   'phone'            : 'string',
-    //   'email'            : 'string',
-    //   'datecreated'      : 'timestamp',
-    //   'lastmodifieddate' : 'timestamp',
-    //   'category'         : 'int',
-    //   'pricelevel'       : 'int',
-    //   'isperson'         : 'string',
-    //   'taxable'          : 'string'
-    // },
+    fields: {
+      'id'               : 'int',
+      'externalid'       : 'string',
+      'displayname'      : 'string',
+      'salesdescription' : 'string',
+      'pricinggroup'     : 'object',
+      'createddate'      : 'timestamp',
+      'lastmodifieddate' : 'timestamp'
+    },
 
     // sublists to be parsed on input
-    // sublists: {
-    //   'addressbook' : core.Address
-    // },
+    sublists: {
+      'locations' : core.InventoryItemLocation,
+      'price'     : core.InventoryItemPriceList
+    },
 
     // fields to be parsed on output
-    // visible: [
-    //   'id',
-    //   'customers_id',
-    //   'customers_firstname',
-    //   'customers_lastname',
-    //   'customers_telephone',
-    //   'customers_email_address',
-    //   'created_at',
-    //   'updated_at',
-    //   'addresses'
-    // ],
+    visible: [
+      'id',
+      'name',
+      'model_number',
+      'products_id',
+      'created_at',
+      'updated_at',
+
+      // relations
+      'price_lists',
+      'inventory_locations'
+    ],
+
+    getNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'salesdescription');
+    },
+
+    getModelNumberAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'displayname');
+    },
+
+    getProductsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'externalid');
+    },
+
+    getCreatedAtAttribute: function()
+    {
+      var value = core.Util.get(this.attrs, 'createddate');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    },
+
+    getUpdatedAtAttribute: function()
+    {
+      var value = core.Util.get(this.attrs, 'lastmodifieddate');
+      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    },
+
+    getAddressesAttribute: function()
+    {
+      var addresses = core.Util.get(this.attrs, 'addressbook', []);
+
+      return _.map(addresses, function(address)
+      {
+        return address.toHash();
+      });
+    },
+
+    getPriceListsAttribute: function()
+    {
+      var priceLists = core.Util.get(this.attrs, 'pricelists', []);
+
+      return _.map(priceLists, function(priceList)
+      {
+        return priceList.toHash();
+      });
+    },
+
+    getInventoryLocationsAttribute: function()
+    {
+      var locations = core.Util.get(this.attrs, 'locations', []);
+
+      return _.map(locations, function(location)
+      {
+        return location.toHash();
+      });
+    },
   });
 })(core);
 
@@ -165,21 +285,23 @@
       return this.okay(inventoryItems.toHash());
     },
 
-    // show: function(datain)
-    // {
-    //   var input     = new core.Input(datain);
-    //   var validator = new core.Validator(input, {id: 'required'}, {customers_id : 'required'});
-    //
-    //   if (validator.passes())
-    //   {
-    //     var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
-    //     return customer ? this.okay(customer.toHash()) : this.notFound();
-    //   }
-    //   else
-    //   {
-    //     return this.badRequest(validator.toHash());
-    //   }
-    // },
+    show: function(datain)
+    {
+      var input     = new core.Input(datain);
+      var validator = new core.Validator(input, {id: 'required'}, {products_id : 'required'});
+
+      // return nlapiLoadRecord('inventoryitem', input.get('products_id'));
+
+      if (validator.passes())
+      {
+        var inventoryItem = input.has('id') ? this.inventoryItems.find(input.get('id')) : this.inventoryItems.findByExternalId(input.get('products_id'));
+        return inventoryItem ? this.okay(inventoryItem.toHash()) : this.notFound();
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
     //
     // store: function(datain)
     // {

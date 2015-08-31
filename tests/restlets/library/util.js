@@ -57,6 +57,21 @@ describe('core.Util', function()
       expect(core.Util.get({name: 'Johnny'}, '0.name')).to.equal(null);
     });
 
+    it('should return the proper falsie value unless that value is undefined', function()
+    {
+      expect(core.Util.get({name: {first: false}},     'name.first')).to.equal(false);
+      expect(core.Util.get({name: {first: 0}},         'name.first')).to.equal(0);
+      expect(core.Util.get({name: {first: ''}},        'name.first')).to.equal('');
+      expect(core.Util.get({name: {first: null}},      'name.first')).to.equal(null);
+      expect(core.Util.get({name: {first: undefined}}, 'name.first')).to.equal(null);
+
+      expect(core.Util.get({name: {first: false}},     'name.first', 'test')).to.equal(false);
+      expect(core.Util.get({name: {first: 0}},         'name.first', 'test')).to.equal(0);
+      expect(core.Util.get({name: {first: ''}},        'name.first', 'test')).to.equal('');
+      expect(core.Util.get({name: {first: null}},      'name.first', 'test')).to.equal('test');
+      expect(core.Util.get({name: {first: undefined}}, 'name.first', 'test')).to.equal('test');
+    });
+
     it('should return fallback when value is undefined and fallback is not undefined', function()
     {
       expect(core.Util.get({}, 'name', 'Johnny')).to.equal('Johnny');
@@ -66,6 +81,7 @@ describe('core.Util', function()
       expect(core.Util.get({}, 'name', [])).to.deep.equal([]);
       expect(core.Util.get({}, 'name', {})).to.deep.equal({});
       expect(core.Util.get({}, 'name', 0)).to.equal(0);
+
       expect(core.Util.get({}, 'name', 1)).to.equal(1);
       expect(core.Util.get({}, 'name', true)).to.equal(true);
     });

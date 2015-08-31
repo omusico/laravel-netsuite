@@ -31,6 +31,8 @@ var customers = [
 ];
 
 var inventoryItems = [
+  baseDir + 'InventoryItems/InventoryItemLocation.js',
+  baseDir + 'InventoryItems/InventoryItemPriceList.js',
   baseDir + 'InventoryItems/InventoryItem.js',
   baseDir + 'InventoryItems/InventoryItemSearchResult.js',
   baseDir + 'InventoryItems/InventoryItemRepository.js',

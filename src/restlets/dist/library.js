@@ -180,7 +180,13 @@ _.mixin({
 
       // if we are already working with a flattened
       // array with dot notation, return the key
-      if (typeof object[key] !== 'undefined') return object[key] || (_.isUndefined(fallback) ? null : fallback);
+      if (typeof object[key] !== 'undefined')
+      {
+        // return falsie values
+        if (_.contains([false, '', 0], object[key])) return object[key];
+
+        if (_.isNull(object[key]) && ! _.isUndefined(fallback)) return fallback;
+      }
 
       // proceed with trying to find value
       var index     = key.indexOf('.');

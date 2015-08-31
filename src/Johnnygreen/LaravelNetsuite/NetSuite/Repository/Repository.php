@@ -156,7 +156,7 @@ class Repository implements RepositoryInterface {
 
   public function convertResponseToModel()
   {
-    return $this->response()->isSuccessful() ? $this->convertArrayToModel($this->response()->json()) : null;
+    return $this->responseOkay() ? $this->convertArrayToModel($this->response()->json()) : null;
   }
 
   public function convertResponseToCollection()
@@ -249,14 +249,14 @@ class Repository implements RepositoryInterface {
   {
     $this->request('POST', $this->endpoint, $attributes);
     $this->send();
-    return $this->convertResponseToModel();
+    return $this->responseOkay() ? $this->convertResponseToModel() : false;
   }
 
   public function update($attributes)
   {
     $this->request('PUT', $this->endpoint, $attributes);
     $this->send();
-    return $this->convertResponseToModel();
+    return $this->responseOkay() ? $this->convertResponseToModel() : false;
   }
 
   public function destroy($id)
