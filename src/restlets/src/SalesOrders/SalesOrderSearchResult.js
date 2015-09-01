@@ -1,6 +1,6 @@
 (function(core)
 {
-  core.CustomerSearchResult = core.Model.extend(
+  core.SalesOrderSearchResult = core.Model.extend(
   {
     // fields to be parsed on input
     fields: {
@@ -13,7 +13,7 @@
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'customers_id',
+      'orders_id',
       'created_at',
       'updated_at'
     ],
@@ -23,7 +23,7 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getCustomersIdAttribute: function()
+    getOrdersIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },

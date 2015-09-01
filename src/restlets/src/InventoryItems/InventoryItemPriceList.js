@@ -5,32 +5,43 @@
     recordType: '',
 
     // fields to be parsed on input
-    // fields: {
-    //   'currency'  : 'object',
-    //   'pricelist' : 'object'
-    // },
+    fields: {
+      'pricelevel'     : 'int',
+      'pricelevelname' : 'object',
+      'price_1_'       : 'float',
+      'currency'       : 'int'
+    },
+
+    // matrices: [
+    //   'currency',
+    //   'price'
+    // ],
 
     visible: [
-      'pricelist',
+      'ns_id',
+      'price_list_name',
+      'price',
       'currency_id',
-      'currency_name'
     ],
 
-    getPricelistAttribute: function()
+    getNsIdAttribute: function()
     {
-      core.Log.debug('prices', this.attrs);
+      return core.Util.get(this.attrs, 'pricelevel');
+    },
 
-      return core.Util.get(this.attrs, 'pricelist');
+    getPriceListNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'pricelevelname');
+    },
+
+    getPriceAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'price_1_');
     },
 
     getCurrencyIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'currency.internalid');
-    },
-
-    getCurrencyNameAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'currency.name');
+      return core.Util.get(this.attrs, 'currency');
     }
   });
 })(core);

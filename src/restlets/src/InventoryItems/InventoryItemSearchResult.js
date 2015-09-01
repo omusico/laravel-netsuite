@@ -12,11 +12,16 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
+      'ns_id',
       'products_id',
       'created_at',
       'updated_at'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getProductsIdAttribute: function()
     {

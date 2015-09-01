@@ -365,6 +365,7 @@ _.mixin({
         {
           if (field == 'id' && (isRecord || isSearch))
           {
+            // core.Log.debug('fields', {recordType: object.getRecordType(), fields: object.getAllFields()});
             attrs[field] = object.getId();
           }
           else
@@ -399,12 +400,12 @@ _.mixin({
       }
       else
       {
-        if (isRecord || isSearch)
-        {
-          core.Log.debug('fields', object.getAllFields());
-        }
-        else
-        {
+        // if (isRecord || isSearch)
+        // {
+        //   core.Log.debug('fields', {recordType: object.getRecordType(), fields: object.getAllFields()});
+        // }
+        // else
+        // {
           _.each(object, function(value, key)
           {
             if (typeof object[key] !== 'function')
@@ -412,7 +413,7 @@ _.mixin({
               attrs[key] = core.Util.get(object, key);
             }
           });
-        }
+        // }
       }
 
       if ( ! _.isEmpty(this.sublists))
@@ -431,7 +432,7 @@ _.mixin({
 
               if (isRecord)
               {
-                core.Log.debug('sublist fields', object.getAllLineItemFields(sublist));
+                // core.Log.debug('sublist fields', {recordType: sublist, fields: object.getAllLineItemFields(sublist)});
 
                 _.each(new recordType().fields, function(value, key)
                 {

@@ -23,7 +23,7 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
+      'ns_id',
       'name',
       'model_number',
       'products_id',
@@ -34,6 +34,11 @@
       'price_lists',
       'inventory_locations'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getNameAttribute: function()
     {

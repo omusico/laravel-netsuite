@@ -14,7 +14,7 @@
     },
 
     visible: [
-      'id',
+      'ns_id',
       'entry_firstname',
       'entry_lastname',
       'entry_street_address',
@@ -24,6 +24,11 @@
       'entry_state',
       'entry_country'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getEntryFirstnameAttribute: function()
     {
@@ -272,11 +277,16 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
+      'ns_id',
       'customers_id',
       'created_at',
       'updated_at'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getCustomersIdAttribute: function()
     {

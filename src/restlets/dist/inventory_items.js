@@ -6,14 +6,21 @@
 
     // fields to be parsed on input
     fields: {
+      'locationid'        : 'int',
       'location_display'  : 'string',
       'quantityavailable' : 'int'
     },
 
     visible: [
+      'ns_id',
       'name',
       'quantity'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'locationid');
+    },
 
     getNameAttribute: function()
     {
@@ -34,32 +41,43 @@
     recordType: '',
 
     // fields to be parsed on input
-    // fields: {
-    //   'currency'  : 'object',
-    //   'pricelist' : 'object'
-    // },
+    fields: {
+      'pricelevel'     : 'int',
+      'pricelevelname' : 'object',
+      'price_1_'       : 'float',
+      'currency'       : 'int'
+    },
+
+    // matrices: [
+    //   'currency',
+    //   'price'
+    // ],
 
     visible: [
-      'pricelist',
+      'ns_id',
+      'price_list_name',
+      'price',
       'currency_id',
-      'currency_name'
     ],
 
-    getPricelistAttribute: function()
+    getNsIdAttribute: function()
     {
-      core.Log.debug('prices', this.attrs);
+      return core.Util.get(this.attrs, 'pricelevel');
+    },
 
-      return core.Util.get(this.attrs, 'pricelist');
+    getPriceListNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'pricelevelname');
+    },
+
+    getPriceAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'price_1_');
     },
 
     getCurrencyIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'currency.internalid');
-    },
-
-    getCurrencyNameAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'currency.name');
+      return core.Util.get(this.attrs, 'currency');
     }
   });
 })(core);
@@ -89,7 +107,7 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
+      'ns_id',
       'name',
       'model_number',
       'products_id',
@@ -100,6 +118,11 @@
       'price_lists',
       'inventory_locations'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getNameAttribute: function()
     {
@@ -174,11 +197,16 @@
 
     // fields to be parsed on output
     visible: [
-      'id',
+      'ns_id',
       'products_id',
       'created_at',
       'updated_at'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getProductsIdAttribute: function()
     {
@@ -290,7 +318,7 @@
       var input     = new core.Input(datain);
       var validator = new core.Validator(input, {id: 'required'}, {products_id : 'required'});
 
-      // return nlapiLoadRecord('inventoryitem', input.get('products_id'));
+      // return nlapiLoadRecord('inventoryitem', input.get('id'));
 
       if (validator.passes())
       {
@@ -301,108 +329,6 @@
       {
         return this.badRequest(validator.toHash());
       }
-    },
-    //
-    // store: function(datain)
-    // {
-    //   var input = new core.Input(datain).parseArrays();
-    //
-    //   var validator = new core.Validator(input, {
-    //     customers_id           : 'required',
-    //     customers_firstname    : 'required',
-    //     customers_lastname     : 'required',
-    //     customers_telephone    : 'required',
-    //     customers_email_address: 'required'
-    //   });
-    //
-    //   if (validator.passes())
-    //   {
-    //     // set defaults
-    //     var attrs = _.defaults(input.only(
-    //       'customers_id',
-    //       'customers_firstname',
-    //       'customers_lastname',
-    //       'customers_telephone',
-    //       'customers_email_address',
-    //       'addresses'
-    //     ), {
-    //       category  : 3,   // Retail
-    //       pricelevel: 5,   // Retail Pricing
-    //       isperson  : 'T', // Individual
-    //       taxable   : 'T'  // Taxable
-    //     });
-    //
-    //     var customer = this.customers.create(attrs);
-    //
-    //     return this.created(customer.toHash());
-    //   }
-    //   else
-    //   {
-    //     return this.badRequest(validator.toHash());
-    //   }
-    // },
-    //
-    // update: function(datain)
-    // {
-    //   var input     = new core.Input(datain);
-    //   var validator = new core.Validator(input, {
-    //     id                     : 'required',
-    //     customers_id           : 'required',
-    //     customers_firstname    : 'required',
-    //     customers_lastname     : 'required',
-    //     customers_telephone    : 'required',
-    //     customers_email_address: 'required'
-    //   });
-    //
-    //   if (validator.passes())
-    //   {
-    //     // set defaults
-    //     var attrs = input.only(
-    //       'id',
-    //       'customers_id',
-    //       'customers_firstname',
-    //       'customers_lastname',
-    //       'customers_telephone',
-    //       'customers_email_address',
-    //       'addresses'
-    //     );
-    //
-    //     var customer = this.customers.update(attrs);
-    //     return this.okay(customer.toHash());
-    //   }
-    //   else
-    //   {
-    //     return this.badRequest(validator.toHash());
-    //   }
-    // },
-    //
-    // destroy: function(datain)
-    // {
-    //   var input     = new core.Input(datain);
-    //   var validator = new core.Validator(input, {id: 'required'}, {customers_id : 'required'});
-    //
-    //   if (validator.passes())
-    //   {
-    //     try
-    //     {
-    //       var success = input.has('id') ?
-    //                     this.customers.destroy(input.get('id')) :
-    //                     this.customers.destroyByExternalId(input.get('customers_id'));
-    //
-    //       // returns are ignored for delete requests?
-    //       // return success ? this.okay([]) : this.notFound();
-    //     }
-    //     catch(e)
-    //     {
-    //       // return this.internalServerError(e); // returns are ignored for delete requests?
-    //       this.internalServerError(e);
-    //     }
-    //   }
-    //   else
-    //   {
-    //     // return this.badRequest(validator.toHash()); // returns are ignored for delete requests?
-    //     this.badRequest(validator.toHash());
-    //   }
-    // }
+    }
   });
 })(core);

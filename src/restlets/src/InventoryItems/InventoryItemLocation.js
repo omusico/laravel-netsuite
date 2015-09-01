@@ -6,14 +6,21 @@
 
     // fields to be parsed on input
     fields: {
+      'locationid'        : 'int',
       'location_display'  : 'string',
       'quantityavailable' : 'int'
     },
 
     visible: [
+      'ns_id',
       'name',
       'quantity'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'locationid');
+    },
 
     getNameAttribute: function()
     {

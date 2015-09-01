@@ -14,7 +14,7 @@
     },
 
     visible: [
-      'id',
+      'ns_id',
       'entry_firstname',
       'entry_lastname',
       'entry_street_address',
@@ -24,6 +24,11 @@
       'entry_state',
       'entry_country'
     ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
 
     getEntryFirstnameAttribute: function()
     {
