@@ -1,46 +1,172 @@
 (function(core)
 {
+  core.SalesOrderItem = core.Model.extend(
+  {
+    recordType: 'salesorderitem',
+
+    fields: {
+      'quantity' : 'int',   // quantity
+      'rate'     : 'float', // price
+      'amount'   : 'float', // line item price
+      'taxcode'  : 'int',   // tax code
+      'location' : 'int',
+    }
+  });
+})(core);
+
+(function(core)
+{
   core.SalesOrder = core.Model.extend(
   {
     recordType: 'salesorder',
 
     // fields to be parsed on input
     fields: {
-      'id'               : 'int',
-      'externalid'       : 'string',
-      'datecreated'      : 'timestamp',
+      'id'               : 'int',    // ns_id
+      'externalid'       : 'string', // orders_id
+      'class'            : 'int',    // web, retail, etc
+      'authcode'         : 'string',
+
+      'location'         : 'int',
+
+      // shipping
+      'shipaddressee'    : 'string',
+      'shipaddress'      : 'string',
+      'shipcity'         : 'string',
+      'shipstate'        : 'string',
+      'shipzip'          : 'string',
+      'shipcountry'      : 'string',
+      'shipmethod'       : 'string',
+      'shipcarrier'      : 'string',
+      'shipping_rate'    : 'string',
+
+      // totals
+      'discounttotal'    : 'notsure',
+      'discountitem'     : 'notsure',
+      'shippingcost'     : 'float',
+      'subtotal'         : 'float',
+      'total'            : 'float',
+
+      'createddate'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
     },
 
+    sublists: {
+      'item' : core.SalesOrderItem
+    },
+
     // fields to be parsed on output
-    visible: [
-      'ns_id',
-      'orders_id'
-    ],
+    // visible: [
+    //   'ns_id',
+    //   'orders_id'
+    // ],
 
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    getOrdersIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'externalid');
-    },
-
-    getCreatedAtAttribute: function()
-    {
-      var value = core.Util.get(this.attrs, 'createddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
-    },
-
-    getUpdatedAtAttribute: function()
-    {
-      var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
-    }
+    // getNsIdAttribute: function()
+    // {
+    //   return core.Util.get(this.attrs, 'id');
+    // },
+    //
+    // getOrdersIdAttribute: function()
+    // {
+    //   return core.Util.get(this.attrs, 'externalid');
+    // },
+    //
+    // getCreatedAtAttribute: function()
+    // {
+    //   var value = core.Util.get(this.attrs, 'createddate');
+    //   return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    // },
+    //
+    // getUpdatedAtAttribute: function()
+    // {
+    //   var value = core.Util.get(this.attrs, 'lastmodifieddate');
+    //   return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    // }
   });
 })(core);
+
+// billings
+//   "billaddress",
+//   "billingaddress2_set",
+
+// totals & payment
+//   "shippingcostoverridden",
+//   "promotionapplied",
+//   "getauth",
+//   "currency",
+//   "ispaypal",
+//   "taxamount2override",
+//   "methodtokenized",
+//   "paypalprocessed",
+//   "overrideshippingcost",
+//   "oldpaypaltranid",
+//   "ispaymethcc",
+
+// general
+//   "email",
+//   "baserecordtype",
+//   "tranid", //   "transactionnumber",
+//   "externalid",
+//   "message",
+//   "isonlinetransaction",
+//   "saleseffectivedate",
+//   "location",
+//   "createddate",
+//   "lastmodifieddate",
+
+// uncategorized
+//   "type",
+//   "fedexservicename",
+//   "promodiscount",
+//   "shipcomplete",
+//   "paypalauthid",
+//   "salesrep",
+//   "shippingaddress_text",
+
+//   "paymentprocessingmode",
+//   "billisresidential",
+
+//   "persistedpromocode",
+//   "paypaltoken",
+//   "paymentmethod",
+//   "linkedtrackingnumbers",
+//   "overallunbilledorders",
+//   "shipaddresslist",
+//   "paypaloverride",
+//   "orderstatus",
+//   "discountrate",
+//   "couponcode",
+//   "shadow_shipaddress",
+//   "billaddresslist",
+//   "promocode",
+//   "oldpaypalstatus",
+//   "paypalprocess",
+//   "terms",
+//   "authcode",
+//   "item_total",
+
+//   "shipoverride",
+//   "paypaltranid",
+//   "pendingpaypalauth",
+//   "webstore",
+//   "customercode",
+//   "trancardid",
+//   "paypalpayerid",
+
+//   "shipisresidential",
+//   "thirdpartycarrier",
+//   "paypalauthiddisp",
+//   "synceventfield",
+//   "linked",
+//   "shippingaddress2_set",
+//   "status",
+//   "class",
+//   "shippingaddress_type",
+//   "taxamountoverride",
+//   "trandate",
+//   "giftcertapplied",
+//   "paypalstatus",
+// ]
 
 (function(core)
 {
@@ -136,20 +262,6 @@
     //
     //   return model;
     // },
-    //
-    // destroy: function(id)
-    // {
-    //   var model = this.find(id);
-    //   if ( ! model) return false;
-    //   return core.Repository.prototype.destroy.call(this, model);
-    // },
-    //
-    // destroyByExternalId: function(external_id)
-    // {
-    //   var model = this.findByExternalId(external_id);
-    //   if ( ! model) return false;
-    //   return core.Repository.prototype.destroy.call(this, model);
-    // }
   });
 })(core);
 
@@ -164,32 +276,22 @@
 
     index: function(datain)
     {
-
-
       var input          = new core.Input(datain).parseDates().parseArrays();
+      var salesOrders = this.salesOrders
+                          .filter(input.get('filters', []))
+                          .paginate(input.get('page', 1), input.get('per_page', 10));
 
-      var record = nlapiLoadRecord('salesorder', 59229);
-      core.Log.debug('fields', {recordType: record.getRecordType(), fields: record.getAllFields()});
-
-      return record;
-
-      // var salesOrders = this.salesOrders
-      //                     .filter(input.get('filters', []))
-      //                     .paginate(input.get('page', 1), input.get('per_page', 10));
-      //
-      // return this.okay(salesOrders.toHash());
+      return this.okay(salesOrders.toHash());
     },
 
     show: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {id: 'required'}, {orders_id : 'required'});
-
-      // return nlapiLoadRecord('salesorder', input.get('id'));
+      var validator = new core.Validator(input, {ns_id: 'required'}, {orders_id : 'required'});
 
       if (validator.passes())
       {
-        var salesOrder = input.has('id') ? this.salesOrders.find(input.get('id')) : this.salesOrders.findByExternalId(input.get('orders_id'));
+        var salesOrder = input.has('ns_id') ? this.salesOrders.find(input.get('ns_id')) : this.salesOrders.findByExternalId(input.get('orders_id'));
         return salesOrder ? this.okay(salesOrder.toHash()) : this.notFound();
       }
       else

@@ -1,20 +1,20 @@
 (function(core)
 {
-  core.SalesOrdersController = core.Controller.extend(
+  core.CashSalesController = core.Controller.extend(
   {
     initialize: function()
     {
-      this.salesOrders = new core.SalesOrderRepository();
+      this.cachSales = new core.CashSaleRepository();
     },
 
     index: function(datain)
     {
       var input          = new core.Input(datain).parseDates().parseArrays();
-      var salesOrders = this.salesOrders
+      var cachSales = this.cachSales
                           .filter(input.get('filters', []))
                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
-      return this.okay(salesOrders.toHash());
+      return this.okay(cachSales.toHash());
     },
 
     show: function(datain)
@@ -24,8 +24,8 @@
 
       if (validator.passes())
       {
-        var salesOrder = input.has('ns_id') ? this.salesOrders.find(input.get('ns_id')) : this.salesOrders.findByExternalId(input.get('orders_id'));
-        return salesOrder ? this.okay(salesOrder.toHash()) : this.notFound();
+        var cachSale = input.has('ns_id') ? this.cachSales.find(input.get('ns_id')) : this.cachSales.findByExternalId(input.get('orders_id'));
+        return cachSale ? this.okay(cachSale.toHash()) : this.notFound();
       }
       else
       {

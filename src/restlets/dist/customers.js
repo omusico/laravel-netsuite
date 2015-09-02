@@ -70,48 +70,53 @@
       return core.Util.get(this.attrs, 'country', '');
     },
 
+    setNsIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'id', value);
+    },
+
     setEntryFirstnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
       name = _.isString(name) ? value + ' ' + name : value;
-      return core.Util.set(this.attrs, 'addressee', name);
+      core.Util.set(this.attrs, 'addressee', name);
     },
 
     setEntryLastnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
       name = _.isString(name) ? name + ' ' + value : value;
-      return core.Util.set(this.attrs, 'addressee', name);
+      core.Util.set(this.attrs, 'addressee', name);
     },
 
     setEntryStreetAddressAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'addr1', value);
+      core.Util.set(this.attrs, 'addr1', value);
     },
 
     setEntryStreetAddress2Attribute: function(value)
     {
-      return core.Util.set(this.attrs, 'addr2', value);
+      core.Util.set(this.attrs, 'addr2', value);
     },
 
     setEntryPostcodeAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'zip', value);
+      core.Util.set(this.attrs, 'zip', value);
     },
 
     setEntryCityAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'city', value);
+      core.Util.set(this.attrs, 'city', value);
     },
 
     setEntryStateAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'state', value);
+      core.Util.set(this.attrs, 'state', value);
     },
 
     setEntryCountryAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'country', value);
+      core.Util.set(this.attrs, 'country', value);
     }
   });
 })(core);
@@ -408,11 +413,11 @@
     show: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {id: 'required'}, {customers_id : 'required'});
+      var validator = new core.Validator(input, {ns_id: 'required'}, {customers_id : 'required'});
 
       if (validator.passes())
       {
-        var customer = input.has('id') ? this.customers.find(input.get('id')) : this.customers.findByExternalId(input.get('customers_id'));
+        var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
         return customer ? this.okay(customer.toHash()) : this.notFound();
       }
       else
@@ -464,7 +469,7 @@
     {
       var input     = new core.Input(datain).parseArrays();
       var validator = new core.Validator(input, {
-        id                     : 'required',
+        ns_id                  : 'required',
         customers_id           : 'required',
         customers_firstname    : 'required',
         customers_lastname     : 'required',
@@ -476,7 +481,7 @@
       {
         // get what we need
         var attrs = input.only(
-          'id',
+          'ns_id',
           'customers_id',
           'customers_firstname',
           'customers_lastname',
@@ -494,33 +499,33 @@
       }
     },
 
-    destroy: function(datain)
-    {
-      var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {id: 'required'}, {customers_id : 'required'});
-
-      if (validator.passes())
-      {
-        try
-        {
-          var success = input.has('id') ?
-                        this.customers.destroy(input.get('id')) :
-                        this.customers.destroyByExternalId(input.get('customers_id'));
-
-          // returns are ignored for delete requests?
-          // return success ? this.okay([]) : this.notFound();
-        }
-        catch(e)
-        {
-          // return this.internalServerError(e); // returns are ignored for delete requests?
-          this.internalServerError(e);
-        }
-      }
-      else
-      {
-        // return this.badRequest(validator.toHash()); // returns are ignored for delete requests?
-        this.badRequest(validator.toHash());
-      }
-    }
+    // destroy: function(datain)
+    // {
+    //   var input     = new core.Input(datain);
+    //   var validator = new core.Validator(input, {ns_id: 'required'}, {customers_id : 'required'});
+    //
+    //   if (validator.passes())
+    //   {
+    //     try
+    //     {
+    //       var success = input.has('ns_id') ?
+    //                     this.customers.destroy(input.get('ns_id')) :
+    //                     this.customers.destroyByExternalId(input.get('customers_id'));
+    //
+    //       // returns are ignored for delete requests?
+    //       // return success ? this.okay([]) : this.notFound();
+    //     }
+    //     catch(e)
+    //     {
+    //       // return this.internalServerError(e); // returns are ignored for delete requests?
+    //       this.internalServerError(e);
+    //     }
+    //   }
+    //   else
+    //   {
+    //     // return this.badRequest(validator.toHash()); // returns are ignored for delete requests?
+    //     this.badRequest(validator.toHash());
+    //   }
+    // }
   });
 })(core);

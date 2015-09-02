@@ -39,7 +39,7 @@
 
     internalServerError: function(exception)
     {
-      var message = _.isString(exception) ? exception : exception.message;
+      var message = _.isString(exception) ? exception : _.isUndefined(exception) ? false : exception.message;
 
       return this.error(500, message || 'Internal Server Error');
     },

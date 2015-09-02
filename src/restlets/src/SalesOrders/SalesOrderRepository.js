@@ -48,19 +48,5 @@
     //
     //   return model;
     // },
-    //
-    // destroy: function(id)
-    // {
-    //   var model = this.find(id);
-    //   if ( ! model) return false;
-    //   return core.Repository.prototype.destroy.call(this, model);
-    // },
-    //
-    // destroyByExternalId: function(external_id)
-    // {
-    //   var model = this.findByExternalId(external_id);
-    //   if ( ! model) return false;
-    //   return core.Repository.prototype.destroy.call(this, model);
-    // }
   });
 })(core);

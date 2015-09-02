@@ -10,45 +10,60 @@ var vendorDir = 'src/restlets/vendor/';
 var library = [
   vendorDir + 'lodash/lodash.min.js',
   vendorDir + 'moment/min/moment.min.js',
-  baseDir + 'Library/Core.js',
-  baseDir + 'Library/Log.js',
-  baseDir + 'Library/Util.js',
-  baseDir + 'Library/Base.js',
-  baseDir + 'Library/Model.js',
-  baseDir + 'Library/Input.js',
-  baseDir + 'Library/Validator.js',
-  baseDir + 'Library/Controller.js',
-  baseDir + 'Library/Router.js',
-  baseDir + 'Library/Repository.js'
-];
-
-var customers = [
-  baseDir + 'Customers/Address.js',
-  baseDir + 'Customers/Customer.js',
-  baseDir + 'Customers/CustomerSearchResult.js',
-  baseDir + 'Customers/CustomerRepository.js',
-  baseDir + 'Customers/CustomersController.js'
-];
-
-var inventoryItems = [
-  baseDir + 'InventoryItems/InventoryItemLocation.js',
-  baseDir + 'InventoryItems/InventoryItemPriceList.js',
-  baseDir + 'InventoryItems/InventoryItem.js',
-  baseDir + 'InventoryItems/InventoryItemSearchResult.js',
-  baseDir + 'InventoryItems/InventoryItemRepository.js',
-  baseDir + 'InventoryItems/InventoryItemsController.js'
-];
-
-var salesOrders = [
-  baseDir + 'SalesOrders/SalesOrder.js',
-  baseDir + 'SalesOrders/SalesOrderSearchResult.js',
-  baseDir + 'SalesOrders/SalesOrderRepository.js',
-  baseDir + 'SalesOrders/SalesOrdersController.js'
+  baseDir   + 'Library/Core.js',
+  baseDir   + 'Library/Log.js',
+  baseDir   + 'Library/Util.js',
+  baseDir   + 'Library/Base.js',
+  baseDir   + 'Library/Model.js',
+  baseDir   + 'Library/Input.js',
+  baseDir   + 'Library/Validator.js',
+  baseDir   + 'Library/Controller.js',
+  baseDir   + 'Library/Router.js',
+  baseDir   + 'Library/Repository.js'
 ];
 
 var bootstraps = [
   baseDir + 'Bootstraps/**/*.js'
 ];
+
+var resources = [{
+  name  : 'customers',
+  files : [
+    baseDir + 'Customers/Address.js',
+    baseDir + 'Customers/Customer.js',
+    baseDir + 'Customers/CustomerSearchResult.js',
+    baseDir + 'Customers/CustomerRepository.js',
+    baseDir + 'Customers/CustomersController.js'
+  ]
+}, {
+  name  : 'inventory_items',
+  files : [
+    baseDir + 'InventoryItems/InventoryItemLocation.js',
+    baseDir + 'InventoryItems/InventoryItemPriceList.js',
+    baseDir + 'InventoryItems/InventoryItem.js',
+    baseDir + 'InventoryItems/InventoryItemSearchResult.js',
+    baseDir + 'InventoryItems/InventoryItemRepository.js',
+    baseDir + 'InventoryItems/InventoryItemsController.js'
+  ]
+}, {
+  name  : 'sales_orders',
+  files : [
+    baseDir + 'SalesOrders/SalesOrderItem.js',
+    baseDir + 'SalesOrders/SalesOrder.js',
+    baseDir + 'SalesOrders/SalesOrderSearchResult.js',
+    baseDir + 'SalesOrders/SalesOrderRepository.js',
+    baseDir + 'SalesOrders/SalesOrdersController.js'
+  ]
+}, {
+  name  : 'cash_sales',
+  files : [
+    baseDir + 'CashSales/CashSaleItem.js',
+    baseDir + 'CashSales/CashSale.js',
+    baseDir + 'CashSales/CashSaleSearchResult.js',
+    baseDir + 'CashSales/CashSaleRepository.js',
+    baseDir + 'CashSales/CashSalesController.js'
+  ]
+}];
 
 gulp.task('library', function()
 {
@@ -57,25 +72,14 @@ gulp.task('library', function()
       .pipe(gulp.dest(buildDir));
 });
 
-gulp.task('customers', function()
+resources.forEach(function(resource)
 {
-  gulp.src(customers)
-      .pipe(concat('customers.js'))
-      .pipe(gulp.dest(buildDir));
-});
-
-gulp.task('inventoryItems', function()
-{
-  gulp.src(inventoryItems)
-      .pipe(concat('inventory_items.js'))
-      .pipe(gulp.dest(buildDir));
-});
-
-gulp.task('salesOrders', function()
-{
-  gulp.src(salesOrders)
-      .pipe(concat('sales_orders.js'))
-      .pipe(gulp.dest(buildDir));
+  gulp.task(resource.name, function()
+  {
+    gulp.src(resource.files)
+        .pipe(concat(resource.name + '.js'))
+        .pipe(gulp.dest(buildDir));
+  });
 });
 
 gulp.task('bootstraps', function()
@@ -92,12 +96,16 @@ gulp.task('upload', function()
 
 gulp.task('watch', function()
 {
-  gulp.watch(library,               ['library']);
-  gulp.watch(customers,             ['customers']);
-  gulp.watch(inventoryItems,        ['inventoryItems']);
-  gulp.watch(salesOrders,           ['salesOrders']);
-  gulp.watch(bootstraps,            ['bootstraps']);
-  gulp.watch(buildDir + '**/*.js',  ['upload']);
+  var builds = buildDir + '**/*.js';
+
+  gulp.watch(library,    ['library']);
+  gulp.watch(bootstraps, ['bootstraps']);
+  gulp.watch(builds,     ['upload']);
+
+  resources.forEach(function(resource)
+  {
+    gulp.watch(resource.files, [resource.name]);
+  });
 });
 
-gulp.task('default', ['library', 'customers', 'inventoryItems', 'salesOrders', 'bootstraps', 'upload']);
+gulp.task('default', ['library'].concat(resources.map(function(resource) { return resource.name; })).concat(['bootstraps', 'upload']));

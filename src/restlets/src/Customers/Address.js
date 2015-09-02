@@ -70,48 +70,53 @@
       return core.Util.get(this.attrs, 'country', '');
     },
 
+    setNsIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'id', value);
+    },
+
     setEntryFirstnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
       name = _.isString(name) ? value + ' ' + name : value;
-      return core.Util.set(this.attrs, 'addressee', name);
+      core.Util.set(this.attrs, 'addressee', name);
     },
 
     setEntryLastnameAttribute: function(value)
     {
       var name = core.Util.get(this.attrs, 'addressee');
       name = _.isString(name) ? name + ' ' + value : value;
-      return core.Util.set(this.attrs, 'addressee', name);
+      core.Util.set(this.attrs, 'addressee', name);
     },
 
     setEntryStreetAddressAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'addr1', value);
+      core.Util.set(this.attrs, 'addr1', value);
     },
 
     setEntryStreetAddress2Attribute: function(value)
     {
-      return core.Util.set(this.attrs, 'addr2', value);
+      core.Util.set(this.attrs, 'addr2', value);
     },
 
     setEntryPostcodeAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'zip', value);
+      core.Util.set(this.attrs, 'zip', value);
     },
 
     setEntryCityAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'city', value);
+      core.Util.set(this.attrs, 'city', value);
     },
 
     setEntryStateAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'state', value);
+      core.Util.set(this.attrs, 'state', value);
     },
 
     setEntryCountryAttribute: function(value)
     {
-      return core.Util.set(this.attrs, 'country', value);
+      core.Util.set(this.attrs, 'country', value);
     }
   });
 })(core);
