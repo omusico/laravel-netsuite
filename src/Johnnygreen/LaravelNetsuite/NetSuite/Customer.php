@@ -1,11 +1,11 @@
 <?php namespace Johnnygreen\LaravelNetSuite\NetSuite;
 
-use Illuminate\Database\Eloquent\Model;
+use Johnnygreen\LaravelNetSuite\NetSuite\Model;
 
 class Customer extends Model {
 
   protected $fillable = [
-    'id',
+    'ns_id',
     'customers_id',
     'customers_firstname',
     'customers_lastname',
@@ -15,16 +15,6 @@ class Customer extends Model {
     'updated_at',
     'addresses'
   ];
-
-  protected function getDateFormat()
-	{
-		return 'Y-m-d H:i:s';
-	}
-
-  public function isNew()
-  {
-    return is_null($this->id);
-  }
 
   public function getName()
   {

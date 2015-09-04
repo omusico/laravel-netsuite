@@ -21,6 +21,7 @@ class Repository implements RepositoryInterface {
 
   public $request;
   public $response;
+  public $error;
 
 
   public function __construct($config = [])
@@ -118,12 +119,57 @@ class Repository implements RepositoryInterface {
 
   public function response()
   {
-    return $this->response;
+    return object_get($this, 'response');
   }
 
-  public function responseOkay()
+  public function responseIsSuccessful()
   {
-    return isset($this->response) ? $this->response->isSuccessful() : false;
+    if (isset($this->response))
+    {
+      try
+      {
+        $this->error = array_get($this->response->json(), 'error', null);
+      }
+      catch (\Exception $exception)
+      {
+        $this->error = new StdClass;
+        $this->error->code = 500;
+        $this->error->message = $exception->getMessage();
+      }
+
+      return $this->response->isSuccessful() && empty($this->error);
+    }
+
+    $this->error = new StdClass;
+    $this->error->code = 500;
+    $this->error->message = 'Response is not set.';
+
+    return false;
+  }
+
+  public function getError()
+  {
+    return object_get($this, 'error');
+  }
+
+  public function getErrorCode()
+  {
+    return object_get($this, 'error.code');
+  }
+
+  public function getErrorMessage()
+  {
+    return object_get($this, 'error.message');
+  }
+
+  public function hasError()
+  {
+    return ! empty($this->getError());
+  }
+
+  public function hasErrorCode($code)
+  {
+    return $this->getErrorCode() == $code;
   }
 
   // helpers for converting return json data into models
@@ -155,20 +201,34 @@ class Repository implements RepositoryInterface {
 
   public function convertResponseToModel()
   {
-    return $this->responseOkay() ? $this->convertArrayToModel($this->response()->json()) : null;
+    if ($this->responseIsSuccessful())
+    {
+      return $this->convertArrayToModel($this->response->json());
+    }
+    else if ($this->hasErrorCode(404))
+    {
+      return null
+    }
+
+    throw new RepositoryException($this->getErrorMessage(), $this->getErrorCode());
   }
 
   public function convertResponseToCollection()
   {
-    return $this->convertArrayToCollection($this->response()->isSuccessful() ? $this->response()->json() : []);
+    if ($this->hasError())
+    {
+      throw new RepositoryException($this->getErrorMessage(), $this->getErrorCode());
+    }
+
+    return $this->convertArrayToCollection($this->responseIsSuccessful() ? $this->response->json() : []);
   }
 
-  public function convertResponseToPaginator($per_page = 15)
-  {
-    $items = $this->response()->isSuccessful() ? array_get($this->response()->json(), 'data') : [];
-    $total = array_get($this->response()->json(), 'total', 0);
-    return $this->convertArrayToPaginator($items, $total, $per_page);
-  }
+  // public function convertResponseToPaginator($per_page = 15)
+  // {
+  //   $items = $this->responseIsSuccessful() ? array_get($this->response->json(), 'data') : [];
+  //   $total = array_get($this->response->json(), 'total', 0);
+  //   return $this->convertArrayToPaginator($items, $total, $per_page);
+  // }
 
   public function where($key, $operator, $value)
   {
@@ -248,21 +308,21 @@ class Repository implements RepositoryInterface {
   {
     $this->request('POST', $this->endpoint, $attributes);
     $this->send();
-    return $this->responseOkay() ? $this->convertResponseToModel() : false;
+    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : false;
   }
 
   public function update($attributes)
   {
     $this->request('PUT', $this->endpoint, $attributes);
     $this->send();
-    return $this->responseOkay() ? $this->convertResponseToModel() : false;
+    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : false;
   }
 
   public function destroy($id)
   {
     $this->request('DELETE', $this->endpoint, compact('id'));
     $this->send();
-    return $this->responseOkay();
+    return $this->responseIsSuccessful();
   }
 
   // $external_id should be an array (i.e. ['customers_id' => 8672])
@@ -270,6 +330,6 @@ class Repository implements RepositoryInterface {
   {
     $this->request('DELETE', $this->endpoint, $external_id);
     $this->send();
-    return $this->responseOkay();
+    return $this->responseIsSuccessful();
   }
 }
