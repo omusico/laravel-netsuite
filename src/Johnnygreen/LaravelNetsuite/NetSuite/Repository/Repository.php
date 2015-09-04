@@ -140,7 +140,7 @@ class Repository implements RepositoryInterface {
       }
       catch (\Exception $exception)
       {
-        $this->error = new StdClass;
+        $this->error = new \StdClass;
         $this->error->code = 500;
         $this->error->message = $exception->getMessage();
       }
@@ -309,14 +309,14 @@ class Repository implements RepositoryInterface {
   {
     $this->request('POST', $this->endpoint_crud, $attributes);
     $this->send();
-    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : null;
+    return $this->convertResponseToModel();
   }
 
   public function update($attributes)
   {
     $this->request('PUT', $this->endpoint_crud, $attributes);
     $this->send();
-    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : null;
+    return $this->convertResponseToModel();
   }
 
   public function destroy($ns_id)

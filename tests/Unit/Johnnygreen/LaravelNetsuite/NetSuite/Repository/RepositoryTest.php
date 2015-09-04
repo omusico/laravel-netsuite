@@ -30,7 +30,6 @@ class RepositoryTest extends \TestCase {
     catch(\Exception $exception)
     {
       $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Repository\RepositoryException', $exception);
-      $this->assertNull($customer);
       $this->assertTrue($this->repository->hasError());
       $this->assertArrayHasKey('code', $this->repository->getError());
       $this->assertArrayHasKey('message', $this->repository->getError());
@@ -45,7 +44,6 @@ class RepositoryTest extends \TestCase {
     catch(\Exception $exception)
     {
       $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Repository\RepositoryException', $exception);
-      $this->assertNull($customer);
       $this->assertTrue($this->repository->hasError());
       $this->assertArrayHasKey('code', $this->repository->getError());
       $this->assertArrayHasKey('message', $this->repository->getError());
