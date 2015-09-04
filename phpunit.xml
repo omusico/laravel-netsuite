@@ -11,11 +11,11 @@
          syntaxCheck="false"
 >
     <testsuites>
-        <testsuite name="Package Unit Tests">
-            <directory suffix=".php">./tests/Unit/Johnnygreen/LaravelNetsuite</directory>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">./tests/Unit/Johnnygreen/LaravelNetsuite</directory>
         </testsuite>
-        <testsuite name="Package Integration Tests">
-            <directory suffix=".php">./tests/Integration</directory>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">./tests/Integration</directory>
         </testsuite>
     </testsuites>
 </phpunit>

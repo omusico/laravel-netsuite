@@ -4,30 +4,29 @@ use Guzzle\Http\Client;
 
 class Repository implements RepositoryInterface {
 
-  // the guzzle instance
-  public $client;
-
   // the model name
   public $model;
 
   // config settings
   public $config;
 
-  // script endpoint
-  public $endpoint;
+  // crud and search endpoints
+  public $endpoint_crud;
+  public $endpoint_search;
 
   // search filters
   public $filters;
 
+  // internals
   public $request;
   public $response;
   public $error;
 
 
-  public function __construct($config = [])
+  public function __construct($config = null)
   {
-    $this->setConfig($config);
-    if ( ! is_null($this->endpoint)) $this->setEndpoint($this->endpoint);
+    if ( ! is_null($config)) $this->setConfig($config);
+    $this->setClient(new Client);
   }
 
   public function setConfig($config)
@@ -62,15 +61,24 @@ class Repository implements RepositoryInterface {
     return $this->model;
   }
 
-  public function setEndpoint($endpoint)
+  public function setCrudEndpoint($endpoint)
   {
-    $this->endpoint = $endpoint;
-    $this->setClient(new Client($this->endpoint));
+    $this->endpoint_crud = $endpoint;
   }
 
-  public function getEndoint()
+  public function getCrudEndpoint()
   {
-    return $this->endpoint;
+    return $this->endpoint_crud;
+  }
+
+  public function setSearchEndpoint($endpoint)
+  {
+    $this->endpoint_search = $endpoint;
+  }
+
+  public function getSearchEndpoint($endpoint)
+  {
+    return $this->endpoint_search;
   }
 
   public function buildAuthorization()
@@ -95,7 +103,7 @@ class Repository implements RepositoryInterface {
       $body   = null;
     }
 
-    $this->request = $this->getClient()->createRequest($method, $url, $headers, json_encode($body));
+    $this->request = $this->client->createRequest($method, $url, $headers, json_encode($body));
     $this->request->setHeader('Authorization', $this->buildAuthorization());
     $this->request->setHeader('Content-Type', 'application/json');
     $this->request->setHeader('Accept',       'application/json');
@@ -154,12 +162,12 @@ class Repository implements RepositoryInterface {
 
   public function getErrorCode()
   {
-    return object_get($this, 'error.code');
+    return array_get($this->getError(), 'code');
   }
 
   public function getErrorMessage()
   {
-    return object_get($this, 'error.message');
+    return array_get($this->getError(), 'message');
   }
 
   public function hasError()
@@ -205,12 +213,12 @@ class Repository implements RepositoryInterface {
     {
       return $this->convertArrayToModel($this->response->json());
     }
-    else if ($this->hasErrorCode(404))
+    else if ($this->hasErrorCode(404) || $this->hasErrorCode('RCRD_DSNT_EXIST'))
     {
-      return null
+      return null;
     }
 
-    throw new RepositoryException($this->getErrorMessage(), $this->getErrorCode());
+    throw new RepositoryException('There was an error communicating with the restlet.', 500);
   }
 
   public function convertResponseToCollection()
@@ -223,13 +231,6 @@ class Repository implements RepositoryInterface {
     return $this->convertArrayToCollection($this->responseIsSuccessful() ? $this->response->json() : []);
   }
 
-  // public function convertResponseToPaginator($per_page = 15)
-  // {
-  //   $items = $this->responseIsSuccessful() ? array_get($this->response->json(), 'data') : [];
-  //   $total = array_get($this->response->json(), 'total', 0);
-  //   return $this->convertArrayToPaginator($items, $total, $per_page);
-  // }
-
   public function where($key, $operator, $value)
   {
     $this->filters[] = compact('key', 'operator', 'value');
@@ -239,7 +240,7 @@ class Repository implements RepositoryInterface {
   public function paginate($per_page = null, $page = null)
   {
     $filters = $this->filters;
-    $this->request('GET', $this->endpoint_batch, compact('per_page', 'page', 'filters'));
+    $this->request('GET', $this->endpoint_search, compact('per_page', 'page', 'filters'));
     $this->send();
     return $this->convertResponseToCollection();
   }
@@ -289,9 +290,9 @@ class Repository implements RepositoryInterface {
     return $this->paginate(1, 1)->first();
   }
 
-  public function find($id)
+  public function find($ns_id)
   {
-    $this->request('GET', $this->endpoint, compact('id'));
+    $this->request('GET', $this->endpoint_crud, compact('ns_id'));
     $this->send();
     return $this->convertResponseToModel();
   }
@@ -299,28 +300,28 @@ class Repository implements RepositoryInterface {
   // $external_id should be an array (i.e. ['customers_id' => 8672])
   public function findByExternalId($external_id)
   {
-    $this->request('GET', $this->endpoint, $external_id);
+    $this->request('GET', $this->endpoint_crud, $external_id);
     $this->send();
     return $this->convertResponseToModel();
   }
 
   public function create($attributes = [])
   {
-    $this->request('POST', $this->endpoint, $attributes);
+    $this->request('POST', $this->endpoint_crud, $attributes);
     $this->send();
-    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : false;
+    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : null;
   }
 
   public function update($attributes)
   {
-    $this->request('PUT', $this->endpoint, $attributes);
+    $this->request('PUT', $this->endpoint_crud, $attributes);
     $this->send();
-    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : false;
+    return $this->responseIsSuccessful() ? $this->convertResponseToModel() : null;
   }
 
-  public function destroy($id)
+  public function destroy($ns_id)
   {
-    $this->request('DELETE', $this->endpoint, compact('id'));
+    $this->request('DELETE', $this->endpoint_crud, compact('ns_id'));
     $this->send();
     return $this->responseIsSuccessful();
   }
@@ -328,7 +329,7 @@ class Repository implements RepositoryInterface {
   // $external_id should be an array (i.e. ['customers_id' => 8672])
   public function destroyByExternalId($external_id)
   {
-    $this->request('DELETE', $this->endpoint, $external_id);
+    $this->request('DELETE', $this->endpoint_crud, $external_id);
     $this->send();
     return $this->responseIsSuccessful();
   }
