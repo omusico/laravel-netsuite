@@ -72,6 +72,18 @@ gulp.task('library', function()
       .pipe(gulp.dest(buildDir));
 });
 
+gulp.task('bootstraps', function()
+{
+  gulp.src(bootstraps)
+      .pipe(gulp.dest(buildDir));
+});
+
+gulp.task('upload', function(file)
+{
+  gulp.src(buildDir + '**/*.js')
+      .pipe(upload(require('./netsuite.json')));
+});
+
 resources.forEach(function(resource)
 {
   gulp.task(resource.name, function()
@@ -82,29 +94,29 @@ resources.forEach(function(resource)
   });
 });
 
-gulp.task('bootstraps', function()
-{
-  gulp.src(bootstraps)
-      .pipe(gulp.dest(buildDir));
-});
-
-gulp.task('upload', function()
-{
-  gulp.src(buildDir + '**/*.js')
-      .pipe(upload(require('./netsuite.json')));
-});
-
 gulp.task('watch', function()
 {
   var builds = buildDir + '**/*.js';
 
   gulp.watch(library,    ['library']);
-  gulp.watch(bootstraps, ['bootstraps']);
-  gulp.watch(builds,     ['upload']);
 
   resources.forEach(function(resource)
   {
     gulp.watch(resource.files, [resource.name]);
+  });
+
+  // only copy over bootstrap that changed
+  gulp.watch(bootstraps, null, function(file)
+  {
+    gulp.src(file.path)
+        .pipe(gulp.dest(buildDir));
+  });
+
+  // only upload the file that changes
+  gulp.watch(builds, null, function(file)
+  {
+    gulp.src(file.path)
+        .pipe(upload(require('./netsuite.json')));
   });
 });
 
