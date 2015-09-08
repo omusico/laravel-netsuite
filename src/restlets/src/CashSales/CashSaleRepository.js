@@ -2,7 +2,7 @@
 {
   core.CashSaleRepository = core.SalesOrderRepository.extend(
   {
-    recordClass: core.CachSale,
-    searchClass: core.CachSaleSearchResult,
+    recordClass: core.CashSale,
+    searchClass: core.CashSaleSearchResult
   });
 })(core);
