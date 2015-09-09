@@ -213,7 +213,7 @@
       });
     },
 
-    setNsIdAttribute: function()
+    setNsIdAttribute: function(value)
     {
       core.Util.set(this.attrs, 'id', value);
     },
@@ -362,7 +362,7 @@
 
     update: function(attrs)
     {
-      var model = this.find(attrs.id);
+      var model = this.find(attrs.ns_id);
       if ( ! model) return false;
       model.set(attrs);
 
@@ -490,7 +490,15 @@
           'addresses'
         );
 
-        var customer = this.customers.update(attrs);
+        try
+        {
+          var customer = this.customers.update(attrs);
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+
         return this.okay(customer.toHash());
       }
       else

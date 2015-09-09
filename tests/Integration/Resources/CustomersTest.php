@@ -6,7 +6,7 @@ class CustomersTest extends \TestCase {
 
   public function setUp()
   {
-    $this->repository  = \NetSuite::getRepository('Product');
+    $this->repository  = \NetSuite::getRepository('Customer');
     $this->destructive = false;
   }
 
@@ -34,7 +34,7 @@ class CustomersTest extends \TestCase {
   public function testSearch($model)
   {
     $customer = $this->repository->where('externalid', 'is', $model->customers_id)->first();
-    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Product', $customer);
+    $this->assertInstanceOf('Johnnygreen\LaravelNetSuite\NetSuite\Customer', $customer);
     $this->assertEquals($model->customers_id, $customer->customers_id);
 
     return $model;

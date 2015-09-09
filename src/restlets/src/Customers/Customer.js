@@ -90,7 +90,7 @@
       });
     },
 
-    setNsIdAttribute: function()
+    setNsIdAttribute: function(value)
     {
       core.Util.set(this.attrs, 'id', value);
     },

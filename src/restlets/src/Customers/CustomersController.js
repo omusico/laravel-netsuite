@@ -97,7 +97,15 @@
           'addresses'
         );
 
-        var customer = this.customers.update(attrs);
+        try
+        {
+          var customer = this.customers.update(attrs);
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+
         return this.okay(customer.toHash());
       }
       else
