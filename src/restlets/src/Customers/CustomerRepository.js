@@ -7,6 +7,7 @@
 
     searchColumns: [
       'externalid',
+      'firstname',
       'datecreated',
       'lastmodifieddate'
     ],

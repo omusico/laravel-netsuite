@@ -849,6 +849,7 @@ _.mixin({
   {
     recordClass   : '',
     searchFilters : [],
+    searchSorts   : [],
     searchColumns : [],
     searchPerPage : 1000,
     searchPage    : 1,
@@ -878,6 +879,14 @@ _.mixin({
       return this;
     },
 
+    // {column: 'externalid', direction: false}
+    // false = ASC, true = DESC
+    orderBy: function(column, direction)
+    {
+      this.searchSorts.push({column: column, direction: direction.toLowerCase() == 'asc' ? false : true});
+      return this;
+    },
+
     // apply an array of filters
     filter: function(filters)
     {
@@ -899,14 +908,24 @@ _.mixin({
       var searchResults;
       var end   = this.searchPage * this.searchPerPage;
       var start = end - this.searchPerPage;
-      var hasColumns = columns && columns.length;
 
-      var searchColumns = _.chain(hasColumns ? this.searchColumns.concat(columns) : this.searchColumns)
-                           .filter(function(column) { return column != 'id'; })
-                           .map(function(column) { return new nlobjSearchColumn(column); })
-                           .value();
+      var searchColumns = _((columns && columns.length) ? this.searchColumns.concat(columns) : this.searchColumns)
+                          .chain()
+                          .filter(function(column) { return column != 'id'; })
+                          .map(function(column) { return new nlobjSearchColumn(column); })
+                          .value();
 
-      if (hasColumns)
+      _.each(this.searchSorts, function(sort)
+      {
+        var column = _.find(searchColumns, function(column)
+        {
+          return column.getName() == sort.column;
+        });
+
+        if (column) column.setSort(sort.direction);
+      });
+
+      if (searchColumns.length)
       {
         var results = nlapiCreateSearch(this.recordType, this.searchFilters, searchColumns)
                       .runSearch()
@@ -916,16 +935,13 @@ _.mixin({
         {
           var attrs = {id: result.id};
 
-          _.each(this.searchColumns, function(column)
+          _.each(searchColumns, function(column)
           {
-            if(column != 'id')
-            {
-              attrs[column.getName()] = result.getValue(column.getName());
-            }
+            attrs[column.getName()] = result.getValue(column.getName());
           });
 
           return attrs;
-        }, this);
+        });
       }
       else
       {
@@ -936,6 +952,7 @@ _.mixin({
 
       // reset filters after search
       this.searchFilters = [];
+      this.searchSorts   = [];
 
       // returned as an underscore collection
       return _(searchResults);
@@ -956,7 +973,18 @@ _.mixin({
     {
       this.searchPage    = page;
       this.searchPerPage = perPage;
-      return this.get();
+
+      // reset filters after search
+      var savedFilters = this.searchFilters;
+      var savedSorts   = this.searchSorts;
+
+      var results = this.get();
+
+      // save the filters and sorts when paginating
+      this.searchFilters = savedFilters;
+      this.searchSorts   = savedSorts;
+
+      return results;
     },
 
     // find a single record by internal id

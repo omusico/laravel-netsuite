@@ -276,6 +276,7 @@
     fields: {
       'id'               : 'int',
       'externalid'       : 'string',
+      'firstname'        : 'string',
       'datecreated'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
     },
@@ -284,6 +285,7 @@
     visible: [
       'ns_id',
       'customers_id',
+      'customers_firstname',
       'created_at',
       'updated_at'
     ],
@@ -298,16 +300,25 @@
       return core.Util.get(this.attrs, 'externalid');
     },
 
+    getCustomersFirstnameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'firstname');
+    },
+
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
+      date = date != 'Invalid date' ? date : null;
+      return date;
     },
 
     getUpdatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
+      date = date != 'Invalid date' ? date : null;
+      return date;
     }
   });
 })(core);
@@ -321,6 +332,7 @@
 
     searchColumns: [
       'externalid',
+      'firstname',
       'datecreated',
       'lastmodifieddate'
     ],
@@ -405,6 +417,7 @@
       var input     = new core.Input(datain).parseDates().parseArrays();
       var customers = this.customers
                           .filter(input.get('filters', []))
+                          .orderBy('lastmodifieddate', 'ASC')
                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(customers.toHash());

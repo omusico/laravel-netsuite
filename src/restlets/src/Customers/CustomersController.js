@@ -12,6 +12,7 @@
       var input     = new core.Input(datain).parseDates().parseArrays();
       var customers = this.customers
                           .filter(input.get('filters', []))
+                          .orderBy('lastmodifieddate', 'ASC')
                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(customers.toHash());
