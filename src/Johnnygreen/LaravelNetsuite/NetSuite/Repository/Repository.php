@@ -147,23 +147,27 @@ class Repository implements RepositoryInterface {
       }
       catch (\Exception $exception)
       {
-        $this->error = new \StdClass;
-        $this->error->code = 500;
-        $this->error->message = $exception->getMessage();
+        $this->error = [
+          'code'    => 500,
+          'message' => $exception->getMessage()
+        ];
       }
 
       return $this->response->isSuccessful() && empty($this->error);
     }
 
-    $this->error = new StdClass;
-    $this->error->code = 500;
-    $this->error->message = 'Response is not set.';
+    $this->error = [
+      'code'    => 500,
+      'message' => 'Response is not set.'
+    ];
 
     return false;
   }
 
   public function getError()
   {
+    if ( ! isset($this->error)) $this->responseIsSuccessful();
+
     return object_get($this, 'error');
   }
 
@@ -295,8 +299,9 @@ class Repository implements RepositoryInterface {
   public function convertArrayToModel(Array $attributes)
   {
     $class = $this->model;
-    $model = new $class;
-    $model->setRawAttributes($attributes);
+    $model = new $class($attributes);
+    $model->exists = ! is_null($model->getKey());
+
     return $model;
   }
 
@@ -333,11 +338,11 @@ class Repository implements RepositoryInterface {
 
   public function convertResponseToCollection()
   {
-    if ($this->hasError())
+    if ($this->responseIsSuccessful())
     {
-      throw new RepositoryException($this->getErrorMessage(), $this->getErrorCode());
+      return $this->convertArrayToCollection($this->response->json());
     }
 
-    return $this->convertArrayToCollection($this->responseIsSuccessful() ? $this->response->json() : []);
+    throw new RepositoryException($this->getErrorMessage(), (int)$this->getErrorCode());
   }
 }

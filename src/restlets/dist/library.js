@@ -535,7 +535,7 @@ _.mixin({
       var attrs  = {};
       object = object || this;
 
-      if (object.visible.length)
+      if (object.visible && object.visible.length)
       {
         var sublists = _.keys(object.sublists || {});
 
@@ -554,7 +554,7 @@ _.mixin({
       }
       else
       {
-        if (object.fields.length)
+        if (object.fields && object.fields.length)
         {
           _.each(object.fields, function(type, field)
           {

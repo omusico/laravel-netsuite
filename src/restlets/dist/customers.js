@@ -276,7 +276,6 @@
     fields: {
       'id'               : 'int',
       'externalid'       : 'string',
-      'firstname'        : 'string',
       'datecreated'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
     },
@@ -285,7 +284,6 @@
     visible: [
       'ns_id',
       'customers_id',
-      'customers_firstname',
       'created_at',
       'updated_at'
     ],
@@ -298,11 +296,6 @@
     getCustomersIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
-    },
-
-    getCustomersFirstnameAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'firstname');
     },
 
     getCreatedAtAttribute: function()
@@ -332,7 +325,6 @@
 
     searchColumns: [
       'externalid',
-      'firstname',
       'datecreated',
       'lastmodifieddate'
     ],
