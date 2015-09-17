@@ -97,7 +97,8 @@
 
     setCustomersIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'externalid', value);
+      var externalid = parseInt(value) + '';
+      core.Util.set(this.attrs, 'externalid', externalid);
     },
 
     setCustomersFirstnameAttribute: function(value)

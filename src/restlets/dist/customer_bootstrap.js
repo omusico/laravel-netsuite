@@ -6,5 +6,5 @@ try
 }
 catch (e)
 {
-  new core.Controller().internalServerError(e);
+  new core.Controller().internalServerError(e.message);
 }
