@@ -37,7 +37,7 @@
 
     getEntryLastnameAttribute: function()
     {
-      return core.Util.get(core.Util.get(this.attrs, 'addressee', '').split(' '), '1', '');
+      return _.rest(core.Util.get(this.attrs, 'addressee', '').split(' ')).join(' ');
     },
 
     getEntryStreetAddressAttribute: function()
@@ -75,18 +75,9 @@
       core.Util.set(this.attrs, 'id', value);
     },
 
-    setEntryFirstnameAttribute: function(value)
+    setEntryAddresseeAttribute: function(value)
     {
-      var name = core.Util.get(this.attrs, 'addressee');
-      name = _.isString(name) ? value + ' ' + name : value;
-      core.Util.set(this.attrs, 'addressee', name);
-    },
-
-    setEntryLastnameAttribute: function(value)
-    {
-      var name = core.Util.get(this.attrs, 'addressee');
-      name = _.isString(name) ? name + ' ' + value : value;
-      core.Util.set(this.attrs, 'addressee', name);
+      core.Util.set(this.attrs, 'addressee', value);
     },
 
     setEntryStreetAddressAttribute: function(value)
