@@ -367,6 +367,7 @@
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
+
       if ( ! model) return false;
       model.set(attrs);
 
@@ -475,13 +476,12 @@
       var input     = new core.Input(datain).parseArrays();
       var validator = new core.Validator(input, {
         ns_id                  : 'required',
-        customers_id           : 'required',
-        customers_firstname    : 'required',
-        customers_lastname     : 'required',
-        customers_telephone    : 'required',
-        customers_email_address: 'required'
+        // customers_id           : 'required',
+        // customers_firstname    : 'required',
+        // customers_lastname     : 'required',
+        // customers_telephone    : 'required',
+        // customers_email_address: 'required'
       });
-
       if (validator.passes())
       {
         // get what we need

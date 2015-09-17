@@ -172,9 +172,8 @@
 
     update: function(model)
     {
-
       var record = model.toUpdateRecord();
-      var id = nlapiSubmitRecord(record, true);
+      nlapiSubmitRecord(record, true);
       return model;
     },
 
