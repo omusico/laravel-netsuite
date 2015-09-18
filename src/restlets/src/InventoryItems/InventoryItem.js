@@ -26,7 +26,7 @@
       'ns_id',
       'name',
       'model_number',
-      'products_id',
+      'product_legacy_id',
       'created_at',
       'updated_at',
 
@@ -50,7 +50,7 @@
       return core.Util.get(this.attrs, 'displayname');
     },
 
-    getProductsIdAttribute: function()
+    getProductLegacyIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },

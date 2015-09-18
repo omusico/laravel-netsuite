@@ -474,6 +474,7 @@
         // customers_telephone    : 'required',
         // customers_email_address: 'required'
       });
+
       if (validator.passes())
       {
         // get what we need
