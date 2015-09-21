@@ -131,7 +131,9 @@
       'isperson'         : 'string',
       'taxable'          : 'string',
       'datecreated'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'lastmodifieddate' : 'timestamp',
+
+      'custentity_rewards_balance' : 'int'
     },
 
     // sublists to be parsed on input
@@ -147,6 +149,7 @@
       'customers_lastname',
       'customers_telephone',
       'customers_email_address',
+      'rewards_balance',
       'created_at',
       'updated_at',
       'addresses'
@@ -180,6 +183,11 @@
     getCustomersEmailAddressAttribute: function()
     {
       return core.Util.get(this.attrs, 'email', '');
+    },
+
+    getRewardsBalanceAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'custentity_rewards_balance', 0);
     },
 
     getCreatedAtAttribute: function()
@@ -233,6 +241,11 @@
     setCustomersEmailAddressAttribute: function(value)
     {
       core.Util.set(this.attrs, 'email', value);
+    },
+
+    setRewardsBalanceAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'custentity_rewards_balance', value);
     },
 
     setCreatedAtAttribute: function(value)
@@ -415,8 +428,15 @@
 
       if (validator.passes())
       {
-        var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
-        return customer ? this.okay(customer.toHash()) : this.notFound();
+        try
+        {
+          var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
+          return customer ? this.okay(customer.toHash()) : this.notFound();
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
       }
       else
       {
@@ -445,6 +465,11 @@
           'customers_lastname',
           'customers_telephone',
           'customers_email_address',
+          'rewards_balance',
+          'category',
+          'pricelevel',
+          'isperson',
+          'taxable',
           'addresses'
         ), {
           category  : 3,   // Retail
@@ -453,9 +478,16 @@
           taxable   : 'T'  // Taxable
         });
 
-        var customer = this.customers.create(attrs);
+        try
+        {
+          var customer = this.customers.create(attrs);
 
-        return this.created(customer.toHash());
+          return this.created(customer.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
       }
       else
       {
@@ -467,12 +499,7 @@
     {
       var input     = new core.Input(datain).parseArrays();
       var validator = new core.Validator(input, {
-        ns_id                  : 'required',
-        // customers_id           : 'required',
-        // customers_firstname    : 'required',
-        // customers_lastname     : 'required',
-        // customers_telephone    : 'required',
-        // customers_email_address: 'required'
+        ns_id: 'required',
       });
 
       if (validator.passes())
@@ -485,19 +512,24 @@
           'customers_lastname',
           'customers_telephone',
           'customers_email_address',
+          'rewards_balance',
+          'category',
+          'pricelevel',
+          'isperson',
+          'taxable',
           'addresses'
         );
 
         try
         {
           var customer = this.customers.update(attrs);
+
+          return this.okay(customer.toHash());
         }
         catch(e)
         {
           return this.internalServerError(e);
         }
-
-        return this.okay(customer.toHash());
       }
       else
       {
