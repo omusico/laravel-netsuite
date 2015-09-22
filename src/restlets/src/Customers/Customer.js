@@ -131,7 +131,7 @@
 
     setRewardsBalanceAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'custentity_rewards_balance', value);
+      core.Util.set(this.attrs, 'custentity_rewards_balance', parseInt(value));
     },
 
     setCreatedAtAttribute: function(value)
