@@ -21,13 +21,13 @@
     show: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {ns_id: 'required'}, {products_id : 'required'});
+      var validator = new core.Validator(input, {ns_id: 'required'}, {product_legacy_id : 'required'});
 
       if (validator.passes())
       {
         try
         {
-          var inventoryItem = input.has('ns_id') ? this.inventoryItems.find(input.get('ns_id')) : this.inventoryItems.findByExternalId(input.get('products_id'));
+          var inventoryItem = input.has('ns_id') ? this.inventoryItems.find(input.get('ns_id')) : this.inventoryItems.findByExternalId(input.get('product_legacy_id'));
           return inventoryItem ? this.okay(inventoryItem.toHash()) : this.notFound();
         }
         catch(e)

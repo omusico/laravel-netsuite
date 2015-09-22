@@ -25,6 +25,7 @@
     {
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
+
       model.set(attrs);
 
       // this model might be missing some sublist ids
