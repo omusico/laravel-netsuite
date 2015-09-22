@@ -120,4 +120,4 @@ gulp.task('watch', function()
   });
 });
 
-gulp.task('default', ['library'].concat(resources.map(function(resource) { return resource.name; })).concat(['bootstraps', 'upload']));
+gulp.task('default', resources.map(function(resource) { return resource.name; }).concat(['library', 'bootstraps', 'upload']));

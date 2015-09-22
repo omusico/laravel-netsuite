@@ -31,13 +31,17 @@
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
+      date = date != 'Invalid date' ? date : null;
+      return date;
     },
 
     getUpdatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
+      date = date != 'Invalid date' ? date : null;
+      return date;
     }
   });
 })(core);

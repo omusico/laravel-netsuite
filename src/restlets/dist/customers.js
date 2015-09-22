@@ -37,7 +37,7 @@
 
     getEntryLastnameAttribute: function()
     {
-      return core.Util.get(core.Util.get(this.attrs, 'addressee', '').split(' '), '1', '');
+      return _.rest(core.Util.get(this.attrs, 'addressee', '').split(' ')).join(' ');
     },
 
     getEntryStreetAddressAttribute: function()
@@ -75,18 +75,9 @@
       core.Util.set(this.attrs, 'id', value);
     },
 
-    setEntryFirstnameAttribute: function(value)
+    setEntryAddresseeAttribute: function(value)
     {
-      var name = core.Util.get(this.attrs, 'addressee');
-      name = _.isString(name) ? value + ' ' + name : value;
-      core.Util.set(this.attrs, 'addressee', name);
-    },
-
-    setEntryLastnameAttribute: function(value)
-    {
-      var name = core.Util.get(this.attrs, 'addressee');
-      name = _.isString(name) ? name + ' ' + value : value;
-      core.Util.set(this.attrs, 'addressee', name);
+      core.Util.set(this.attrs, 'addressee', value);
     },
 
     setEntryStreetAddressAttribute: function(value)
@@ -140,7 +131,9 @@
       'isperson'         : 'string',
       'taxable'          : 'string',
       'datecreated'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'lastmodifieddate' : 'timestamp',
+
+      'custentity_rewards_balance' : 'int'
     },
 
     // sublists to be parsed on input
@@ -156,6 +149,7 @@
       'customers_lastname',
       'customers_telephone',
       'customers_email_address',
+      'rewards_balance',
       'created_at',
       'updated_at',
       'addresses'
@@ -191,6 +185,11 @@
       return core.Util.get(this.attrs, 'email', '');
     },
 
+    getRewardsBalanceAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'custentity_rewards_balance', 0);
+    },
+
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
@@ -220,7 +219,8 @@
 
     setCustomersIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'externalid', value);
+      var externalid = parseInt(value) + '';
+      core.Util.set(this.attrs, 'externalid', externalid);
     },
 
     setCustomersFirstnameAttribute: function(value)
@@ -241,6 +241,11 @@
     setCustomersEmailAddressAttribute: function(value)
     {
       core.Util.set(this.attrs, 'email', value);
+    },
+
+    setRewardsBalanceAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'custentity_rewards_balance', parseInt(value));
     },
 
     setCreatedAtAttribute: function(value)
@@ -301,13 +306,17 @@
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
+      date = date != 'Invalid date' ? date : null;
+      return date;
     },
 
     getUpdatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
+      date = date != 'Invalid date' ? date : null;
+      return date;
     }
   });
 })(core);
@@ -363,6 +372,7 @@
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
+
       if ( ! model) return false;
       model.set(attrs);
 
@@ -405,6 +415,7 @@
       var input     = new core.Input(datain).parseDates().parseArrays();
       var customers = this.customers
                           .filter(input.get('filters', []))
+                          .orderBy('lastmodifieddate', 'ASC')
                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(customers.toHash());
@@ -417,8 +428,15 @@
 
       if (validator.passes())
       {
-        var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
-        return customer ? this.okay(customer.toHash()) : this.notFound();
+        try
+        {
+          var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
+          return customer ? this.okay(customer.toHash()) : this.notFound();
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
       }
       else
       {
@@ -447,6 +465,11 @@
           'customers_lastname',
           'customers_telephone',
           'customers_email_address',
+          'rewards_balance',
+          'category',
+          'pricelevel',
+          'isperson',
+          'taxable',
           'addresses'
         ), {
           category  : 3,   // Retail
@@ -455,9 +478,16 @@
           taxable   : 'T'  // Taxable
         });
 
-        var customer = this.customers.create(attrs);
+        try
+        {
+          var customer = this.customers.create(attrs);
 
-        return this.created(customer.toHash());
+          return this.created(customer.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
       }
       else
       {
@@ -469,12 +499,7 @@
     {
       var input     = new core.Input(datain).parseArrays();
       var validator = new core.Validator(input, {
-        ns_id                  : 'required',
-        customers_id           : 'required',
-        customers_firstname    : 'required',
-        customers_lastname     : 'required',
-        customers_telephone    : 'required',
-        customers_email_address: 'required'
+        ns_id: 'required',
       });
 
       if (validator.passes())
@@ -487,19 +512,24 @@
           'customers_lastname',
           'customers_telephone',
           'customers_email_address',
+          'rewards_balance',
+          'category',
+          'pricelevel',
+          'isperson',
+          'taxable',
           'addresses'
         );
 
         try
         {
           var customer = this.customers.update(attrs);
+
+          return this.okay(customer.toHash());
         }
         catch(e)
         {
           return this.internalServerError(e);
         }
-
-        return this.okay(customer.toHash());
       }
       else
       {

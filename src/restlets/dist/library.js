@@ -311,7 +311,7 @@ _.mixin({
       }
       else
       {
-        this.attrs[key] = this.mutate('set', key, value);
+        this.mutate('set', key, this.coerceType(key, value));
       }
 
       return this;
@@ -345,9 +345,13 @@ _.mixin({
       {
         return this[mutator] ? this[mutator](key) : _.has(this.attrs, key);
       }
-      else
+      else if (prefix === 'get')
       {
         return this[mutator] ? this[mutator](value) : value;
+      }
+      else if (prefix === 'set')
+      {
+        this[mutator] ? _.bind(this[mutator], this)(value) : this.attrs[key] = value;
       }
     },
 
@@ -377,26 +381,8 @@ _.mixin({
                 core.Util.get(object, field);
           }
 
-          // parse attr into correct type
-          switch(type)
-          {
-            case 'int':
-              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseInt(attrs[field]);
-              break;
-            case 'float':
-              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseFloat(attrs[field]);
-              break;
-            case 'timestamp':
-              var date = moment(attrs[field], this.timeFormat, true);
-              attrs[field] = date.isValid() ? attrs[field] : null;
-              break;
-            case 'string':
-              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : attrs[field] + '';
-              break;
-            default:
-              // do nothing to the field
-          }
-        });
+          attrs[field] = this.coerceType(field, attrs[field]);
+        }, this);
       }
       else
       {
@@ -453,6 +439,33 @@ _.mixin({
       return attrs;
     },
 
+    coerceType: function(field, value)
+    {
+      var type = this.fields[field];
+
+      // parse attr into correct type
+      switch(type)
+      {
+        case 'int':
+          value = (_.isNull(value) || _.isUndefined(value)) ? null : parseInt(value);
+          break;
+        case 'float':
+          value = (_.isNull(value) || _.isUndefined(value)) ? null : parseFloat(value);
+          break;
+        case 'timestamp':
+          var date = moment(value, this.timeFormat, true);
+          value = date.isValid() ? value : null;
+          break;
+        case 'string':
+          value = (_.isNull(value) || _.isUndefined(value)) ? null : value + '';
+          break;
+        default:
+          // do nothing to the field
+      }
+
+      return value;
+    },
+
     toCreateRecord: function(object)
     {
       object = object || this;
@@ -489,7 +502,7 @@ _.mixin({
 
     toUpdateRecord: function()
     {
-      var record = nlapiLoadRecord(this.recordType, this.attrs.id);
+      var record = nlapiLoadRecord(this.recordType, this.get('id'));
 
       _.each(_.omit(this.fields, 'id'), function(value, key)
       {
@@ -498,18 +511,16 @@ _.mixin({
 
       _.each(this.sublists, function(recordClass, sublist)
       {
-
         // remove any item in record and not in sent sublist
         _.times(record.getLineItemCount(sublist), function(index)
         {
           index++; // sublists are 1 based
 
           var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
-              foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), { id: id });
+              foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), {id: id});
 
           // remove that one
-          if (! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
-
+          if ( ! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
         }, this);
 
         // update/add the rest
@@ -535,7 +546,7 @@ _.mixin({
       var attrs  = {};
       object = object || this;
 
-      if (object.visible.length)
+      if (object.visible && object.visible.length)
       {
         var sublists = _.keys(object.sublists || {});
 
@@ -554,7 +565,7 @@ _.mixin({
       }
       else
       {
-        if (object.fields.length)
+        if (object.fields && object.fields.length)
         {
           _.each(object.fields, function(type, field)
           {
@@ -849,6 +860,7 @@ _.mixin({
   {
     recordClass   : '',
     searchFilters : [],
+    searchSorts   : [],
     searchColumns : [],
     searchPerPage : 1000,
     searchPage    : 1,
@@ -878,6 +890,14 @@ _.mixin({
       return this;
     },
 
+    // {column: 'externalid', direction: false}
+    // false = ASC, true = DESC
+    orderBy: function(column, direction)
+    {
+      this.searchSorts.push({column: column, direction: direction.toLowerCase() == 'asc' ? false : true});
+      return this;
+    },
+
     // apply an array of filters
     filter: function(filters)
     {
@@ -899,14 +919,24 @@ _.mixin({
       var searchResults;
       var end   = this.searchPage * this.searchPerPage;
       var start = end - this.searchPerPage;
-      var hasColumns = columns && columns.length;
 
-      var searchColumns = _.chain(hasColumns ? this.searchColumns.concat(columns) : this.searchColumns)
-                           .filter(function(column) { return column != 'id'; })
-                           .map(function(column) { return new nlobjSearchColumn(column); })
-                           .value();
+      var searchColumns = _((columns && columns.length) ? this.searchColumns.concat(columns) : this.searchColumns)
+                          .chain()
+                          .filter(function(column) { return column != 'id'; })
+                          .map(function(column) { return new nlobjSearchColumn(column); })
+                          .value();
 
-      if (hasColumns)
+      _.each(this.searchSorts, function(sort)
+      {
+        var column = _.find(searchColumns, function(column)
+        {
+          return column.getName() == sort.column;
+        });
+
+        if (column) column.setSort(sort.direction);
+      });
+
+      if (searchColumns.length)
       {
         var results = nlapiCreateSearch(this.recordType, this.searchFilters, searchColumns)
                       .runSearch()
@@ -916,16 +946,13 @@ _.mixin({
         {
           var attrs = {id: result.id};
 
-          _.each(this.searchColumns, function(column)
+          _.each(searchColumns, function(column)
           {
-            if(column != 'id')
-            {
-              attrs[column.getName()] = result.getValue(column.getName());
-            }
+            attrs[column.getName()] = result.getValue(column.getName());
           });
 
           return attrs;
-        }, this);
+        });
       }
       else
       {
@@ -936,6 +963,7 @@ _.mixin({
 
       // reset filters after search
       this.searchFilters = [];
+      this.searchSorts   = [];
 
       // returned as an underscore collection
       return _(searchResults);
@@ -956,7 +984,18 @@ _.mixin({
     {
       this.searchPage    = page;
       this.searchPerPage = perPage;
-      return this.get();
+
+      // reset filters after search
+      var savedFilters = this.searchFilters;
+      var savedSorts   = this.searchSorts;
+
+      var results = this.get();
+
+      // save the filters and sorts when paginating
+      this.searchFilters = savedFilters;
+      this.searchSorts   = savedSorts;
+
+      return results;
     },
 
     // find a single record by internal id
@@ -989,9 +1028,8 @@ _.mixin({
 
     update: function(model)
     {
-
       var record = model.toUpdateRecord();
-      var id = nlapiSubmitRecord(record, true);
+      nlapiSubmitRecord(record, true);
       return model;
     },
 

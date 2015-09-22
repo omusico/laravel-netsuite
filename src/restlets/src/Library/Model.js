@@ -35,7 +35,7 @@
       }
       else
       {
-        this.attrs[key] = this.mutate('set', key, value);
+        this.mutate('set', key, this.coerceType(key, value));
       }
 
       return this;
@@ -69,9 +69,13 @@
       {
         return this[mutator] ? this[mutator](key) : _.has(this.attrs, key);
       }
-      else
+      else if (prefix === 'get')
       {
         return this[mutator] ? this[mutator](value) : value;
+      }
+      else if (prefix === 'set')
+      {
+        this[mutator] ? _.bind(this[mutator], this)(value) : this.attrs[key] = value;
       }
     },
 
@@ -101,26 +105,8 @@
                 core.Util.get(object, field);
           }
 
-          // parse attr into correct type
-          switch(type)
-          {
-            case 'int':
-              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseInt(attrs[field]);
-              break;
-            case 'float':
-              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : parseFloat(attrs[field]);
-              break;
-            case 'timestamp':
-              var date = moment(attrs[field], this.timeFormat, true);
-              attrs[field] = date.isValid() ? attrs[field] : null;
-              break;
-            case 'string':
-              attrs[field] = (_.isNull(attrs[field]) || _.isUndefined(attrs[field])) ? null : attrs[field] + '';
-              break;
-            default:
-              // do nothing to the field
-          }
-        });
+          attrs[field] = this.coerceType(field, attrs[field]);
+        }, this);
       }
       else
       {
@@ -177,6 +163,33 @@
       return attrs;
     },
 
+    coerceType: function(field, value)
+    {
+      var type = this.fields[field];
+
+      // parse attr into correct type
+      switch(type)
+      {
+        case 'int':
+          value = (_.isNull(value) || _.isUndefined(value)) ? null : parseInt(value);
+          break;
+        case 'float':
+          value = (_.isNull(value) || _.isUndefined(value)) ? null : parseFloat(value);
+          break;
+        case 'timestamp':
+          var date = moment(value, this.timeFormat, true);
+          value = date.isValid() ? value : null;
+          break;
+        case 'string':
+          value = (_.isNull(value) || _.isUndefined(value)) ? null : value + '';
+          break;
+        default:
+          // do nothing to the field
+      }
+
+      return value;
+    },
+
     toCreateRecord: function(object)
     {
       object = object || this;
@@ -213,7 +226,7 @@
 
     toUpdateRecord: function()
     {
-      var record = nlapiLoadRecord(this.recordType, this.attrs.id);
+      var record = nlapiLoadRecord(this.recordType, this.get('id'));
 
       _.each(_.omit(this.fields, 'id'), function(value, key)
       {
@@ -222,18 +235,16 @@
 
       _.each(this.sublists, function(recordClass, sublist)
       {
-
         // remove any item in record and not in sent sublist
         _.times(record.getLineItemCount(sublist), function(index)
         {
           index++; // sublists are 1 based
 
           var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
-              foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), { id: id });
+              foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), {id: id});
 
           // remove that one
-          if (! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
-
+          if ( ! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
         }, this);
 
         // update/add the rest
@@ -259,7 +270,7 @@
       var attrs  = {};
       object = object || this;
 
-      if (object.visible.length)
+      if (object.visible && object.visible.length)
       {
         var sublists = _.keys(object.sublists || {});
 
@@ -278,7 +289,7 @@
       }
       else
       {
-        if (object.fields.length)
+        if (object.fields && object.fields.length)
         {
           _.each(object.fields, function(type, field)
           {

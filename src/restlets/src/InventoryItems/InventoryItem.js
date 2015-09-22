@@ -10,7 +10,6 @@
       'externalid'       : 'string',
       'displayname'      : 'string',
       'salesdescription' : 'string',
-      'pricinggroup'     : 'object',
       'createddate'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
     },
@@ -26,13 +25,13 @@
       'ns_id',
       'name',
       'model_number',
-      'products_id',
+      'product_legacy_id',
       'created_at',
       'updated_at',
 
       // relations
       'price_lists',
-      'inventory_locations'
+      'inventories'
     ],
 
     getNsIdAttribute: function()
@@ -50,7 +49,7 @@
       return core.Util.get(this.attrs, 'displayname');
     },
 
-    getProductsIdAttribute: function()
+    getProductLegacyIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },
@@ -67,34 +66,78 @@
       return moment(value, this.timeFormat).format(core.Util.timeFormat);
     },
 
-    getAddressesAttribute: function()
-    {
-      var addresses = core.Util.get(this.attrs, 'addressbook', []);
-
-      return _.map(addresses, function(address)
-      {
-        return address.toHash();
-      });
-    },
-
     getPriceListsAttribute: function()
     {
-      var priceLists = core.Util.get(this.attrs, 'price', []);
+      var priceListProducts = core.Util.get(this.attrs, 'price', []);
 
-      return _.map(priceLists, function(priceList)
+      return _.map(priceListProducts, function(priceListProduct)
       {
-        return priceList.toHash();
+        return priceListProduct.toHash();
       });
     },
 
-    getInventoryLocationsAttribute: function()
+    getInventoriesAttribute: function()
     {
-      var locations = core.Util.get(this.attrs, 'locations', []);
+      var inventories = core.Util.get(this.attrs, 'locations', []);
 
-      return _.map(locations, function(location)
+      return _.map(inventories, function(inventory)
       {
-        return location.toHash();
+        return inventory.toHash();
       });
     },
+
+    setNsIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'id', value);
+    },
+
+    setProductLegacyIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'externalid', value);
+    },
+
+    toUpdateRecord: function()
+    {
+      var record = nlapiLoadRecord(this.recordType, this.get('id'));
+
+      _.each(_.omit(this.fields, 'id'), function(value, key)
+      {
+        core.Log.debug(key, this.get(key));
+        record.setFieldValue(key, this.get(key));
+      }, this);
+
+      // when we update product, we only need to update it's own attributes, not sublists etc
+
+      // _.each(this.sublists, function(recordClass, sublist)
+      // {
+      //   // remove any item in record and not in sent sublist
+      //   _.times(record.getLineItemCount(sublist), function(index)
+      //   {
+      //     index++; // sublists are 1 based
+      //
+      //     var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
+      //         foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), {id: id});
+      //
+      //     // remove that one
+      //     if ( ! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
+      //   }, this);
+      //
+      //   // update/add the rest
+      //   _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
+      //   {
+      //     index++; // sublists are 1 based
+      //
+      //     _.each(item.fields, function(type, field)
+      //     {
+      //       if (item.has(field))
+      //       {
+      //         record.setLineItemValue(sublist, field, index, item.get(field));
+      //       }
+      //     });
+      //   }, this);
+      // }, this);
+
+      return record;
+    }
   });
 })(core);

@@ -17,7 +17,9 @@
       'isperson'         : 'string',
       'taxable'          : 'string',
       'datecreated'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'lastmodifieddate' : 'timestamp',
+
+      'custentity_rewards_balance' : 'int'
     },
 
     // sublists to be parsed on input
@@ -33,6 +35,7 @@
       'customers_lastname',
       'customers_telephone',
       'customers_email_address',
+      'rewards_balance',
       'created_at',
       'updated_at',
       'addresses'
@@ -68,6 +71,11 @@
       return core.Util.get(this.attrs, 'email', '');
     },
 
+    getRewardsBalanceAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'custentity_rewards_balance', 0);
+    },
+
     getCreatedAtAttribute: function()
     {
       var value = core.Util.get(this.attrs, 'datecreated');
@@ -97,7 +105,8 @@
 
     setCustomersIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'externalid', value);
+      var externalid = parseInt(value) + '';
+      core.Util.set(this.attrs, 'externalid', externalid);
     },
 
     setCustomersFirstnameAttribute: function(value)
@@ -118,6 +127,11 @@
     setCustomersEmailAddressAttribute: function(value)
     {
       core.Util.set(this.attrs, 'email', value);
+    },
+
+    setRewardsBalanceAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'custentity_rewards_balance', parseInt(value));
     },
 
     setCreatedAtAttribute: function(value)

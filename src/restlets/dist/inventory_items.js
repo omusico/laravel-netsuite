@@ -94,7 +94,6 @@
       'externalid'       : 'string',
       'displayname'      : 'string',
       'salesdescription' : 'string',
-      'pricinggroup'     : 'object',
       'createddate'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
     },
@@ -110,13 +109,13 @@
       'ns_id',
       'name',
       'model_number',
-      'products_id',
+      'product_legacy_id',
       'created_at',
       'updated_at',
 
       // relations
       'price_lists',
-      'inventory_locations'
+      'inventories'
     ],
 
     getNsIdAttribute: function()
@@ -134,7 +133,7 @@
       return core.Util.get(this.attrs, 'displayname');
     },
 
-    getProductsIdAttribute: function()
+    getProductLegacyIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },
@@ -151,35 +150,79 @@
       return moment(value, this.timeFormat).format(core.Util.timeFormat);
     },
 
-    getAddressesAttribute: function()
-    {
-      var addresses = core.Util.get(this.attrs, 'addressbook', []);
-
-      return _.map(addresses, function(address)
-      {
-        return address.toHash();
-      });
-    },
-
     getPriceListsAttribute: function()
     {
-      var priceLists = core.Util.get(this.attrs, 'price', []);
+      var priceListProducts = core.Util.get(this.attrs, 'price', []);
 
-      return _.map(priceLists, function(priceList)
+      return _.map(priceListProducts, function(priceListProduct)
       {
-        return priceList.toHash();
+        return priceListProduct.toHash();
       });
     },
 
-    getInventoryLocationsAttribute: function()
+    getInventoriesAttribute: function()
     {
-      var locations = core.Util.get(this.attrs, 'locations', []);
+      var inventories = core.Util.get(this.attrs, 'locations', []);
 
-      return _.map(locations, function(location)
+      return _.map(inventories, function(inventory)
       {
-        return location.toHash();
+        return inventory.toHash();
       });
     },
+
+    setNsIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'id', value);
+    },
+
+    setProductLegacyIdAttribute: function(value)
+    {
+      core.Util.set(this.attrs, 'externalid', value);
+    },
+
+    toUpdateRecord: function()
+    {
+      var record = nlapiLoadRecord(this.recordType, this.get('id'));
+
+      _.each(_.omit(this.fields, 'id'), function(value, key)
+      {
+        core.Log.debug(key, this.get(key));
+        record.setFieldValue(key, this.get(key));
+      }, this);
+
+      // when we update product, we only need to update it's own attributes, not sublists etc
+
+      // _.each(this.sublists, function(recordClass, sublist)
+      // {
+      //   // remove any item in record and not in sent sublist
+      //   _.times(record.getLineItemCount(sublist), function(index)
+      //   {
+      //     index++; // sublists are 1 based
+      //
+      //     var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
+      //         foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), {id: id});
+      //
+      //     // remove that one
+      //     if ( ! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
+      //   }, this);
+      //
+      //   // update/add the rest
+      //   _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
+      //   {
+      //     index++; // sublists are 1 based
+      //
+      //     _.each(item.fields, function(type, field)
+      //     {
+      //       if (item.has(field))
+      //       {
+      //         record.setLineItemValue(sublist, field, index, item.get(field));
+      //       }
+      //     });
+      //   }, this);
+      // }, this);
+
+      return record;
+    }
   });
 })(core);
 
@@ -198,7 +241,7 @@
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'products_id',
+      'product_legacy_id',
       'created_at',
       'updated_at'
     ],
@@ -208,7 +251,7 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getProductsIdAttribute: function()
+    getProductLegacyIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },
@@ -250,47 +293,21 @@
       }, this);
     },
 
-    // create: function(attrs)
-    // {
-    //   var model = new this.recordClass(attrs, {mutate: true});
-    //
-    //   // this model will have id set on it, but might be missing some sublist ids
-    //   model = core.Repository.prototype.create.call(this, model);
-    //
-    //   // reload model so ids are set on sublists etc
-    //   model = this.find(model.get('id'));
-    //
-    //   return model;
-    // },
-    //
-    // update: function(attrs)
-    // {
-    //   var model = this.find(attrs.id);
-    //   if ( ! model) return false;
-    //   model.set(attrs);
-    //
-    //   // this model might be missing some sublist ids
-    //   model = core.Repository.prototype.update.call(this, model);
-    //
-    //   // reload model so ids are set on sublists etc
-    //   model = this.find(model.get('id'));
-    //
-    //   return model;
-    // },
-    //
-    // destroy: function(id)
-    // {
-    //   var model = this.find(id);
-    //   if ( ! model) return false;
-    //   return core.Repository.prototype.destroy.call(this, model);
-    // },
-    //
-    // destroyByExternalId: function(external_id)
-    // {
-    //   var model = this.findByExternalId(external_id);
-    //   if ( ! model) return false;
-    //   return core.Repository.prototype.destroy.call(this, model);
-    // }
+    update: function(attrs)
+    {
+      var model = this.find(attrs.ns_id);
+      if ( ! model) return false;
+
+      model.set(attrs);
+
+      // this model might be missing some sublist ids
+      model = core.Repository.prototype.update.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
+    }
   });
 })(core);
 
@@ -307,8 +324,9 @@
     {
       var input          = new core.Input(datain).parseDates().parseArrays();
       var inventoryItems = this.inventoryItems
-                          .filter(input.get('filters', []))
-                          .paginate(input.get('page', 1), input.get('per_page', 10));
+                               .filter(input.get('filters', []))
+                               .orderBy('lastmodifieddate', 'ASC')
+                               .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(inventoryItems.toHash());
     },
@@ -316,12 +334,48 @@
     show: function(datain)
     {
       var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {ns_id: 'required'}, {products_id : 'required'});
+      var validator = new core.Validator(input, {ns_id: 'required'}, {product_legacy_id : 'required'});
 
       if (validator.passes())
       {
-        var inventoryItem = input.has('ns_id') ? this.inventoryItems.find(input.get('ns_id')) : this.inventoryItems.findByExternalId(input.get('products_id'));
-        return inventoryItem ? this.okay(inventoryItem.toHash()) : this.notFound();
+        try
+        {
+          var inventoryItem = input.has('ns_id') ? this.inventoryItems.find(input.get('ns_id')) : this.inventoryItems.findByExternalId(input.get('product_legacy_id'));
+          return inventoryItem ? this.okay(inventoryItem.toHash()) : this.notFound();
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    update: function(datain)
+    {
+      var input     = new core.Input(datain);
+      var validator = new core.Validator(input, {ns_id: 'required'});
+
+      if (validator.passes())
+      {
+        // get what we need
+        var attrs = input.only(
+          'ns_id',
+          'product_legacy_id'
+        );
+
+        try
+        {
+          var inventoryItem = this.inventoryItems.update(attrs);
+          return this.okay(inventoryItem.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
       }
       else
       {

@@ -13,7 +13,7 @@
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'products_id',
+      'product_legacy_id',
       'created_at',
       'updated_at'
     ],
@@ -23,7 +23,7 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getProductsIdAttribute: function()
+    getProductLegacyIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'externalid');
     },

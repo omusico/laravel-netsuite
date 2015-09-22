@@ -49,6 +49,7 @@
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
+
       if ( ! model) return false;
       model.set(attrs);
 
