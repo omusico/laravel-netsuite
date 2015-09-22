@@ -333,7 +333,7 @@ class Repository implements RepositoryInterface {
       return null;
     }
 
-    throw new RepositoryException('There was an error communicating with the restlet.', 500);
+    throw new RepositoryException($this->getErrorMessage() ?: 'There was an error communicating with the restlet.', (int)$this->getErrorCode() ?: 500);
   }
 
   public function convertResponseToCollection()
@@ -343,6 +343,6 @@ class Repository implements RepositoryInterface {
       return $this->convertArrayToCollection($this->response->json());
     }
 
-    throw new RepositoryException($this->getErrorMessage(), (int)$this->getErrorCode());
+    throw new RepositoryException($this->getErrorMessage() ?: 'There was an error communicating with the restlet.', (int)$this->getErrorCode() ?: 500);
   }
 }
