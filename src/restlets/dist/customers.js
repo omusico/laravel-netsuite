@@ -254,7 +254,6 @@
     setUpdatedAtAttribute: function(value)
     {
       core.Util.set(this.attrs, 'lastmodifieddate', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
-
     },
 
     setAddressesAttribute: function(value)

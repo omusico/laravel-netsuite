@@ -57,15 +57,13 @@
     //
     // getCreatedAtAttribute: function()
     // {
-    //   var value = core.Util.get(this.attrs, 'createddate');
-    //   return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
     // },
     //
     // getUpdatedAtAttribute: function()
     // {
-    //   var value = core.Util.get(this.attrs, 'lastmodifieddate');
-    //   return moment(value, this.timeFormat).format(core.Util.timeFormat);
-    // }
+    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+    // },
   });
 })(core);
 
