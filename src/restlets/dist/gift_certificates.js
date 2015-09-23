@@ -70,7 +70,7 @@
 
     setNsIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'id', value);
+      if (value) core.Util.set(this.attrs, 'id', value);
     }
   });
 })(core);
