@@ -63,6 +63,22 @@ var resources = [{
     baseDir + 'CashSales/CashSaleRepository.js',
     baseDir + 'CashSales/CashSalesController.js'
   ]
+}, {
+  name  : 'gift_certificates',
+  files : [
+    baseDir + 'GiftCertificates/GiftCertificate.js',
+    baseDir + 'GiftCertificates/GiftCertificateSearchResult.js',
+    baseDir + 'GiftCertificates/GiftCertificateRepository.js',
+    baseDir + 'GiftCertificates/GiftCertificatesController.js'
+  ]
+}, {
+  name  : 'promotions',
+  files : [
+    baseDir + 'Promotions/Promotion.js',
+    baseDir + 'Promotions/PromotionSearchResult.js',
+    baseDir + 'Promotions/PromotionRepository.js',
+    baseDir + 'Promotions/PromotionsController.js'
+  ]
 }];
 
 gulp.task('library', function()
@@ -98,7 +114,7 @@ gulp.task('watch', function()
 {
   var builds = buildDir + '**/*.js';
 
-  gulp.watch(library,    ['library']);
+  gulp.watch(library, ['library']);
 
   resources.forEach(function(resource)
   {
