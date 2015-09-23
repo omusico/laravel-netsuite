@@ -5,34 +5,25 @@
     // fields to be parsed on input
     fields: {
       'id'               : 'int',
-      'externalid'       : 'string',
       'giftcertcode'     : 'string',
       'originalamount'   : 'float',
       'amountremaining'  : 'float',
       'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'createddate'      : 'timestamp'
     },
 
     // fields to be parsed on output
     visible: [
-      'gift_cards_id',
       'gift_cards_code',
       'gift_cards_amount',
       'gift_cards_amount_remaining',
       'date_end',
-      'date_added',
-      'date_updated'
+      'date_added'
     ],
 
     getNsIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'id');
-    },
-
-    getGiftCardsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'externalid');
     },
 
     getGiftCardsCodeAttribute: function()
@@ -52,20 +43,12 @@
 
     getDateEndAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'expirationdate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
     },
 
     getDateAddedAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'createddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
-    },
-
-    getDateUpdatedAtAttribute: function()
-    {
-      var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
     }
   });
 })(core);

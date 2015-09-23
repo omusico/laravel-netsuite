@@ -55,20 +55,17 @@
 
     getDateEndAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'expirationdate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
     },
 
     getDateAddedAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'createddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
     },
 
     getDateUpdatedAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
     },
 
     setNsIdAttribute: function(value)
