@@ -33,19 +33,19 @@
       return core.Util.get(this.attrs, 'code');
     },
 
-    getCreatedAtAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
-    },
-
-    getUpdatedAtAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
-    },
+    // getCreatedAtAttribute: function()
+    // {
+    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
+    // },
+    //
+    // getUpdatedAtAttribute: function()
+    // {
+    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+    // },
 
     setNsIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'id', value);
+      if (value) core.Util.set(this.attrs, 'id', value);
     }
   });
 })(core);

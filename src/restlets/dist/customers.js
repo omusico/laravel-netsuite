@@ -72,7 +72,7 @@
 
     setNsIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'id', value);
+      if (value) core.Util.set(this.attrs, 'id', value);
     },
 
     setEntryAddresseeAttribute: function(value)
@@ -212,7 +212,7 @@
 
     setNsIdAttribute: function(value)
     {
-      core.Util.set(this.attrs, 'id', value);
+      if (value) core.Util.set(this.attrs, 'id', value);
     },
 
     setCustomersIdAttribute: function(value)

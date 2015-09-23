@@ -165,6 +165,9 @@
     create: function(model)
     {
       var record = model.toCreateRecord();
+
+      core.Log.debug('record', record);
+
       var id = nlapiSubmitRecord(record, true);
       model.set('id', parseInt(id));
       return model;
