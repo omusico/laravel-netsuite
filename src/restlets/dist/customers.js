@@ -192,14 +192,12 @@
 
     getCreatedAtAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'datecreated'), this.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
     },
 
     getAddressesAttribute: function()
@@ -250,14 +248,13 @@
 
     setCreatedAtAttribute: function(value)
     {
-      value = moment(value, core.Util.timeFormat).format(this.timeFormat);
-      core.Util.set(this.attrs, 'datecreated', value);
+      core.Util.set(this.attrs, 'datecreated', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
     },
 
     setUpdatedAtAttribute: function(value)
     {
-      value = moment(value, core.Util.timeFormat).format(this.timeFormat);
-      core.Util.set(this.attrs, 'lastmodifieddate', value);
+      core.Util.set(this.attrs, 'lastmodifieddate', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
+
     },
 
     setAddressesAttribute: function(value)
@@ -430,7 +427,10 @@
       {
         try
         {
-          var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
+          var customer = input.has('ns_id')
+                       ? this.customers.find(input.get('ns_id'))
+                       : this.customers.findByExternalId(input.get('customers_id'));
+
           return customer ? this.okay(customer.toHash()) : this.notFound();
         }
         catch(e)

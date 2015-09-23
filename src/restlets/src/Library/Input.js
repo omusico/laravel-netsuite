@@ -25,10 +25,7 @@
 
         // if attr is a valid date in the above format,
         // then parse it into the netsuite format
-        if (date.isValid())
-        {
-          this.attrs[key] = date.format(this.timeFormat);
-        }
+        if (date.isValid()) this.attrs[key] = date.format(this.timeFormat);
       }, this);
 
       return this;

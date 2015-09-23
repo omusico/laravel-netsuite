@@ -33,17 +33,17 @@
       return core.Util.get(this.attrs, 'code');
     },
 
-    getCreatedAtAttribute: function()
-    {
-      var value = core.Util.get(this.attrs, 'createddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
-    },
-
-    getUpdatedAtAttribute: function()
-    {
-      var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
-    },
+    // getCreatedAtAttribute: function()
+    // {
+    //   var value = core.Util.get(this.attrs, 'createddate');
+    //   return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    // },
+    //
+    // getUpdatedAtAttribute: function()
+    // {
+    //   var value = core.Util.get(this.attrs, 'lastmodifieddate');
+    //   return moment(value, this.timeFormat).format(core.Util.timeFormat);
+    // },
 
     setNsIdAttribute: function(value)
     {

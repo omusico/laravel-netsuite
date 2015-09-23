@@ -24,7 +24,10 @@
 
       if (validator.passes())
       {
-        var cachSale = input.has('ns_id') ? this.cachSales.find(input.get('ns_id')) : this.cachSales.findByExternalId(input.get('orders_id'));
+        var cachSale = input.has('ns_id')
+                     ? this.cachSales.find(input.get('ns_id'))
+                     : this.cachSales.findByExternalId(input.get('orders_id'));
+
         return cachSale ? this.okay(cachSale.toHash()) : this.notFound();
       }
       else

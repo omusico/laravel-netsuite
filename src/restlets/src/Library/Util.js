@@ -82,6 +82,15 @@
       {
         return match[1].toUpperCase();
       });
+    },
+
+    formatDate: function(value, inputFormat, outputFormat)
+    {
+      inputFormat  = inputFormat  || core.Util.timeFormat;
+      outputFormat = outputFormat || core.Util.timeFormat;
+
+      var time = moment(value, inputFormat, true);
+      return time.isValid() ? time.format(outputFormat) : null;
     }
   };
 })(core);

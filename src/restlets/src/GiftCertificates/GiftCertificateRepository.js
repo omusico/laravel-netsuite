@@ -6,7 +6,13 @@
     searchClass: core.GiftCertificateSearchResult,
 
     searchColumns: [
-      'createddate'
+      'externalid',
+      'giftcertcode',
+      'originalamount',
+      'amountremaining',
+      'expirationdate',
+      'createddate',
+      'lastmodifieddate'
     ],
 
     get: function()

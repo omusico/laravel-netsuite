@@ -246,6 +246,15 @@ _.mixin({
       {
         return match[1].toUpperCase();
       });
+    },
+
+    formatDate: function(value, inputFormat, outputFormat)
+    {
+      inputFormat  = inputFormat  || core.Util.timeFormat;
+      outputFormat = outputFormat || core.Util.timeFormat;
+
+      var time = moment(value, inputFormat, true);
+      return time.isValid() ? time.format(outputFormat) : null;
     }
   };
 })(core);
@@ -631,10 +640,7 @@ _.mixin({
 
         // if attr is a valid date in the above format,
         // then parse it into the netsuite format
-        if (date.isValid())
-        {
-          this.attrs[key] = date.format(this.timeFormat);
-        }
+        if (date.isValid()) this.attrs[key] = date.format(this.timeFormat);
       }, this);
 
       return this;

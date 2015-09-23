@@ -27,7 +27,10 @@
       {
         try
         {
-          var customer = input.has('ns_id') ? this.customers.find(input.get('ns_id')) : this.customers.findByExternalId(input.get('customers_id'));
+          var customer = input.has('ns_id')
+                       ? this.customers.find(input.get('ns_id'))
+                       : this.customers.findByExternalId(input.get('customers_id'));
+
           return customer ? this.okay(customer.toHash()) : this.notFound();
         }
         catch(e)
