@@ -4,12 +4,13 @@ var upload = require('gulp-nsupload');
 
 var buildDir  = 'src/restlets/dist/';
 var baseDir   = 'src/restlets/src/';
-var vendorDir = 'src/restlets/vendor/';
+var vendorDir = 'src/../node_modules/';
 
 // ordering matters here
 var library = [
-  vendorDir + 'lodash/lodash.min.js',
+  vendorDir + 'underscore/underscore-min.js',
   vendorDir + 'moment/min/moment.min.js',
+  vendorDir + 'pathparser/pathparser.min.js',
   baseDir   + 'Library/Core.js',
   baseDir   + 'Library/Log.js',
   baseDir   + 'Library/Util.js',

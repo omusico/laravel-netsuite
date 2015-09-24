@@ -24,6 +24,10 @@
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
     "gulp-nsupload": "^1.2.6",
-    "mocha": "^2.2.5"
+    "lodash": "^3.10.1",
+    "mocha": "^2.2.5",
+    "moment": "^2.10.6",
+    "pathparser": "0.0.1",
+    "underscore": "^1.8.3"
   }
 }
