@@ -5,53 +5,65 @@
     constructor: function()
     {
       this.initialize.apply(this, arguments);
-      this.map = {};
+      this.parser = new routes.Router();
     },
 
     initialize: function() {},
 
-    parseIdentifier: function(identifier)
+    parseAction: function(action)
     {
-      var parts = identifier.split('@');
-      return {controllerName: parts[0], controllerMethod: parts[1]};
+      var parts = action.split('@');
+      return {controller: parts[0], method: parts[1]};
     },
 
-    buildMethod: function(resource, identifier, httpMethod)
+    register: function(httpMethod, url, callable)
     {
-      var parsedIdentifier   = this.parseIdentifier(identifier);
-      var controllerMethod   = parsedIdentifier.controllerMethod;
-      var controllerName     = parsedIdentifier.controllerName;
-      var controllerInstance = new core[controllerName]();
-      this.map[resource]     = this.map[resource] || {};
+      if (_.isFunction(callable))
+      {
+        var method = function()
+        {
+          return callable;
+        };
+      }
+      else
+      {
+        var parsedAction = this.parseAction(callable);
+
+        var method = function()
+        {
+          var controller = new core[parsedAction.controller];
+          return controller[parsedAction.method];
+        }
+      }
 
       // setup the route map
-      this.map[resource][controllerMethod] = controllerInstance[controllerMethod].bind(controllerInstance);
+      this.parser.addRoute(httpMethod + '_' + url, method);
 
       return this;
     },
 
-    get:    function(resource, identifier) { return this.buildMethod(resource, identifier, 'get'); },
-    post:   function(resource, identifier) { return this.buildMethod(resource, identifier, 'post'); },
-    put:    function(resource, identifier) { return this.buildMethod(resource, identifier, 'put'); },
-    delete: function(resource, identifier) { return this.buildMethod(resource, identifier, 'delete'); },
+    get:    function(url, callable) { return this.register('get',    url, callable); },
+    post:   function(url, callable) { return this.register('post',   url, callable); },
+    put:    function(url, callable) { return this.register('put',    url, callable); },
+    delete: function(url, callable) { return this.register('delete', url, callable); },
 
-    resource: function(resource, controller)
+    resource: function(url, controller)
     {
-      this.get(resource,    controller + '@index');
-      this.get(resource,    controller + '@show');
-      this.post(resource,   controller + '@store');
-      this.put(resource,    controller + '@update');
-      this.delete(resource, controller + '@destroy');
+      this.get(   url,          controller + '@index');
+      this.get(   url + '/:id', controller + '@show');
+      this.post(  url + '/:id', controller + '@store');
+      this.put(   url + '/:id', controller + '@update');
+      this.delete(url + '/:id', controller + '@destroy');
 
       return this;
     },
 
-    start: function(resource, context)
+    match: function(httpMethod, url)
     {
-      for (var methodName in this.map[resource])
-      {
-        context[methodName] = this.map[resource][methodName];
-      }
+      var match = this.parser.match(httpMethod + '_' + url);
+      this.params = match ? match.params : null;
+
+      return match ? match.fn() : null;
     }
   });
 })(core);

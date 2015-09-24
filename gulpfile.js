@@ -10,7 +10,7 @@ var vendorDir = 'src/../node_modules/';
 var library = [
   vendorDir + 'underscore/underscore-min.js',
   vendorDir + 'moment/min/moment.min.js',
-  vendorDir + 'pathparser/pathparser.min.js',
+  vendorDir + 'routes/dist/routes.js',
   baseDir   + 'Library/Core.js',
   baseDir   + 'Library/Log.js',
   baseDir   + 'Library/Util.js',
@@ -95,11 +95,11 @@ gulp.task('bootstraps', function()
       .pipe(gulp.dest(buildDir));
 });
 
-gulp.task('upload', function(file)
-{
-  gulp.src(buildDir + '**/*.js')
-      .pipe(upload(require('./netsuite.json')));
-});
+// gulp.task('upload', function(file)
+// {
+//   gulp.src(buildDir + '**/*.js')
+//       .pipe(upload(require('./netsuite.json')));
+// });
 
 resources.forEach(function(resource)
 {
@@ -130,11 +130,11 @@ gulp.task('watch', function()
   });
 
   // only upload the file that changes
-  gulp.watch(builds, null, function(file)
-  {
-    gulp.src(file.path)
-        .pipe(upload(require('./netsuite.json')));
-  });
+  // gulp.watch(builds, null, function(file)
+  // {
+  //   gulp.src(file.path)
+  //       .pipe(upload(require('./netsuite.json')));
+  // });
 });
 
 gulp.task('default', resources.map(function(resource) { return resource.name; }).concat(['library', 'bootstraps', 'upload']));
