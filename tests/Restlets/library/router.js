@@ -72,4 +72,29 @@ describe('core.Router', function()
       expect(method).to.equal(null);
     });
   });
+
+  describe('#start', function()
+  {
+    var context = {};
+    var router = new core.Router();
+
+    router.resource('test', 'TestController');
+    router.start('test', context);
+
+    it('it should expose 5 routes to the passed in context', function()
+    {
+      expect(typeof context['index']).to.not.equal('undefined');
+      expect(typeof context['show']).to.not.equal('undefined');
+      expect(typeof context['store']).to.not.equal('undefined');
+      expect(typeof context['update']).to.not.equal('undefined');
+      expect(typeof context['destroy']).to.not.equal('undefined');
+      expect(typeof context['edit']).to.equal('undefined');
+
+      expect(context['index']()).to.equal('index');
+      expect(context['show']()).to.equal('show');
+      expect(context['store']()).to.equal('store');
+      expect(context['update']()).to.equal('update');
+      expect(context['destroy']()).to.equal('destroy');
+    });
+  });
 });

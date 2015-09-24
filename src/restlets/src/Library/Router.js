@@ -5,7 +5,8 @@
     constructor: function()
     {
       this.initialize.apply(this, arguments);
-      this.parser = new routes.Router();
+      this.parser    = new routes.Router();
+      this.resources = {};
     },
 
     initialize: function() {},
@@ -55,6 +56,8 @@
       this.put(   url + '/:id', controller + '@update');
       this.delete(url + '/:id', controller + '@destroy');
 
+      this.resources[url] = controller;
+
       return this;
     },
 
@@ -64,6 +67,20 @@
       this.params = match ? match.params : null;
 
       return match ? match.fn() : null;
+    },
+
+    // old router start function
+    start: function(url, context)
+    {
+      var controller = new core[this.resources[url]];
+
+      _.each(['index', 'show', 'store', 'update', 'destroy'], function(name)
+      {
+        if (typeof controller[name] != 'undefined')
+        {
+          context[name] = controller[name].bind(controller);
+        }
+      });
     }
   });
 })(core);
