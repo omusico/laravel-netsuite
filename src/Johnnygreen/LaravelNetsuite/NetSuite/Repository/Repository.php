@@ -92,6 +92,16 @@ class Repository implements RepositoryInterface {
 
   // helpers for request / response
 
+  public function requestAction($action, $body = [])
+  {
+    // builds request
+    return $this->request('GET', $this->getUrl(), array_merge([
+      'action'     => $action,
+      'controller' => $this->getController()
+    ], $body));
+
+  }
+
   public function request($method, $url = null, $body = null, $headers = null)
   {
     $method = strtoupper($method);
