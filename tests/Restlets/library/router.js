@@ -16,7 +16,7 @@ describe('core.Router', function()
 
     it('should register 5 routes', function()
     {
-      expect(router.parser.routes.length).to.equal(5);
+      expect(router.routes.length).to.equal(5);
     });
 
     it('should match get test to index method', function()
@@ -57,7 +57,7 @@ describe('core.Router', function()
 
     it('should register 1 route', function()
     {
-      expect(router.parser.routes.length).to.equal(1);
+      expect(router.routes.length).to.equal(1);
     });
 
     it('should match get test to closure', function()
@@ -70,6 +70,31 @@ describe('core.Router', function()
     {
       var method = router.match('post', 'test');
       expect(method).to.equal(null);
+    });
+  });
+
+  describe('#start', function()
+  {
+    var context = {};
+    var router = new core.Router();
+
+    router.resource('test', 'TestController');
+    router.start('test', context);
+
+    it('it should expose 5 routes to the passed in context', function()
+    {
+      expect(typeof context['index']).to.not.equal('undefined');
+      expect(typeof context['show']).to.not.equal('undefined');
+      expect(typeof context['store']).to.not.equal('undefined');
+      expect(typeof context['update']).to.not.equal('undefined');
+      expect(typeof context['destroy']).to.not.equal('undefined');
+      expect(typeof context['edit']).to.equal('undefined');
+
+      expect(context['index']()).to.equal('index');
+      expect(context['show']()).to.equal('show');
+      expect(context['store']()).to.equal('store');
+      expect(context['update']()).to.equal('update');
+      expect(context['destroy']()).to.equal('destroy');
     });
   });
 });

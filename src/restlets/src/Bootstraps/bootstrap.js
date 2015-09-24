@@ -1,36 +1,55 @@
-var context = this;
-
-function main(datain)
+(function(global)
 {
-  try
+  global.main = function(datain)
   {
-    context.input = new core.Input(datain).parseDates().parseArrays();
-    var validator = new core.Validator(input, {controller: 'required', method: 'required'});
-
-    if(validator.passes())
+    try
     {
-      var router = new core.Router();
+      // create a global input object
+      global.input = new core.Input(datain).parseDates().parseArrays();
 
-      router.resource('cash_sales',        'CashSalesController');
-      router.resource('sales_orders',      'SalesOrdersController');
+      // validate that a url and method were sent so that we can match a route
+      var validator = new core.Validator(input, {url: 'required', method: 'required'});
 
-      router.resource('customers',         'CustomersController');
-      router.resource('inventory_items',   'InventoryItemsController');
+      if(validator.passes())
+      {
+        var router = new core.Router();
 
-      router.resource('gift_certificates', 'GiftCertificatesController');
-      router.resource('promotions',        'PromotionsSalesController');
+        // register routes
 
-      input.set(params);
+        router.resource('cash_sales',        'CashSalesController');
+        router.resource('sales_orders',      'SalesOrdersController');
 
-      return router.match()();
+        router.resource('customers',         'CustomersController');
+        router.resource('inventory_items',   'InventoryItemsController');
+
+        router.resource('gift_certificates', 'GiftCertificatesController');
+        router.resource('promotions',        'PromotionsSalesController');
+
+        // match a route!
+        var match = router.match(input.get('method'), input.get('url'));
+
+        if (match)
+        {
+          // set the params that might have been
+          // matched in the url to the global input object
+          input.set(router.params);
+
+          // fire the route
+          return match();
+        }
+
+        // if no route matched return a 404
+        return new core.Controller().notFound('No route matched');
+      }
+      else
+      {
+        return new core.Controller().badRequest(validator.toHash());
+      }
     }
-    else
+    catch (e)
     {
-      return new core.Controller().badRequest(validator.toHash());
+      return new core.Controller().internalServerError(e);
     }
-  }
-  catch (e)
-  {
-    return new core.Controller().internalServerError(e);
-  }
-}
+  };
+
+})(this);
