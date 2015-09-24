@@ -1,7 +1,6 @@
 var gulp   = require('gulp');
 var concat = require('gulp-concat');
 var upload = require('gulp-nsupload');
-var async  = require('async');
 
 var buildDir = 'src/restlets/dist/';
 var baseDir  = 'src/restlets/src/';
@@ -86,38 +85,38 @@ var resources = [{
 
 gulp.task('library', function()
 {
-  gulp.src(library)
-      .pipe(concat('library.js'))
-      .pipe(gulp.dest(buildDir));
+  return gulp.src(library)
+             .pipe(concat('library.js'))
+             .pipe(gulp.dest(buildDir));
 });
 
 gulp.task('bootstraps', function()
 {
-  gulp.src(bootstraps)
-      .pipe(gulp.dest(buildDir));
-});
-
-gulp.task('upload', function(file)
-{
-  gulp.src(buildDir + '**/*.js')
-      .pipe(upload(require('./netsuite.json')));
+  return gulp.src(bootstraps)
+             .pipe(gulp.dest(buildDir));
 });
 
 resources.forEach(function(resource)
 {
   gulp.task(resource.name, function()
   {
-    gulp.src(resource.files)
-        .pipe(concat(resource.name + '.js'))
-        .pipe(gulp.dest(buildDir));
+    return gulp.src(resource.files)
+               .pipe(concat(resource.name + '.js'))
+               .pipe(gulp.dest(buildDir));
   });
 });
 
 gulp.task('resources', function()
 {
-  gulp.src([].concat.apply([], resources.map(function(resource) { return resource.files; })))
-      .pipe(concat('resources.js'))
-      .pipe(gulp.dest(buildDir));
+  return gulp.src([].concat.apply([], resources.map(function(resource) { return resource.files; })))
+             .pipe(concat('resources.js'))
+             .pipe(gulp.dest(buildDir));
+});
+
+gulp.task('upload', ['library', 'resources', 'bootstraps'].concat(resources.map(function(resource) { return resource.name; })), function(file)
+{
+  gulp.src(buildDir + '**/*.js')
+      .pipe(upload(require('./netsuite.json')));
 });
 
 gulp.task('watch', function()
@@ -146,40 +145,4 @@ gulp.task('watch', function()
   });
 });
 
-// gulp.task('default', ['library', 'resources'].concat(resources.map(function(resource) { return resource.name; })).concat(['bootstraps', 'upload']));
-gulp.task('default', function()
-{
-  async.series([
-    function()
-    {
-      gulp.src(library)
-          .pipe(concat('library.js'))
-          .pipe(gulp.dest(buildDir));
-    },
-    function()
-    {
-      gulp.src([].concat.apply([], resources.map(function(resource) { return resource.files; })))
-          .pipe(concat('resources.js'))
-          .pipe(gulp.dest(buildDir));
-    },
-    function()
-    {
-      resources.forEach(function(resource)
-      {
-        gulp.src(resource.files)
-            .pipe(concat(resource.name + '.js'))
-            .pipe(gulp.dest(buildDir))
-      });
-    },
-    function()
-    {
-      gulp.src(bootstraps)
-          .pipe(gulp.dest(buildDir));
-    },
-    function()
-    {
-      gulp.src(buildDir + '**/*.js')
-          .pipe(upload(require('./netsuite.json')));
-    }
-  ]);
-});
+gulp.task('default', ['upload']);
