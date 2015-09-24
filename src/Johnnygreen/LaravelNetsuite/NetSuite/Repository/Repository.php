@@ -11,8 +11,9 @@ class Repository implements RepositoryInterface {
   public $config;
 
   // crud and search endpoints
-  public $endpoint_crud;
-  public $endpoint_search;
+  public $endpoints = [
+    'https://rest.na1.netsuite.com/app/site/hosting/restlet.nl?script=26&deploy=5'
+  ];
 
   // search filters
   public $filters;
@@ -27,6 +28,12 @@ class Repository implements RepositoryInterface {
   {
     if ( ! is_null($config)) $this->setConfig($config);
     $this->setClient(new Client);
+  }
+
+  // TODO:: IMPLEMENT SOMETHING THAT MAKES SENSE
+  public function getEndpoint($index = null)
+  {
+    return array_get($this->endpoints, $index, $this->endpoints[array_rand($this->endpoints)]);
   }
 
   public function setConfig($config)
@@ -62,26 +69,9 @@ class Repository implements RepositoryInterface {
     return $this->model;
   }
 
-  public function setCrudEndpoint($endpoint)
+  public function getUrl($id = null)
   {
-    $this->endpoint_crud = $endpoint;
-    return $this;
-  }
-
-  public function getCrudEndpoint()
-  {
-    return $this->endpoint_crud;
-  }
-
-  public function setSearchEndpoint($endpoint)
-  {
-    $this->endpoint_search = $endpoint;
-    return $this;
-  }
-
-  public function getSearchEndpoint($endpoint)
-  {
-    return $this->endpoint_search;
+    return rtrim("{$this->url}/{$id}", '/');
   }
 
   public function buildAuthorization()
@@ -92,13 +82,10 @@ class Repository implements RepositoryInterface {
 
   // helpers for request / response
 
-  public function requestAction($action, $body = [])
+  public function requestResource($method, $url, $body = [])
   {
     // builds request
-    return $this->request('GET', $this->getUrl(), array_merge([
-      'action'     => $action,
-      'controller' => $this->getController()
-    ], $body));
+    return $this->request('GET', $this->getEndpoint(), compact('method', 'url', 'body'));
 
   }
 
@@ -210,7 +197,7 @@ class Repository implements RepositoryInterface {
   public function paginate($per_page = null, $page = null)
   {
     $filters = $this->filters;
-    $this->request('GET', $this->endpoint_search, compact('per_page', 'page', 'filters'));
+    $this->requestResource('GET', $this->getUrl(), compact('per_page', 'page', 'filters'));
     $this->send();
     return $this->convertResponseToCollection();
   }
@@ -262,7 +249,7 @@ class Repository implements RepositoryInterface {
 
   public function find($ns_id)
   {
-    $this->request('GET', $this->endpoint_crud, compact('ns_id'));
+    $this->requestResource('GET', $this->getUrl($ns_id), compact('ns_id'));
     $this->send();
     return $this->convertResponseToModel();
   }
@@ -270,28 +257,29 @@ class Repository implements RepositoryInterface {
   // $external_id should be an array (i.e. ['customers_id' => 8672])
   public function findByExternalId($external_id)
   {
-    $this->request('GET', $this->endpoint_crud, $external_id);
+    // 'customers/:id'
+    $this->requestResource('GET', $this->getUrl(reset($external_id)), $external_id);
     $this->send();
     return $this->convertResponseToModel();
   }
 
   public function create($attributes = [])
   {
-    $this->request('POST', $this->endpoint_crud, $attributes);
+    $this->requestResource('POST', $this->getUrl(), $attributes);
     $this->send();
     return $this->convertResponseToModel();
   }
 
   public function update($attributes)
   {
-    $this->request('PUT', $this->endpoint_crud, $attributes);
+    $this->requestResource('PUT', $this->getUrl(array_get($attributes, 'ns_id')), $attributes);
     $this->send();
     return $this->convertResponseToModel();
   }
 
   public function destroy($ns_id)
   {
-    $this->request('DELETE', $this->endpoint_crud, compact('ns_id'));
+    $this->requestResource('DELETE', $this->getUrl($ns_id), compact('ns_id'));
     $this->send();
     return $this->responseIsSuccessful();
   }
@@ -299,13 +287,12 @@ class Repository implements RepositoryInterface {
   // $external_id should be an array (i.e. ['customers_id' => 8672])
   public function destroyByExternalId($external_id)
   {
-    $this->request('DELETE', $this->endpoint_crud, $external_id);
+    $this->request('DELETE', $this->getUrl(reset($external_id)), $external_id);
     $this->send();
     return $this->responseIsSuccessful();
   }
 
   // helpers for converting return json data into models
-
   public function convertArrayToModel(Array $attributes)
   {
     $class = $this->model;
