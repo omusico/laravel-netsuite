@@ -2,25 +2,26 @@ var gulp   = require('gulp');
 var concat = require('gulp-concat');
 var upload = require('gulp-nsupload');
 
-var buildDir  = 'src/restlets/dist/';
-var baseDir   = 'src/restlets/src/';
-var vendorDir = 'src/../node_modules/';
+var buildDir = 'src/restlets/dist/';
+var baseDir  = 'src/restlets/src/';
+var npmDir   = 'src/../node_modules/';
+var bowerDir = 'src/../bower_components/';
 
 // ordering matters here
 var library = [
-  vendorDir + 'underscore/underscore-min.js',
-  vendorDir + 'moment/min/moment.min.js',
-  vendorDir + 'routes/dist/routes.js',
-  baseDir   + 'Library/Core.js',
-  baseDir   + 'Library/Log.js',
-  baseDir   + 'Library/Util.js',
-  baseDir   + 'Library/Base.js',
-  baseDir   + 'Library/Model.js',
-  baseDir   + 'Library/Input.js',
-  baseDir   + 'Library/Validator.js',
-  baseDir   + 'Library/Controller.js',
-  baseDir   + 'Library/Router.js',
-  baseDir   + 'Library/Repository.js'
+  bowerDir + 'lodash/lodash.min.js',
+  bowerDir + 'moment/min/moment.min.js',
+  npmDir   + 'path-parser/dist/umd/path-parser.js',
+  baseDir  + 'Library/Core.js',
+  baseDir  + 'Library/Log.js',
+  baseDir  + 'Library/Util.js',
+  baseDir  + 'Library/Base.js',
+  baseDir  + 'Library/Model.js',
+  baseDir  + 'Library/Input.js',
+  baseDir  + 'Library/Validator.js',
+  baseDir  + 'Library/Controller.js',
+  baseDir  + 'Library/Router.js',
+  baseDir  + 'Library/Repository.js'
 ];
 
 var bootstraps = [
@@ -95,11 +96,11 @@ gulp.task('bootstraps', function()
       .pipe(gulp.dest(buildDir));
 });
 
-// gulp.task('upload', function(file)
-// {
-//   gulp.src(buildDir + '**/*.js')
-//       .pipe(upload(require('./netsuite.json')));
-// });
+gulp.task('upload', function(file)
+{
+  gulp.src(buildDir + '**/*.js')
+      .pipe(upload(require('./netsuite.json')));
+});
 
 resources.forEach(function(resource)
 {
@@ -130,11 +131,11 @@ gulp.task('watch', function()
   });
 
   // only upload the file that changes
-  // gulp.watch(builds, null, function(file)
-  // {
-  //   gulp.src(file.path)
-  //       .pipe(upload(require('./netsuite.json')));
-  // });
+  gulp.watch(builds, null, function(file)
+  {
+    gulp.src(file.path)
+        .pipe(upload(require('./netsuite.json')));
+  });
 });
 
 gulp.task('default', resources.map(function(resource) { return resource.name; }).concat(['library', 'bootstraps', 'upload']));

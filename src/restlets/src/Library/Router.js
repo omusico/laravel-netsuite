@@ -5,7 +5,7 @@
     constructor: function()
     {
       this.initialize.apply(this, arguments);
-      this.parser    = new routes.Router();
+      this.routes    = [];
       this.resources = {};
     },
 
@@ -21,7 +21,7 @@
     {
       if (_.isFunction(callable))
       {
-        var method = function()
+        var callback = function()
         {
           return callable;
         };
@@ -30,15 +30,17 @@
       {
         var parsedAction = this.parseAction(callable);
 
-        var method = function()
+        var callback = function()
         {
           var controller = new core[parsedAction.controller];
           return controller[parsedAction.method];
         }
       }
 
-      // setup the route map
-      this.parser.addRoute(httpMethod + '_' + url, method);
+      this.routes.push({
+        path: new Path(httpMethod + '_' + url),
+        callback: callback
+      });
 
       return this;
     },
@@ -63,10 +65,16 @@
 
     match: function(httpMethod, url)
     {
-      var match = this.parser.match(httpMethod + '_' + url);
-      this.params = match ? match.params : null;
+      var match = _.find(this.routes, function(route)
+      {
+        var params = route.path.match(httpMethod + '_' + url);
+        route.params = params;
+        return ! _.isNull(params);
+      });
 
-      return match ? match.fn() : null;
+      if (match) this.params = match.params;
+
+      return match ? match.callback() : null;
     },
 
     // old router start function

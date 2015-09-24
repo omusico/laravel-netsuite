@@ -16,7 +16,7 @@ describe('core.Router', function()
 
     it('should register 5 routes', function()
     {
-      expect(router.parser.routes.length).to.equal(5);
+      expect(router.routes.length).to.equal(5);
     });
 
     it('should match get test to index method', function()
@@ -57,7 +57,7 @@ describe('core.Router', function()
 
     it('should register 1 route', function()
     {
-      expect(router.parser.routes.length).to.equal(1);
+      expect(router.routes.length).to.equal(1);
     });
 
     it('should match get test to closure', function()

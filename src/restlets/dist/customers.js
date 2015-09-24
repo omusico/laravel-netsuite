@@ -346,10 +346,12 @@
     {
       var results = core.Repository.prototype.get.call(this);
 
-      return results.map(function(result)
+      var models = results.map(function(result)
       {
         return new this.searchClass(result);
       }, this);
+
+      return models;
     },
 
     create: function(attrs)
