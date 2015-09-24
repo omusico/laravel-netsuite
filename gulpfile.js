@@ -1,6 +1,7 @@
 var gulp   = require('gulp');
 var concat = require('gulp-concat');
 var upload = require('gulp-nsupload');
+var async  = require('async');
 
 var buildDir = 'src/restlets/dist/';
 var baseDir  = 'src/restlets/src/';
@@ -112,11 +113,18 @@ resources.forEach(function(resource)
   });
 });
 
+gulp.task('resources', function()
+{
+  gulp.src([].concat.apply([], resources.map(function(resource) { return resource.files; })))
+      .pipe(concat('resources.js'))
+      .pipe(gulp.dest(buildDir));
+});
+
 gulp.task('watch', function()
 {
-  var builds = buildDir + '**/*.js';
-
   gulp.watch(library, ['library']);
+
+  gulp.watch([].concat.apply([], resources.map(function(resource) { return resource.files; })), ['resources']);
 
   resources.forEach(function(resource)
   {
@@ -131,11 +139,47 @@ gulp.task('watch', function()
   });
 
   // only upload the file that changes
-  gulp.watch(builds, null, function(file)
+  gulp.watch(buildDir + '**/*.js', null, function(file)
   {
     gulp.src(file.path)
         .pipe(upload(require('./netsuite.json')));
   });
 });
 
-gulp.task('default', resources.map(function(resource) { return resource.name; }).concat(['library', 'bootstraps', 'upload']));
+// gulp.task('default', ['library', 'resources'].concat(resources.map(function(resource) { return resource.name; })).concat(['bootstraps', 'upload']));
+gulp.task('default', function()
+{
+  async.series([
+    function()
+    {
+      gulp.src(library)
+          .pipe(concat('library.js'))
+          .pipe(gulp.dest(buildDir));
+    },
+    function()
+    {
+      gulp.src([].concat.apply([], resources.map(function(resource) { return resource.files; })))
+          .pipe(concat('resources.js'))
+          .pipe(gulp.dest(buildDir));
+    },
+    function()
+    {
+      resources.forEach(function(resource)
+      {
+        gulp.src(resource.files)
+            .pipe(concat(resource.name + '.js'))
+            .pipe(gulp.dest(buildDir))
+      });
+    },
+    function()
+    {
+      gulp.src(bootstraps)
+          .pipe(gulp.dest(buildDir));
+    },
+    function()
+    {
+      gulp.src(buildDir + '**/*.js')
+          .pipe(upload(require('./netsuite.json')));
+    }
+  ]);
+});
