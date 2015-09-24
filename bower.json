@@ -1,0 +1,19 @@
+{
+  "name": "laravel-netsuite",
+  "version": "0.0.0",
+  "authors": [
+    "Johnny Green <johnnygreen@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "moment": "~2.10.6",
+    "lodash": "~3.10.1"
+  }
+}
