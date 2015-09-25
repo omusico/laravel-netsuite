@@ -8,28 +8,45 @@
     fields: {
       'id'               : 'int',    // ns_id
       'externalid'       : 'string', // orders_id
-      'class'            : 'int',    // web, retail, etc
+      'entity'           : 'int',    // customers ns_id
+
       'authcode'         : 'string',
 
+      // set these as defaults for now
+      'class'            : 'int',    // web, retail, etc
       'location'         : 'int',
+
+      // 'discountitem' : 'notsure',
+      'email'            : 'string',
 
       // shipping
       'shipaddressee'    : 'string',
-      'shipaddress'      : 'string',
+      'shipaddr1'        : 'string',
+      'shipaddr2'        : 'string',
       'shipcity'         : 'string',
       'shipstate'        : 'string',
       'shipzip'          : 'string',
       'shipcountry'      : 'string',
-      'shipmethod'       : 'string',
+
+      // shipping method
+      'shipmethod'       : 'int',
       'shipcarrier'      : 'string',
-      'shipping_rate'    : 'string',
+
+      'paymentmethod'    : 'int',
 
       // totals
-      'discounttotal'    : 'notsure',
-      'discountitem'     : 'notsure',
-      'shippingcost'     : 'float',
+      'discounttotal'    : 'float',
       'subtotal'         : 'float',
+      'shippingcost'     : 'float',
+      'taxtotal'         : 'float',
       'total'            : 'float',
+
+      'giftcertapplied'  : 'int',
+      'promotionapplied' : 'int',
+
+      'custbody14'       : 'string', // comments
+
+      // 'taxrate' : 'float',
 
       'createddate'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
@@ -40,40 +57,101 @@
     },
 
     // fields to be parsed on output
-    // visible: [
-    //   'ns_id',
-    //   'orders_id'
-    // ],
+    visible: [
+      'ns_id',
+      'orders_id',
+      'customers_ns_id',
+      'customers_email_address',
+      'delivery_name',
+      'delivery_street_address',
+      'delivery_street_address_2',
+      'delivery_city',
+      'delivery_state',
+      'delivery_postcode',
+      'delivery_country',
+      'products',
+      // 'item',
+      'created_at',
+      'updated_at'
+    ],
 
-    // getNsIdAttribute: function()
-    // {
-    //   return core.Util.get(this.attrs, 'id');
-    // },
-    //
-    // getOrdersIdAttribute: function()
-    // {
-    //   return core.Util.get(this.attrs, 'externalid');
-    // },
-    //
-    // getCreatedAtAttribute: function()
-    // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
-    // },
-    //
-    // getUpdatedAtAttribute: function()
-    // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
-    // },
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    getOrdersIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'externalid');
+    },
+
+    getCustomersNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'entity');
+    },
+
+    getCustomersEmailAddressAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'email');
+    },
+
+    getDeliveryNameAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipaddressee');
+    },
+
+    getDeliveryStreetAddressAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipaddr1');
+    },
+
+    getDeliveryStreetAddress2Attribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipaddr2');
+    },
+
+    getDeliveryCityAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipcity');
+    },
+
+    getDeliveryStateAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipstate');
+    },
+
+    getDeliveryPostcodeAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipzip');
+    },
+
+    getDeliveryCountryAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'shipcountry');
+    },
+
+    getProductsAttribute: function()
+    {
+      return _.map(core.Util.get(this.attrs, 'item', []), function(item)
+      {
+        return item.toHash();
+      });
+    },
+
+    getCreatedAtAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
+    },
+
+    getUpdatedAtAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+    },
   });
 })(core);
 
-// billings
-//   "billaddress",
-//   "billingaddress2_set",
-
 // totals & payment
 //   "shippingcostoverridden",
-//   "promotionapplied",
 //   "getauth",
 //   "currency",
 //   "ispaypal",
@@ -85,16 +163,7 @@
 //   "ispaymethcc",
 
 // general
-//   "email",
-//   "baserecordtype",
 //   "tranid", //   "transactionnumber",
-//   "externalid",
-//   "message",
-//   "isonlinetransaction",
-//   "saleseffectivedate",
-//   "location",
-//   "createddate",
-//   "lastmodifieddate",
 
 // uncategorized
 //   "type",
@@ -103,34 +172,24 @@
 //   "shipcomplete",
 //   "paypalauthid",
 //   "salesrep",
-//   "shippingaddress_text",
 
 //   "paymentprocessingmode",
 //   "billisresidential",
 
 //   "persistedpromocode",
 //   "paypaltoken",
-//   "paymentmethod",
-//   "linkedtrackingnumbers",
-//   "overallunbilledorders",
-//   "shipaddresslist",
 //   "paypaloverride",
 //   "orderstatus",
 //   "discountrate",
 //   "couponcode",
-//   "shadow_shipaddress",
-//   "billaddresslist",
 //   "promocode",
-//   "oldpaypalstatus",
 //   "paypalprocess",
 //   "terms",
-//   "authcode",
 //   "item_total",
 
 //   "shipoverride",
 //   "paypaltranid",
 //   "pendingpaypalauth",
-//   "webstore",
 //   "customercode",
 //   "trancardid",
 //   "paypalpayerid",
@@ -140,12 +199,8 @@
 //   "paypalauthiddisp",
 //   "synceventfield",
 //   "linked",
-//   "shippingaddress2_set",
-//   "status",
 //   "class",
-//   "shippingaddress_type",
 //   "taxamountoverride",
 //   "trandate",
-//   "giftcertapplied",
 //   "paypalstatus",
 // ]

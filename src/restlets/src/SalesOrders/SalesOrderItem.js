@@ -5,11 +5,32 @@
     recordType: 'salesorderitem',
 
     fields: {
-      'quantity' : 'int',   // quantity
-      'rate'     : 'float', // price
-      'amount'   : 'float', // line item price
-      'taxcode'  : 'int',   // tax code
-      'location' : 'int',
+      'item'      : 'int',    // item id
+      'quantity'  : 'int',   // quantity
+      'rate'      : 'float', // price
+      'amount'    : 'float', // line item price
+      'istaxable' : 'int'
+    },
+
+    visible: [
+      'products_ns_id',
+      'products_quantity',
+      'products_price'
+    ],
+
+    getProductsNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'item');
+    },
+
+    getProductsQuantityAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'quantity');
+    },
+
+    getProductsPriceAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'rate')
     }
   });
 })(core);

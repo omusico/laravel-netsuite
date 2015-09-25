@@ -26,6 +26,8 @@
                        ? this.salesOrders.find(input.get('ns_id'))
                        : this.salesOrders.findByExternalId(input.get('orders_id'));
 
+        return this.okay({model: salesOrder.toHash(), record: nlapiLoadRecord('salesorder', input.get('ns_id'))});
+
         return salesOrder ? this.okay(salesOrder.toHash()) : this.notFound();
       }
       else
