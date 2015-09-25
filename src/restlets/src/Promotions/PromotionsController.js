@@ -7,9 +7,9 @@
       this.promotions = new core.PromotionRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input      = new core.Input(datain).parseDates().parseArrays();
+      // var input      = new core.Input(datain).parseDates().parseArrays();
       var promotions = this.promotions
                                .filter(input.get('filters', []))
                               //  .orderBy('lastmodifieddate', 'ASC')
@@ -18,9 +18,9 @@
       return this.okay(promotions.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
+      // var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())

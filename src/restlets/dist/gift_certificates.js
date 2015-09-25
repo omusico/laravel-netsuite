@@ -184,9 +184,8 @@
       this.giftCertificates = new core.GiftCertificateRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input            = new core.Input(datain).parseDates().parseArrays();
       var giftCertificates = this.giftCertificates
                                  .filter(input.get('filters', []))
                                  .paginate(input.get('page', 1), input.get('per_page', 10));
@@ -194,9 +193,8 @@
       return this.okay(giftCertificates.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {gift_cards_id : 'required'});
 
       // return nlapiLoadRecord('giftcertificate', input.get('ns_id'));

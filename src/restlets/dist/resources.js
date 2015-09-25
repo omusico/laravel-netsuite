@@ -885,9 +885,8 @@
       this.inventoryItems = new core.InventoryItemRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input          = new core.Input(datain).parseDates().parseArrays();
       var inventoryItems = this.inventoryItems
                                .filter(input.get('filters', []))
                                .orderBy('lastmodifieddate', 'ASC')
@@ -896,9 +895,8 @@
       return this.okay(inventoryItems.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {product_legacy_id : 'required'});
 
       if (validator.passes())
@@ -1227,9 +1225,8 @@
       this.salesOrders = new core.SalesOrderRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input       = new core.Input(datain).parseDates().parseArrays();
       var salesOrders = this.salesOrders
                           .filter(input.get('filters', []))
                           .paginate(input.get('page', 1), input.get('per_page', 10));
@@ -1237,9 +1234,8 @@
       return this.okay(salesOrders.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {orders_id : 'required'});
 
       if (validator.passes())
@@ -1307,9 +1303,8 @@
       this.cachSales = new core.CashSaleRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input     = new core.Input(datain).parseDates().parseArrays();
       var cachSales = this.cachSales
                           .filter(input.get('filters', []))
                           .paginate(input.get('page', 1), input.get('per_page', 10));
@@ -1317,9 +1312,8 @@
       return this.okay(cachSales.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {orders_id : 'required'});
 
       if (validator.passes())
@@ -1524,9 +1518,8 @@
       this.giftCertificates = new core.GiftCertificateRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input            = new core.Input(datain).parseDates().parseArrays();
       var giftCertificates = this.giftCertificates
                                  .filter(input.get('filters', []))
                                  .paginate(input.get('page', 1), input.get('per_page', 10));
@@ -1534,9 +1527,8 @@
       return this.okay(giftCertificates.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {gift_cards_id : 'required'});
 
       // return nlapiLoadRecord('giftcertificate', input.get('ns_id'));
@@ -1723,9 +1715,9 @@
       this.promotions = new core.PromotionRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input      = new core.Input(datain).parseDates().parseArrays();
+      // var input      = new core.Input(datain).parseDates().parseArrays();
       var promotions = this.promotions
                                .filter(input.get('filters', []))
                               //  .orderBy('lastmodifieddate', 'ASC')
@@ -1734,9 +1726,9 @@
       return this.okay(promotions.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
+      // var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())
