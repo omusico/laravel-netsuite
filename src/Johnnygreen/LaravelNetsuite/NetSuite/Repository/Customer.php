@@ -2,7 +2,7 @@
 
 class Customer extends Repository {
 
-  public $model           = 'Johnnygreen\LaravelNetSuite\NetSuite\Customer';
-  public $url             = 'customers';
-  
+  public $model = 'Johnnygreen\LaravelNetSuite\NetSuite\Customer';
+  public $url   = 'customers';
+
 }
