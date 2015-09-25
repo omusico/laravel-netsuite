@@ -408,9 +408,8 @@
       this.customers = new core.CustomerRepository();
     },
 
-    index: function(datain)
+    index: function()
     {
-      var input     = new core.Input(datain).parseDates().parseArrays();
       var customers = this.customers
                           .filter(input.get('filters', []))
                           .orderBy('lastmodifieddate', 'ASC')
@@ -419,9 +418,8 @@
       return this.okay(customers.toHash());
     },
 
-    show: function(datain)
+    show: function()
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'}, {customers_id : 'required'});
 
       if (validator.passes())
@@ -445,10 +443,8 @@
       }
     },
 
-    store: function(datain)
+    store: function()
     {
-      var input = new core.Input(datain).parseArrays();
-
       var validator = new core.Validator(input, {
         customers_id           : 'required',
         customers_firstname    : 'required',
@@ -496,9 +492,8 @@
       }
     },
 
-    update: function(datain)
+    update: function()
     {
-      var input     = new core.Input(datain).parseArrays();
       var validator = new core.Validator(input, {
         ns_id: 'required',
       });
@@ -538,9 +533,8 @@
       }
     },
 
-    // destroy: function(datain)
+    // destroy: function()
     // {
-    //   var input     = new core.Input(datain);
     //   var validator = new core.Validator(input, {ns_id: 'required'}, {customers_id : 'required'});
     //
     //   if (validator.passes())

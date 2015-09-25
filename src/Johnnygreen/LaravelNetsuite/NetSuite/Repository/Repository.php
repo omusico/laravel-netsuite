@@ -12,7 +12,7 @@ class Repository implements RepositoryInterface {
 
   // crud and search endpoints
   public $endpoints = [
-    'https://rest.na1.netsuite.com/app/site/hosting/restlet.nl?script=26&deploy=5'
+    'https://rest.na1.netsuite.com/app/site/hosting/restlet.nl?script=41&deploy=1'
   ];
 
   // search filters
@@ -30,10 +30,9 @@ class Repository implements RepositoryInterface {
     $this->setClient(new Client);
   }
 
-  // TODO:: IMPLEMENT SOMETHING THAT MAKES SENSE
-  public function getEndpoint($index = null)
+  public function getEndpoint($index = 0)
   {
-    return array_get($this->endpoints, $index, $this->endpoints[array_rand($this->endpoints)]);
+    return array_get($this->endpoints, $index);
   }
 
   public function setConfig($config)
@@ -85,7 +84,7 @@ class Repository implements RepositoryInterface {
   public function requestResource($method, $url, $body = [])
   {
     // builds request
-    return $this->request('GET', $this->getEndpoint(), compact('method', 'url', 'body'));
+    return $this->request('GET', $this->getEndpoint(), compact('method', 'url') + $body);
 
   }
 

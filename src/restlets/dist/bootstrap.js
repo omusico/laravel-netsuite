@@ -7,6 +7,8 @@
       // create a global input object
       global.input = new core.Input(datain).parseDates().parseArrays();
 
+      core.Log.register('input', input.all());
+
       // validate that a url and method were sent so that we can match a route
       var validator = new core.Validator(input, {url: 'required', method: 'required'});
 
@@ -26,7 +28,7 @@
         router.resource('promotions',        'PromotionsSalesController');
 
         // match a route!
-        var match = router.match(input.get('method'), input.get('url'));
+        var match = router.match(input.get('method').toLowerCase(), input.get('url'));
 
         if (match)
         {

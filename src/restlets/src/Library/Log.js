@@ -12,24 +12,31 @@
   };
 
   core.Log = {
+    details: {},
+
+    register: function(key, value)
+    {
+      this.details[key] = value;
+    },
+
     audit: function(title, details)
     {
-      log('AUDIT', title, details);
+      log('AUDIT', title, _.extend(this.details, details));
     },
 
     debug: function(title, details)
     {
-      if (core.debug) log('DEBUG', title, details);
+      if (core.debug) log('DEBUG', title, _.extend(this.details, details));
     },
 
     error: function(title, details)
     {
-      log('ERROR', title, details);
+      log('ERROR', title, _.extend(this.details, details));
     },
 
     emergency: function(title, details)
     {
-      log('EMERGENCY', title, details);
+      log('EMERGENCY', title, _.extend(this.details, details));
     }
   };
 })(core);

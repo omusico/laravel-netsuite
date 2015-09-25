@@ -33,7 +33,7 @@
         var callback = function()
         {
           var controller = new core[parsedAction.controller];
-          return controller[parsedAction.method];
+          return controller[parsedAction.method].bind(controller);
         }
       }
 
