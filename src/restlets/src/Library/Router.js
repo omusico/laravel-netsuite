@@ -19,9 +19,11 @@
 
     register: function(httpMethod, url, callable)
     {
+      var callback;
+
       if (_.isFunction(callable))
       {
-        var callback = function()
+        callback = function()
         {
           return callable;
         };
@@ -30,11 +32,11 @@
       {
         var parsedAction = this.parseAction(callable);
 
-        var callback = function()
+        callback = function()
         {
-          var controller = new core[parsedAction.controller];
+          var controller = new core[parsedAction.controller]();
           return controller[parsedAction.method].bind(controller);
-        }
+        };
       }
 
       this.routes.push({
@@ -54,7 +56,7 @@
     {
       this.get(   url,          controller + '@index');
       this.get(   url + '/:id', controller + '@show');
-      this.post(  url + '/:id', controller + '@store');
+      this.post(  url         , controller + '@store');
       this.put(   url + '/:id', controller + '@update');
       this.delete(url + '/:id', controller + '@destroy');
 

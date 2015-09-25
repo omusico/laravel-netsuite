@@ -84,7 +84,7 @@ class Repository implements RepositoryInterface {
   public function requestResource($method, $url, $body = [])
   {
     // builds request
-    return $this->request('GET', $this->getEndpoint(), compact('method', 'url') + $body);
+    return $this->request($method, $this->getEndpoint(), compact('method', 'url') + $body);
 
   }
 
