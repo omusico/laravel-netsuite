@@ -45,7 +45,7 @@
       'total'            : 'float',
 
       'giftcertredemption' : 'object',
-      'couponcode'        : 'object',
+      'couponcode'         : 'object',
 
       'giftcertapplied'  : 'int',
       'promotionapplied' : 'int',
@@ -211,7 +211,7 @@
         },
         {
           class: 'ot_total',
-          value: core.Util.get(this.attrs, 'total', 0),
+          value: core.Util.get(this.attrs, 'total', 0)
         },
         {
           class: 'ot_giftcard',
@@ -229,6 +229,6 @@
     getLastModifiedAttribute: function()
     {
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
-    },
+    }
   });
 })(core);
