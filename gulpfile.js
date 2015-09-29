@@ -51,6 +51,7 @@ var resources = [{
   name  : 'sales_orders',
   files : [
     baseDir + 'SalesOrders/SalesOrderItem.js',
+    baseDir + 'SalesOrders/SalesOrderGiftCertRedemption.js',
     baseDir + 'SalesOrders/SalesOrder.js',
     baseDir + 'SalesOrders/SalesOrderSearchResult.js',
     baseDir + 'SalesOrders/SalesOrderRepository.js',

@@ -37,6 +37,38 @@
 
 (function(core)
 {
+  core.SalesOrderGiftCertRedemption = core.Model.extend(
+  {
+    recordType: 'giftcertredemption',
+
+    fields: {
+      // 'gift_certificate_code': 'string',
+      'authcode'             : 'int',    // item id
+      // 'name'                 : 'string', // item id
+      'authcodeamtremaining' : 'float',  // quantity
+      'authcodeapplied'      : 'float',  // price
+      'giftcertavailable'    : 'float'   // line item price
+    },
+
+    visible: [
+      'ns_id',
+      'gift_cards_code',
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'authcode');
+    },
+
+    getGiftCardsCodeAttribute: function()
+    {
+      return JSON.stringify(this.attrs);
+    },
+  });
+})(core);
+
+(function(core)
+{
   core.SalesOrder = core.Model.extend(
   {
     recordType: 'salesorder',
@@ -81,7 +113,7 @@
       'taxtotal'         : 'float',
       'total'            : 'float',
 
-      'giftcertredemption' : 'object',
+      // 'giftcertredemption' : 'object',
       'couponcode'         : 'object',
 
       'giftcertapplied'  : 'int',
@@ -96,7 +128,8 @@
     },
 
     sublists: {
-      'item' : core.SalesOrderItem
+      'item'               : core.SalesOrderItem,
+      'giftcertredemption' : core.SalesOrderGiftCertRedemption
     },
 
     // fields to be parsed on output
@@ -115,6 +148,8 @@
       'delivery_country',
       'payment_method',
       'orders_products',
+      'orders_status',
+      'gift_certificates',
       'date_purchased',
       'last_modified',
 
@@ -230,8 +265,39 @@
       });
     },
 
+    getOrdersStatusAttribute: function()
+    {
+      return core.Util.get({
+        // Sales Order:Pending Approval	SalesOrd:A
+        A: 1,
+        // Sales Order:Pending Fulfillment	SalesOrd:B
+        B: 2,
+        // Sales Order:Cancelled	SalesOrd:C
+        C: 6,
+        // Sales Order:Partially Fulfilled	SalesOrd:D
+        D: 2,
+        // Sales Order:Pending Billing/Partially Fulfilled	SalesOrd:E
+        E: 2,
+        // Sales Order:Pending Billing	SalesOrd:F
+        F: 2,
+        // Sales Order:Billed	SalesOrd:G
+        G: 2,
+        // Sales Order:Closed	SalesOrd:H
+        H: 6
+      }, core.Util.get(this.attrs, 'orderstatus', 'A'), 1);
+    },
+
+    getGiftCertificatesAttribute: function()
+    {
+      return _.map(core.Util.get(this.attrs, 'giftcertredemption', []), function(item)
+      {
+        return item.toHash();
+      }, this);
+    },
+
     getOrdersTotalsAttribute: function()
     {
+      core.Log.debug('redemption', this.attrs);
       return [
         {
           class: 'ot_discount_coupon',
@@ -253,7 +319,7 @@
         {
           class: 'ot_giftcard',
           value: core.Util.get(this.attrs, 'giftcertapplied', 0),
-          gift_cards_code: core.Util.get(this.attrs, 'giftcertredemption.authcode.name')
+          gift_cards_code: core.Util.get(this.attrs, 'giftcertredemption.0.authcode.name')
         }
       ];
     },
