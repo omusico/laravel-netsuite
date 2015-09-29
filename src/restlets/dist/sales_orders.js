@@ -54,7 +54,10 @@
       'location'         : 'int',
 
       // 'discountitem' : 'notsure',
-      'email'            : 'string',
+
+      // customer is a nesteded entity
+      // 'email'            : 'string',
+      // 'telephone'        : 'string',
 
       // shipping
       'shipaddressee'    : 'string',
@@ -78,6 +81,9 @@
       'taxtotal'         : 'float',
       'total'            : 'float',
 
+      'giftcertredemption' : 'object',
+      'couponcode'        : 'object',
+
       'giftcertapplied'  : 'int',
       'promotionapplied' : 'int',
 
@@ -98,7 +104,8 @@
       'ns_id',
       'orders_id',
       'customers_ns_id',
-      'customers_email_address',
+      // 'customers_email_address',
+      // 'customers_telephone',
       'delivery_name',
       'delivery_street_address',
       'delivery_street_address_2',
@@ -106,10 +113,12 @@
       'delivery_state',
       'delivery_postcode',
       'delivery_country',
-      'products',
-      // 'item',
-      'created_at',
-      'updated_at'
+      'payment_method',
+      'orders_products',
+      'date_purchased',
+      'last_modified',
+
+      'orders_totals'
     ],
 
     getNsIdAttribute: function()
@@ -127,10 +136,56 @@
       return core.Util.get(this.attrs, 'entity');
     },
 
-    getCustomersEmailAddressAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'email');
-    },
+    // getCustomersIdAttribute: function()
+    // {
+    //   var ns_id = core.Util.get(this.attrs, 'entity');
+    //
+    //   if (ns_id)
+    //   {
+    //     var customer = new core.CustomerRepository().find(ns_id);
+    //
+    //     if (customer)
+    //     {
+    //       return customer.get('externalid');
+    //     }
+    //   }
+    //
+    //   return null;
+    // },
+    //
+    // getCustomersEmailAddressAttribute: function()
+    // {
+    //   var ns_id = core.Util.get(this.attrs, 'entity');
+    //
+    //   if (ns_id)
+    //   {
+    //     var customer = new core.CustomerRepository().find(ns_id);
+    //
+    //     if (customer)
+    //     {
+    //       return customer.get('customers_email_address');
+    //     }
+    //   }
+    //
+    //   return null;
+    // },
+    //
+    // getCustomersTelephoneAttribute: function()
+    // {
+    //   var ns_id = core.Util.get(this.attrs, 'entity');
+    //
+    //   if (ns_id)
+    //   {
+    //     var customer = new core.CustomerRepository().find(ns_id);
+    //
+    //     if (customer)
+    //     {
+    //       return customer.get('customers_telephone');
+    //     }
+    //   }
+    //
+    //   return null;
+    // },
 
     getDeliveryNameAttribute: function()
     {
@@ -167,7 +222,7 @@
       return core.Util.get(this.attrs, 'shipcountry');
     },
 
-    getProductsAttribute: function()
+    getOrdersProductsAttribute: function()
     {
       return _.map(core.Util.get(this.attrs, 'item', []), function(item)
       {
@@ -175,72 +230,45 @@
       });
     },
 
-    getCreatedAtAttribute: function()
+    getOrdersTotalsAttribute: function()
+    {
+      return [
+        {
+          class: 'ot_discount_coupon',
+          value: core.Util.get(this.attrs, 'discounttotal', 0),
+          coupon_id: core.Util.get(this.attrs, 'couponcode.name')
+        },
+        {
+          class: 'ot_subtotal',
+          value: core.Util.get(this.attrs, 'subtotal', 0),
+        },
+        {
+          class: 'ot_tax',
+          value: core.Util.get(this.attrs, 'taxtotal', 0),
+        },
+        {
+          class: 'ot_total',
+          value: core.Util.get(this.attrs, 'total', 0),
+        },
+        {
+          class: 'ot_giftcard',
+          value: core.Util.get(this.attrs, 'giftcertapplied', 0),
+          gift_cards_code: core.Util.get(this.attrs, 'giftcertredemption.authcode.name')
+        }
+      ];
+    },
+
+    getDatePurchasedAttribute: function()
     {
       return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
     },
 
-    getUpdatedAtAttribute: function()
+    getLastModifiedAttribute: function()
     {
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
     },
   });
 })(core);
-
-// totals & payment
-//   "shippingcostoverridden",
-//   "getauth",
-//   "currency",
-//   "ispaypal",
-//   "taxamount2override",
-//   "methodtokenized",
-//   "paypalprocessed",
-//   "overrideshippingcost",
-//   "oldpaypaltranid",
-//   "ispaymethcc",
-
-// general
-//   "tranid", //   "transactionnumber",
-
-// uncategorized
-//   "type",
-//   "fedexservicename",
-//   "promodiscount",
-//   "shipcomplete",
-//   "paypalauthid",
-//   "salesrep",
-
-//   "paymentprocessingmode",
-//   "billisresidential",
-
-//   "persistedpromocode",
-//   "paypaltoken",
-//   "paypaloverride",
-//   "orderstatus",
-//   "discountrate",
-//   "couponcode",
-//   "promocode",
-//   "paypalprocess",
-//   "terms",
-//   "item_total",
-
-//   "shipoverride",
-//   "paypaltranid",
-//   "pendingpaypalauth",
-//   "customercode",
-//   "trancardid",
-//   "paypalpayerid",
-
-//   "shipisresidential",
-//   "thirdpartycarrier",
-//   "paypalauthiddisp",
-//   "synceventfield",
-//   "linked",
-//   "class",
-//   "taxamountoverride",
-//   "trandate",
-//   "paypalstatus",
-// ]
 
 (function(core)
 {
