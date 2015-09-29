@@ -42,17 +42,15 @@
     recordType: 'giftcertredemption',
 
     fields: {
-      // 'gift_certificate_code': 'string',
-      'authcode'             : 'int',    // item id
-      // 'name'                 : 'string', // item id
-      'authcodeamtremaining' : 'float',  // quantity
-      'authcodeapplied'      : 'float',  // price
-      'giftcertavailable'    : 'float'   // line item price
+      'authcode'          : 'int',    // item id
+      'authcode_display'  : 'string', // item id
+      'authcodeapplied'   : 'float',  // quantity
     },
 
     visible: [
       'ns_id',
       'gift_cards_code',
+      'authcodeapplied'
     ],
 
     getNsIdAttribute: function()
@@ -62,8 +60,13 @@
 
     getGiftCardsCodeAttribute: function()
     {
-      return JSON.stringify(this.attrs);
+      return core.Util.get(this.attrs, 'authcode_display');
     },
+
+    getAuthcodeappliedAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'authcodeapplied');
+    }
   });
 })(core);
 
@@ -297,7 +300,6 @@
 
     getOrdersTotalsAttribute: function()
     {
-      core.Log.debug('redemption', this.attrs);
       return [
         {
           class: 'ot_discount_coupon',
@@ -318,8 +320,8 @@
         },
         {
           class: 'ot_giftcard',
-          value: core.Util.get(this.attrs, 'giftcertapplied', 0),
-          gift_cards_code: core.Util.get(this.attrs, 'giftcertredemption.0.authcode.name')
+          value: _.reduce(this.get('gift_certificates'), function(total, gc){ return total + gc.authcodeapplied; }, 0),
+          gift_cards: this.get('gift_certificates')
         }
       ];
     },

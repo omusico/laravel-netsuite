@@ -5,17 +5,15 @@
     recordType: 'giftcertredemption',
 
     fields: {
-      // 'gift_certificate_code': 'string',
-      'authcode'             : 'int',    // item id
-      // 'name'                 : 'string', // item id
-      'authcodeamtremaining' : 'float',  // quantity
-      'authcodeapplied'      : 'float',  // price
-      'giftcertavailable'    : 'float'   // line item price
+      'authcode'          : 'int',    // item id
+      'authcode_display'  : 'string', // item id
+      'authcodeapplied'   : 'float',  // quantity
     },
 
     visible: [
       'ns_id',
       'gift_cards_code',
+      'authcodeapplied'
     ],
 
     getNsIdAttribute: function()
@@ -25,7 +23,12 @@
 
     getGiftCardsCodeAttribute: function()
     {
-      return JSON.stringify(this.attrs);
+      return core.Util.get(this.attrs, 'authcode_display');
     },
+
+    getAuthcodeappliedAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'authcodeapplied');
+    }
   });
 })(core);

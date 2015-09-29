@@ -14,6 +14,13 @@
   core.Log = {
     details: {},
 
+    extend: function(one, two, type)
+    {
+      var extend = {};
+      _.isObject(two) ? extend = two : extend[type] = two;
+      return _.extend(one, extend);
+    },
+
     register: function(key, value)
     {
       this.details[key] = value;
@@ -21,22 +28,22 @@
 
     audit: function(title, details)
     {
-      log('AUDIT', title, _.extend(this.details, details));
+      log('AUDIT', title, this.extend(this.details, details, 'audit'));
     },
 
     debug: function(title, details)
     {
-      if (core.debug) log('DEBUG', title, _.extend(this.details, details));
+      if (core.debug) log('DEBUG', title, this.extend(this.details, details, 'debug'));
     },
 
     error: function(title, details)
     {
-      log('ERROR', title, _.extend(this.details, details));
+      log('ERROR', title, this.extend(this.details, details, 'error'));
     },
 
     emergency: function(title, details)
     {
-      log('EMERGENCY', title, _.extend(this.details, details));
+      log('EMERGENCY', title, this.extend(this.details, details, 'emergency'));
     }
   };
 })(core);

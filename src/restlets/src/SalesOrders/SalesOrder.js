@@ -228,7 +228,6 @@
 
     getOrdersTotalsAttribute: function()
     {
-      core.Log.debug('redemption', this.attrs);
       return [
         {
           class: 'ot_discount_coupon',
@@ -249,8 +248,8 @@
         },
         {
           class: 'ot_giftcard',
-          value: core.Util.get(this.attrs, 'giftcertapplied', 0),
-          gift_cards_code: core.Util.get(this.attrs, 'giftcertredemption.0.authcode.name')
+          value: _.reduce(this.get('gift_certificates'), function(total, gc){ return total + gc.authcodeapplied; }, 0),
+          gift_cards: this.get('gift_certificates')
         }
       ];
     },
