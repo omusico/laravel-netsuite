@@ -405,33 +405,48 @@
       }, this);
     },
 
-    // create: function(attrs)
-    // {
-    //   var model = new this.recordClass(attrs, {mutate: true});
-    //
-    //   // this model will have id set on it, but might be missing some sublist ids
-    //   model = core.Repository.prototype.create.call(this, model);
-    //
-    //   // reload model so ids are set on sublists etc
-    //   model = this.find(model.get('id'));
-    //
-    //   return model;
-    // },
-    //
-    // update: function(attrs)
-    // {
-    //   var model = this.find(attrs.id);
-    //   if ( ! model) return false;
-    //   model.set(attrs);
-    //
-    //   // this model might be missing some sublist ids
-    //   model = core.Repository.prototype.update.call(this, model);
-    //
-    //   // reload model so ids are set on sublists etc
-    //   model = this.find(model.get('id'));
-    //
-    //   return model;
-    // },
+    create: function(attrs)
+    {
+      var model = new this.recordClass(attrs, {mutate: true});
+
+      // this model will have id set on it, but might be missing some sublist ids
+      model = core.Repository.prototype.create.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
+    },
+
+    update: function(attrs)
+    {
+      var model = this.find(attrs.ns_id);
+
+      if ( ! model) return false;
+      model.set(attrs);
+
+      // this model might be missing some sublist ids
+      model = core.Repository.prototype.update.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
+    },
+
+    destroy: function(id)
+    {
+      var model = this.find(id);
+      if ( ! model) return false;
+      return core.Repository.prototype.destroy.call(this, model);
+    },
+
+    destroyByExternalId: function(external_id)
+    {
+      var model = this.findByExternalId(external_id);
+      if ( ! model) return false;
+      return core.Repository.prototype.destroy.call(this, model);
+    }
   });
 })(core);
 
@@ -447,8 +462,8 @@
     index: function()
     {
       var salesOrders = this.salesOrders
-                          .filter(input.get('filters', []))
-                          .paginate(input.get('page', 1), input.get('per_page', 10));
+                            .filter(input.get('filters', []))
+                            .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(salesOrders.toHash());
     },
@@ -463,9 +478,72 @@
                        ? this.salesOrders.find(input.get('ns_id'))
                        : this.salesOrders.findByExternalId(input.get('orders_id'));
 
-        return this.okay({model: salesOrder.toHash(), record: nlapiLoadRecord('salesorder', input.get('ns_id'))});
+        // return this.okay({model: salesOrder.toHash(), record: nlapiLoadRecord('salesorder', input.get('ns_id'))});
 
         return salesOrder ? this.okay(salesOrder.toHash()) : this.notFound();
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    store: function()
+    {
+      var validator = new core.Validator(input, {
+
+      });
+
+      if (validator.passes())
+      {
+        // set defaults
+        var attrs = _.defaults(input.only(
+
+        ), {
+          class: 3,   // web order
+          location: 4 // web warehouse
+        });
+
+        try
+        {
+          var salesOrder = this.salesOrders.create(attrs);
+
+          return this.created(salesOrder.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    update: function()
+    {
+      var validator = new core.Validator(input, {
+        ns_id: 'required',
+      });
+
+      if (validator.passes())
+      {
+        // get what we need
+        var attrs = input.only(
+
+        );
+
+        try
+        {
+          var salesOrder = this.salesOrders.update(attrs);
+
+          return this.okay(salesOrder.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
       }
       else
       {
