@@ -91,22 +91,6 @@ gulp.task('library', function()
              .pipe(gulp.dest(buildDir));
 });
 
-gulp.task('bootstraps', function()
-{
-  return gulp.src(bootstraps)
-             .pipe(gulp.dest(buildDir));
-});
-
-resources.forEach(function(resource)
-{
-  gulp.task(resource.name, function()
-  {
-    return gulp.src(resource.files)
-               .pipe(concat(resource.name + '.js'))
-               .pipe(gulp.dest(buildDir));
-  });
-});
-
 gulp.task('resources', function()
 {
   return gulp.src([].concat.apply([], resources.map(function(resource) { return resource.files; })))
@@ -114,7 +98,13 @@ gulp.task('resources', function()
              .pipe(gulp.dest(buildDir));
 });
 
-gulp.task('upload', ['library', 'resources', 'bootstraps'].concat(resources.map(function(resource) { return resource.name; })), function(file)
+gulp.task('bootstraps', function()
+{
+  return gulp.src(bootstraps)
+             .pipe(gulp.dest(buildDir));
+});
+
+gulp.task('upload', ['library', 'resources', 'bootstraps'], function(file)
 {
   gulp.src(buildDir + '**/*.js')
       .pipe(upload(require('./netsuite.json')));
@@ -125,11 +115,6 @@ gulp.task('watch', function()
   gulp.watch(library, ['library']);
 
   gulp.watch([].concat.apply([], resources.map(function(resource) { return resource.files; })), ['resources']);
-
-  resources.forEach(function(resource)
-  {
-    gulp.watch(resource.files, [resource.name]);
-  });
 
   // only copy over bootstrap that changed
   gulp.watch(bootstraps, null, function(file)

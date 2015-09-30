@@ -590,13 +590,14 @@ _.mixin({
 {
   core.Model = core.Base.extend(
   {
-    recordType: '',
-    timeFormat: 'M/DD/YYYY h:mm a',
+    recordType : '',
+    timeFormat : 'M/DD/YYYY h:mm a',
 
-    attrs   : {},
-    fields  : {},
-    sublists: {},
-    visible : [],
+    attrs      : {},
+    fields     : {},
+    subrecords : {},
+    sublists   : {},
+    visible    : [],
 
     constructor: function(attrs, options)
     {
@@ -713,6 +714,31 @@ _.mixin({
           });
         // }
       }
+
+      // if ( ! _.isEmpty(this.subrecords))
+      // {
+      //   _.each(this.subrecords, function(recordType, subrecord)
+      //   {
+      //
+      //     var item = {};
+      //
+      //     if (isRecord)
+      //     {
+      //       // core.Log.debug('sublist fields', {recordType: sublist, fields: object.getAllLineItemFields(sublist)});
+      //
+      //       _.each(new recordType().fields, function(value, key)
+      //       {
+      //         item[key] = object.getLineItemValue(sublist, key, i);
+      //       });
+      //     }
+      //     else
+      //     {
+      //       item = object[sublist][i];
+      //     }
+      //
+      //     attrs[subrecord] = new recordType(item);
+      //   });
+      // }
 
       if ( ! _.isEmpty(this.sublists))
       {
