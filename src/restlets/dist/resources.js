@@ -1590,14 +1590,17 @@
       'delivery_postcode',
       'delivery_country',
       'payment_method',
-      'orders_products',
       'orders_status',
       'date_purchased',
       'last_modified',
 
+      // recordrefs
       'gift_certificates',
       'coupon',
-      'orders_totals'
+
+      // sublists
+      'products',
+      'totals'
     ],
 
     getNsIdAttribute: function()
@@ -1663,14 +1666,6 @@
       return core.Util.get(this.attrs, 'shipcountry');
     },
 
-    getOrdersProductsAttribute: function()
-    {
-      return _.map(core.Util.get(this.attrs, 'item', []), function(item)
-      {
-        return item.toHash();
-      });
-    },
-
     getOrdersStatusAttribute: function()
     {
       return core.Util.get({
@@ -1706,30 +1701,68 @@
       return core.Util.get(this.attrs, 'couponcode');
     },
 
-    getOrdersTotalsAttribute: function()
+    getProductsAttribute: function()
     {
+      return _.map(core.Util.get(this.attrs, 'item', []), function(item)
+      {
+        return item.toHash();
+      });
+    },
+
+    getTotalsAttribute: function()
+    {
+
+      var giftcardSum = _.reduce(this.get('gift_certificates'), function(total, gc){ return total + gc.authcodeapplied; }, 0);
+
       return [
         {
+          title: 'Discount Coupon',
+          text: core.Util.formatCurrency(0, 2, '-$'),
+          value: '0.00',
           class: 'ot_discount_coupon',
-          value: core.Util.get(this.attrs, 'discounttotal', 0),
-          coupon_id: core.Util.get(this.attrs, 'couponcode.name')
+          sort_order: 1
         },
         {
-          class: 'ot_subtotal',
+          title: 'Sub-Total:',
+          text:  core.Util.formatCurrency(core.Util.get(this.attrs, 'subtotal', 0)),
           value: core.Util.get(this.attrs, 'subtotal', 0),
+          class: 'ot_subtotal',
+          sort_order: 2
         },
         {
-          class: 'ot_tax',
+          title: 'Sales Tax:',
+          text: core.Util.formatCurrency(core.Util.get(this.attrs, 'taxtotal', 0)),
           value: core.Util.get(this.attrs, 'taxtotal', 0),
+          class: 'ot_tax',
+          sort_order: 3
         },
         {
-          class: 'ot_total',
-          value: core.Util.get(this.attrs, 'total', 0)
+          title: 'Duties:',
+          text: '????????',
+          value: '????????',
+          class: 'ot_duties',
+          sort_order: 4
         },
         {
+          title: 'Shipping Name:',
+          text:  core.Util.formatCurrency(core.Util.get(this.attrs, 'shipping', 0)),
+          value: core.Util.get(this.attrs, 'shipping', 0),
+          class: 'ot_shipping',
+          sort_order: 5
+        },
+        {
+          title: 'Gift Card:',
+          text: core.Util.formatCurrency(giftcardSum),
+          value: giftcardSum,
           class: 'ot_giftcard',
-          value: _.reduce(this.get('gift_certificates'), function(total, gc){ return total + gc.authcodeapplied; }, 0),
-          gift_cards: this.get('gift_certificates')
+          sort_order: 6
+        },
+        {
+          title: 'Total:',
+          text: core.Util.formatCurrency(core.Util.get(this.attrs, 'total', 0)),
+          value: core.Util.get(this.attrs, 'total', 0),
+          class: 'ot_total',
+          sort_order: 7
         }
       ];
     },

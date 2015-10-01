@@ -83,14 +83,17 @@
       'delivery_postcode',
       'delivery_country',
       'payment_method',
-      'orders_products',
       'orders_status',
       'date_purchased',
       'last_modified',
 
+      // recordrefs
       'gift_certificates',
       'coupon',
-      'orders_totals'
+
+      // sublists
+      'products',
+      'totals'
     ],
 
     getNsIdAttribute: function()
@@ -156,14 +159,6 @@
       return core.Util.get(this.attrs, 'shipcountry');
     },
 
-    getOrdersProductsAttribute: function()
-    {
-      return _.map(core.Util.get(this.attrs, 'item', []), function(item)
-      {
-        return item.toHash();
-      });
-    },
-
     getOrdersStatusAttribute: function()
     {
       return core.Util.get({
@@ -199,7 +194,15 @@
       return core.Util.get(this.attrs, 'couponcode');
     },
 
-    getOrdersTotalsAttribute: function()
+    getProductsAttribute: function()
+    {
+      return _.map(core.Util.get(this.attrs, 'item', []), function(item)
+      {
+        return item.toHash();
+      });
+    },
+
+    getTotalsAttribute: function()
     {
 
       var giftcardSum = _.reduce(this.get('gift_certificates'), function(total, gc){ return total + gc.authcodeapplied; }, 0);
