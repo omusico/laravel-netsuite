@@ -1086,6 +1086,10 @@
       'lastmodifieddate' : 'timestamp'
     },
 
+    recordref: {
+      'entity' : core.Customer
+    },
+
     sublists: {
       'item'               : core.SalesOrderItem,
       'giftcertredemption' : core.SalesOrderGiftCertRedemption
@@ -2034,6 +2038,95 @@
       {
         return this.badRequest(validator.toHash());
       }
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.Coupon = core.Model.extend(
+  {
+    recordType: 'couponcode',
+
+    // fields to be parsed on input
+    fields: {
+      'id'               : 'int'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    setNsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'id', value);
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.CouponSearchResult = core.Model.extend(
+  {
+    // fields to be parsed on input
+    fields: {
+      'id'         : 'int',
+      'externalid' : 'string'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.CouponRepository = core.Repository.extend(
+  {
+    recordClass: core.Coupon,
+    searchClass: core.CouponSearchResult,
+
+    searchColumns: [
+      'externalid'
+    ],
+
+    get: function()
+    {
+      var results = core.Repository.prototype.get.call(this);
+
+      return results.map(function(result)
+      {
+        return new this.searchClass(result);
+      }, this);
+    },
+
+    update: function(attrs)
+    {
+      var model = this.find(attrs.ns_id);
+      if ( ! model) return false;
+
+      model.set(attrs);
+
+      // this model might be missing some sublist ids
+      model = core.Repository.prototype.update.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
     }
   });
 })(core);

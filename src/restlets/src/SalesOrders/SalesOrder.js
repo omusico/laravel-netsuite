@@ -58,6 +58,11 @@
       'lastmodifieddate' : 'timestamp'
     },
 
+    recordref: {
+      'entity' : core.Customer,
+      'couponcode' : core.Coupon
+    },
+
     sublists: {
       'item'               : core.SalesOrderItem,
       'giftcertredemption' : core.SalesOrderGiftCertRedemption

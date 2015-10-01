@@ -7,7 +7,7 @@
 
     attrs      : {},
     fields     : {},
-    subrecords : {},
+    recordrefs : {},
     sublists   : {},
     visible    : [],
 
@@ -111,50 +111,31 @@
       }
       else
       {
-        // if (isRecord || isSearch)
-        // {
-        //   core.Log.debug('fields', {recordType: object.getRecordType(), fields: object.getAllFields()});
-        // }
-        // else
-        // {
-          _.each(object, function(value, key)
+        _.each(object, function(value, key)
+        {
+          if (typeof object[key] !== 'function')
           {
-            if (typeof object[key] !== 'function')
-            {
-              attrs[key] = core.Util.get(object, key);
-            }
-          });
-        // }
+            attrs[key] = core.Util.get(object, key);
+          }
+        });
       }
 
-      // if ( ! _.isEmpty(this.subrecords))
-      // {
-      //   _.each(this.subrecords, function(recordType, subrecord)
-      //   {
-      //
-      //     var item = {};
-      //
-      //     if (isRecord)
-      //     {
-      //       // core.Log.debug('sublist fields', {recordType: sublist, fields: object.getAllLineItemFields(sublist)});
-      //
-      //       _.each(new recordType().fields, function(value, key)
-      //       {
-      //         item[key] = object.getLineItemValue(sublist, key, i);
-      //       });
-      //     }
-      //     else
-      //     {
-      //       item = object[sublist][i];
-      //     }
-      //
-      //     attrs[subrecord] = new recordType(item);
-      //   });
-      // }
+      if ( ! _.isEmpty(this.recordrefs))
+      {
+        _.each(this.recordrefs, function(recordClass, recordref)
+        {
+          var record = nlapiLoadRecord(new recordClass().recordType, core.Util.get(this.attrs, recordref));
+
+          if (record)
+          {
+            attrs[recordref] = new recordClass(record);
+          }
+        }, this);
+      }
 
       if ( ! _.isEmpty(this.sublists))
       {
-        _.each(this.sublists, function(recordType, sublist)
+        _.each(this.sublists, function(recordClass, sublist)
         {
           var count = isRecord ? object.getLineItemCount(sublist) : core.Util.get(object, sublist, []).length;
 
@@ -168,9 +149,9 @@
 
               if (isRecord)
               {
-                // core.Log.debug('sublist fields', {recordType: sublist, fields: object.getAllLineItemFields(sublist)});
+                // core.Log.debug('sublist fields', {recordClass: sublist, fields: object.getAllLineItemFields(sublist)});
 
-                _.each(new recordType().fields, function(value, key)
+                _.each(new recordClass().fields, function(value, key)
                 {
                   item[key] = object.getLineItemValue(sublist, key, i);
                 });
@@ -180,7 +161,7 @@
                 item = object[sublist][i];
               }
 
-              attrs[sublist].push(new recordType(item));
+              attrs[sublist].push(new recordClass(item));
             });
           }
         });
