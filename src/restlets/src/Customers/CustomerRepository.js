@@ -6,6 +6,7 @@
     searchClass: core.CustomerSearchResult,
 
     searchColumns: [
+      'internalid',
       'externalid',
       'datecreated',
       'lastmodifieddate'

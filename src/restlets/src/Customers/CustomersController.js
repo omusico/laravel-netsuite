@@ -11,8 +11,10 @@
     {
       var customers = this.customers
                           .filter(input.get('filters', []))
-                          .orderBy('lastmodifieddate', 'ASC')
+                          .sort(input.get('sorts', []))
                           .paginate(input.get('page', 1), input.get('per_page', 10));
+
+      core.Log.debug('CustomersController#index', '');
 
       return this.okay(customers.toHash());
     },

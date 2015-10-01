@@ -49,6 +49,12 @@
       return this;
     },
 
+    sort: function(sorts)
+    {
+      _.each(sorts, function(sort) { this.orderBy(sort.column, sort.direction); }, this);
+      return this;
+    },
+
     // left join a column to filter on
     join: function(recordType, column)
     {
