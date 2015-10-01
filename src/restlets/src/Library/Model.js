@@ -3,7 +3,7 @@
   core.Model = core.Base.extend(
   {
     recordType : '',
-    timeFormat : 'M/DD/YYYY h:mm a',
+    timeFormat : 'M/D/YYYY h:mm a',
 
     attrs      : {},
     fields     : {},

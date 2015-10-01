@@ -416,13 +416,13 @@
                           .sort(input.get('sorts', []))
                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
-      core.Log.debug('CustomersController#index', '');
-
       return this.okay(customers.toHash());
     },
 
     show: function()
     {
+      // return nlapiLoadRecord('customer', input.get('ns_id'));
+
       var validator = new core.Validator(input, {ns_id: 'required'}, {customers_id : 'required'});
 
       if (validator.passes())
