@@ -82,6 +82,14 @@ var resources = [{
     baseDir + 'Promotions/PromotionRepository.js',
     baseDir + 'Promotions/PromotionsController.js'
   ]
+}, {
+  name  : 'coupons',
+  files : [
+    baseDir + 'Coupons/Coupon.js',
+    baseDir + 'Coupons/CouponSearchResult.js',
+    baseDir + 'Coupons/CouponRepository.js',
+    baseDir + 'Coupons/CouponsController.js'
+  ]
 }];
 
 gulp.task('library', function()
