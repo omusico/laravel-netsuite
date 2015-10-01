@@ -91,6 +91,14 @@
 
       var time = moment(value, inputFormat, true);
       return time.isValid() ? time.format(outputFormat) : null;
+    },
+
+    formatCurrency: function(value, decimalPlaces, prefix)
+    {
+      floatValue     = parseFloat(value);
+      decimalPlaces  = decimalPlaces  || 2;
+      prefix         = (floatValue < 0 ? '-' : '') + prefix || '$';
+      return prefix + Math.abs(floatValue).toFixed(decimalPlaces);
     }
   };
 })(core);
