@@ -6,7 +6,7 @@
 
     // fields to be parsed on input
     fields: {
-      'id'               : 'int'
+      'id' : 'int'
     },
 
     // fields to be parsed on output

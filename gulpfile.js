@@ -38,6 +38,30 @@ var resources = [{
     baseDir + 'Customers/CustomersController.js'
   ]
 }, {
+  name  : 'promotions',
+  files : [
+    baseDir + 'Promotions/Promotion.js',
+    baseDir + 'Promotions/PromotionSearchResult.js',
+    baseDir + 'Promotions/PromotionRepository.js',
+    baseDir + 'Promotions/PromotionsController.js'
+  ]
+}, {
+  name  : 'coupons',
+  files : [
+    baseDir + 'Coupons/Coupon.js'
+    // baseDir + 'Coupons/CouponSearchResult.js',
+    // baseDir + 'Coupons/CouponRepository.js',
+    // baseDir + 'Coupons/CouponsController.js'
+  ]
+}, {
+  name  : 'gift_certificates',
+  files : [
+    baseDir + 'GiftCertificates/GiftCertificate.js',
+    baseDir + 'GiftCertificates/GiftCertificateSearchResult.js',
+    baseDir + 'GiftCertificates/GiftCertificateRepository.js',
+    baseDir + 'GiftCertificates/GiftCertificatesController.js'
+  ]
+}, {
   name  : 'inventory_items',
   files : [
     baseDir + 'InventoryItems/InventoryItemLocation.js',
@@ -65,30 +89,6 @@ var resources = [{
     baseDir + 'CashSales/CashSaleSearchResult.js',
     baseDir + 'CashSales/CashSaleRepository.js',
     baseDir + 'CashSales/CashSalesController.js'
-  ]
-}, {
-  name  : 'gift_certificates',
-  files : [
-    baseDir + 'GiftCertificates/GiftCertificate.js',
-    baseDir + 'GiftCertificates/GiftCertificateSearchResult.js',
-    baseDir + 'GiftCertificates/GiftCertificateRepository.js',
-    baseDir + 'GiftCertificates/GiftCertificatesController.js'
-  ]
-}, {
-  name  : 'promotions',
-  files : [
-    baseDir + 'Promotions/Promotion.js',
-    baseDir + 'Promotions/PromotionSearchResult.js',
-    baseDir + 'Promotions/PromotionRepository.js',
-    baseDir + 'Promotions/PromotionsController.js'
-  ]
-}, {
-  name  : 'coupons',
-  files : [
-    baseDir + 'Coupons/Coupon.js',
-    baseDir + 'Coupons/CouponSearchResult.js',
-    baseDir + 'Coupons/CouponRepository.js',
-    baseDir + 'Coupons/CouponsController.js'
   ]
 }];
 

@@ -58,8 +58,8 @@
       'lastmodifieddate' : 'timestamp'
     },
 
-    recordref: {
-      'entity' : core.Customer,
+    recordrefs: {
+      'entity'     : core.Customer,
       'couponcode' : core.Coupon
     },
 
@@ -72,9 +72,9 @@
     visible: [
       'ns_id',
       'orders_id',
-      'customers_ns_id',
-      // 'customers_email_address',
-      // 'customers_telephone',
+      'customers_id',
+      'customers_email_address',
+      'customers_telephone',
       'delivery_name',
       'delivery_street_address',
       'delivery_street_address_2',
@@ -85,10 +85,11 @@
       'payment_method',
       'orders_products',
       'orders_status',
-      'gift_certificates',
       'date_purchased',
       'last_modified',
 
+      'gift_certificates',
+      'coupon',
       'orders_totals'
     ],
 
@@ -102,61 +103,23 @@
       return core.Util.get(this.attrs, 'externalid');
     },
 
-    getCustomersNsIdAttribute: function()
+    getCustomersIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'entity');
+      var customer = core.Util.get(this.attrs, 'entity');
+      return customer.get('customers_id');
     },
 
-    // getCustomersIdAttribute: function()
-    // {
-    //   var ns_id = core.Util.get(this.attrs, 'entity');
-    //
-    //   if (ns_id)
-    //   {
-    //     var customer = new core.CustomerRepository().find(ns_id);
-    //
-    //     if (customer)
-    //     {
-    //       return customer.get('externalid');
-    //     }
-    //   }
-    //
-    //   return null;
-    // },
-    //
-    // getCustomersEmailAddressAttribute: function()
-    // {
-    //   var ns_id = core.Util.get(this.attrs, 'entity');
-    //
-    //   if (ns_id)
-    //   {
-    //     var customer = new core.CustomerRepository().find(ns_id);
-    //
-    //     if (customer)
-    //     {
-    //       return customer.get('customers_email_address');
-    //     }
-    //   }
-    //
-    //   return null;
-    // },
-    //
-    // getCustomersTelephoneAttribute: function()
-    // {
-    //   var ns_id = core.Util.get(this.attrs, 'entity');
-    //
-    //   if (ns_id)
-    //   {
-    //     var customer = new core.CustomerRepository().find(ns_id);
-    //
-    //     if (customer)
-    //     {
-    //       return customer.get('customers_telephone');
-    //     }
-    //   }
-    //
-    //   return null;
-    // },
+    getCustomersEmailAddressAttribute: function()
+    {
+      var customer = core.Util.get(this.attrs, 'entity');
+      return customer.get('customers_email_address');
+    },
+
+    getCustomersTelephoneAttribute: function()
+    {
+      var customer = core.Util.get(this.attrs, 'entity');
+      return customer.get('customers_telephone');
+    },
 
     getDeliveryNameAttribute: function()
     {
@@ -229,6 +192,11 @@
       {
         return item.toHash();
       }, this);
+    },
+
+    getCouponAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'couponcode');
     },
 
     getOrdersTotalsAttribute: function()

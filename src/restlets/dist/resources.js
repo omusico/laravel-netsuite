@@ -568,6 +568,485 @@
 
 (function(core)
 {
+  core.Promotion = core.Model.extend(
+  {
+    recordType: 'promotioncode',
+
+    // fields to be parsed on input
+    fields: {
+      'id'               : 'int',
+      'externalid'       : 'string',
+      'code'             : 'string',
+      'description'      : 'string',
+      'discount'         : 'float',
+      'discounttype'     : 'string',
+      'usetype'          : 'string',
+      'startdate'        : 'timestamp',
+      'enddate'          : 'timestamp'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id',
+      'coupons_id'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    getCouponsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'code');
+    },
+
+    // getCreatedAtAttribute: function()
+    // {
+    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
+    // },
+    //
+    // getUpdatedAtAttribute: function()
+    // {
+    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+    // },
+
+    setNsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'id', value);
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.PromotionSearchResult = core.Model.extend(
+  {
+    // fields to be parsed on input
+    fields: {
+      'id'         : 'int',
+      'externalid' : 'string',
+      'code'       : 'string'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id',
+      'coupons_id'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    getCouponsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'code');
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.PromotionRepository = core.Repository.extend(
+  {
+    recordClass: core.Promotion,
+    searchClass: core.PromotionSearchResult,
+
+    searchColumns: [
+      'externalid',
+      'code'
+    ],
+
+    get: function()
+    {
+      var results = core.Repository.prototype.get.call(this);
+
+      return results.map(function(result)
+      {
+        return new this.searchClass(result);
+      }, this);
+    },
+
+    update: function(attrs)
+    {
+      var model = this.find(attrs.ns_id);
+      if ( ! model) return false;
+
+      model.set(attrs);
+
+      // this model might be missing some sublist ids
+      model = core.Repository.prototype.update.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.PromotionsController = core.Controller.extend(
+  {
+    initialize: function()
+    {
+      this.promotions = new core.PromotionRepository();
+    },
+
+    index: function()
+    {
+      // var input      = new core.Input(datain).parseDates().parseArrays();
+      var promotions = this.promotions
+                               .filter(input.get('filters', []))
+                              //  .orderBy('lastmodifieddate', 'ASC')
+                               .paginate(input.get('page', 1), input.get('per_page', 10));
+
+      return this.okay(promotions.toHash());
+    },
+
+    show: function()
+    {
+      // var input     = new core.Input(datain);
+      var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
+
+      if (validator.passes())
+      {
+        try
+        {
+          var promotion = input.has('ns_id')
+                        ? this.promotions.find(input.get('ns_id'))
+                        : this.promotions.findByExternalId(input.get('coupons_id'));
+
+          return promotion ? this.okay(promotion.toHash()) : this.notFound();
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    update: function(datain)
+    {
+      var input     = new core.Input(datain);
+      var validator = new core.Validator(input, {ns_id: 'required'});
+
+      if (validator.passes())
+      {
+        // get what we need
+        var attrs = input.only(
+          'ns_id',
+          'coupons_id'
+        );
+
+        try
+        {
+          var promotion = this.promotions.update(attrs);
+          return this.okay(promotion.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.Coupon = core.Model.extend(
+  {
+    recordType: 'couponcode',
+
+    // fields to be parsed on input
+    fields: {
+      'id' : 'int'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    setNsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'id', value);
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.GiftCertificate = core.Model.extend(
+  {
+    recordType: 'giftcertificate',
+
+    // fields to be parsed on input
+    fields: {
+      'id'               : 'int',
+      'externalid'       : 'string',
+      'giftcertcode'     : 'string',
+      'originalamount'   : 'float',
+      'amountremaining'  : 'float',
+      'expirationdate'   : 'timestamp',
+      'createddate'      : 'timestamp',
+      'lastmodifieddate' : 'timestamp'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id',
+      'gift_cards_id',
+      'gift_cards_code',
+      'gift_cards_amount',
+      'gift_cards_amount_remaining',
+      'date_end',
+      'date_added',
+      'date_updated'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    getGiftCardsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'externalid');
+    },
+
+    getGiftCardsCodeAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'giftcertcode');
+    },
+
+    getGiftCardsAmountAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'originalamount');
+    },
+
+    getGiftCardsAmountRemainingAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'amountremaining');
+    },
+
+    getDateEndAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
+    },
+
+    getDateAddedAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
+    },
+
+    getDateUpdatedAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
+    },
+
+    setNsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'id', value);
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.GiftCertificateSearchResult = core.Model.extend(
+  {
+    // fields to be parsed on input
+    fields: {
+      'id'               : 'int',
+      'giftcertcode'     : 'string',
+      'originalamount'   : 'float',
+      'amountremaining'  : 'float',
+      'expirationdate'   : 'timestamp',
+      'createddate'      : 'timestamp'
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'gift_cards_code',
+      'gift_cards_amount',
+      'gift_cards_amount_remaining',
+      'date_end',
+      'date_added'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'id');
+    },
+
+    getGiftCardsCodeAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'giftcertcode');
+    },
+
+    getGiftCardsAmountAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'originalamount');
+    },
+
+    getGiftCardsAmountRemainingAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'amountremaining');
+    },
+
+    getDateEndAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
+    },
+
+    getDateAddedAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.GiftCertificateRepository = core.Repository.extend(
+  {
+    recordClass: core.GiftCertificate,
+    searchClass: core.GiftCertificateSearchResult,
+
+    searchColumns: [
+      // 'externalid',
+      'giftcertcode',
+      'originalamount',
+      'amountremaining',
+      'expirationdate',
+      'createddate'
+      // 'lastmodifieddate'
+    ],
+
+    get: function()
+    {
+      var results = core.Repository.prototype.get.call(this);
+
+      return results.map(function(result)
+      {
+        return new this.searchClass(result);
+      }, this);
+    },
+
+    update: function(attrs)
+    {
+      var model = this.find(attrs.ns_id);
+      if ( ! model) return false;
+
+      model.set(attrs);
+
+      // this model might be missing some sublist ids
+      model = core.Repository.prototype.update.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
+    }
+  });
+})(core);
+
+(function(core)
+{
+  core.GiftCertificatesController = core.Controller.extend(
+  {
+    initialize: function()
+    {
+      this.giftCertificates = new core.GiftCertificateRepository();
+    },
+
+    index: function()
+    {
+      var giftCertificates = this.giftCertificates
+                                 .filter(input.get('filters', []))
+                                 .paginate(input.get('page', 1), input.get('per_page', 10));
+
+      return this.okay(giftCertificates.toHash());
+    },
+
+    show: function()
+    {
+      var validator = new core.Validator(input, {ns_id: 'required'}, {gift_cards_id : 'required'});
+
+      // return nlapiLoadRecord('giftcertificate', input.get('ns_id'));
+
+      if (validator.passes())
+      {
+        try
+        {
+          var giftCertificate = input.has('ns_id')
+                              ? this.giftCertificates.find(input.get('ns_id'))
+                              : this.giftCertificates.findByExternalId(input.get('gift_cards_id'));
+
+          return giftCertificate ? this.okay(giftCertificate.toHash()) : this.notFound();
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    update: function(datain)
+    {
+      var input     = new core.Input(datain);
+      var validator = new core.Validator(input, {ns_id: 'required'});
+
+      if (validator.passes())
+      {
+        // get what we need
+        var attrs = input.only(
+          'ns_id',
+          'gift_cards_id'
+        );
+
+        try
+        {
+          var giftCertificate = this.giftCertificates.update(attrs);
+          return this.okay(giftCertificate.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    }
+  });
+})(core);
+
+(function(core)
+{
   core.InventoryItemLocation = core.Model.extend(
   {
     recordType: '',
@@ -1086,8 +1565,9 @@
       'lastmodifieddate' : 'timestamp'
     },
 
-    recordref: {
-      'entity' : core.Customer
+    recordrefs: {
+      'entity'     : core.Customer,
+      'couponcode' : core.Coupon
     },
 
     sublists: {
@@ -1099,9 +1579,9 @@
     visible: [
       'ns_id',
       'orders_id',
-      'customers_ns_id',
-      // 'customers_email_address',
-      // 'customers_telephone',
+      'customers_id',
+      'customers_email_address',
+      'customers_telephone',
       'delivery_name',
       'delivery_street_address',
       'delivery_street_address_2',
@@ -1112,10 +1592,11 @@
       'payment_method',
       'orders_products',
       'orders_status',
-      'gift_certificates',
       'date_purchased',
       'last_modified',
 
+      'gift_certificates',
+      'coupon',
       'orders_totals'
     ],
 
@@ -1129,61 +1610,23 @@
       return core.Util.get(this.attrs, 'externalid');
     },
 
-    getCustomersNsIdAttribute: function()
+    getCustomersIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'entity');
+      var customer = core.Util.get(this.attrs, 'entity');
+      return customer.get('customers_id');
     },
 
-    // getCustomersIdAttribute: function()
-    // {
-    //   var ns_id = core.Util.get(this.attrs, 'entity');
-    //
-    //   if (ns_id)
-    //   {
-    //     var customer = new core.CustomerRepository().find(ns_id);
-    //
-    //     if (customer)
-    //     {
-    //       return customer.get('externalid');
-    //     }
-    //   }
-    //
-    //   return null;
-    // },
-    //
-    // getCustomersEmailAddressAttribute: function()
-    // {
-    //   var ns_id = core.Util.get(this.attrs, 'entity');
-    //
-    //   if (ns_id)
-    //   {
-    //     var customer = new core.CustomerRepository().find(ns_id);
-    //
-    //     if (customer)
-    //     {
-    //       return customer.get('customers_email_address');
-    //     }
-    //   }
-    //
-    //   return null;
-    // },
-    //
-    // getCustomersTelephoneAttribute: function()
-    // {
-    //   var ns_id = core.Util.get(this.attrs, 'entity');
-    //
-    //   if (ns_id)
-    //   {
-    //     var customer = new core.CustomerRepository().find(ns_id);
-    //
-    //     if (customer)
-    //     {
-    //       return customer.get('customers_telephone');
-    //     }
-    //   }
-    //
-    //   return null;
-    // },
+    getCustomersEmailAddressAttribute: function()
+    {
+      var customer = core.Util.get(this.attrs, 'entity');
+      return customer.get('customers_email_address');
+    },
+
+    getCustomersTelephoneAttribute: function()
+    {
+      var customer = core.Util.get(this.attrs, 'entity');
+      return customer.get('customers_telephone');
+    },
 
     getDeliveryNameAttribute: function()
     {
@@ -1256,6 +1699,11 @@
       {
         return item.toHash();
       }, this);
+    },
+
+    getCouponAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'couponcode');
     },
 
     getOrdersTotalsAttribute: function()
@@ -1587,546 +2035,6 @@
       {
         return this.badRequest(validator.toHash());
       }
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.GiftCertificate = core.Model.extend(
-  {
-    recordType: 'giftcertificate',
-
-    // fields to be parsed on input
-    fields: {
-      'id'               : 'int',
-      'externalid'       : 'string',
-      'giftcertcode'     : 'string',
-      'originalamount'   : 'float',
-      'amountremaining'  : 'float',
-      'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
-    },
-
-    // fields to be parsed on output
-    visible: [
-      'ns_id',
-      'gift_cards_id',
-      'gift_cards_code',
-      'gift_cards_amount',
-      'gift_cards_amount_remaining',
-      'date_end',
-      'date_added',
-      'date_updated'
-    ],
-
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    getGiftCardsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'externalid');
-    },
-
-    getGiftCardsCodeAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'giftcertcode');
-    },
-
-    getGiftCardsAmountAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'originalamount');
-    },
-
-    getGiftCardsAmountRemainingAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'amountremaining');
-    },
-
-    getDateEndAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
-    },
-
-    getDateAddedAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
-    },
-
-    getDateUpdatedAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
-    },
-
-    setNsIdAttribute: function(value)
-    {
-      if (value) core.Util.set(this.attrs, 'id', value);
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.GiftCertificateSearchResult = core.Model.extend(
-  {
-    // fields to be parsed on input
-    fields: {
-      'id'               : 'int',
-      'giftcertcode'     : 'string',
-      'originalamount'   : 'float',
-      'amountremaining'  : 'float',
-      'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp'
-    },
-
-    // fields to be parsed on output
-    visible: [
-      'gift_cards_code',
-      'gift_cards_amount',
-      'gift_cards_amount_remaining',
-      'date_end',
-      'date_added'
-    ],
-
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    getGiftCardsCodeAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'giftcertcode');
-    },
-
-    getGiftCardsAmountAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'originalamount');
-    },
-
-    getGiftCardsAmountRemainingAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'amountremaining');
-    },
-
-    getDateEndAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
-    },
-
-    getDateAddedAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.GiftCertificateRepository = core.Repository.extend(
-  {
-    recordClass: core.GiftCertificate,
-    searchClass: core.GiftCertificateSearchResult,
-
-    searchColumns: [
-      // 'externalid',
-      'giftcertcode',
-      'originalamount',
-      'amountremaining',
-      'expirationdate',
-      'createddate'
-      // 'lastmodifieddate'
-    ],
-
-    get: function()
-    {
-      var results = core.Repository.prototype.get.call(this);
-
-      return results.map(function(result)
-      {
-        return new this.searchClass(result);
-      }, this);
-    },
-
-    update: function(attrs)
-    {
-      var model = this.find(attrs.ns_id);
-      if ( ! model) return false;
-
-      model.set(attrs);
-
-      // this model might be missing some sublist ids
-      model = core.Repository.prototype.update.call(this, model);
-
-      // reload model so ids are set on sublists etc
-      model = this.find(model.get('id'));
-
-      return model;
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.GiftCertificatesController = core.Controller.extend(
-  {
-    initialize: function()
-    {
-      this.giftCertificates = new core.GiftCertificateRepository();
-    },
-
-    index: function()
-    {
-      var giftCertificates = this.giftCertificates
-                                 .filter(input.get('filters', []))
-                                 .paginate(input.get('page', 1), input.get('per_page', 10));
-
-      return this.okay(giftCertificates.toHash());
-    },
-
-    show: function()
-    {
-      var validator = new core.Validator(input, {ns_id: 'required'}, {gift_cards_id : 'required'});
-
-      // return nlapiLoadRecord('giftcertificate', input.get('ns_id'));
-
-      if (validator.passes())
-      {
-        try
-        {
-          var giftCertificate = input.has('ns_id')
-                              ? this.giftCertificates.find(input.get('ns_id'))
-                              : this.giftCertificates.findByExternalId(input.get('gift_cards_id'));
-
-          return giftCertificate ? this.okay(giftCertificate.toHash()) : this.notFound();
-        }
-        catch(e)
-        {
-          return this.internalServerError(e);
-        }
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
-    },
-
-    update: function(datain)
-    {
-      var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {ns_id: 'required'});
-
-      if (validator.passes())
-      {
-        // get what we need
-        var attrs = input.only(
-          'ns_id',
-          'gift_cards_id'
-        );
-
-        try
-        {
-          var giftCertificate = this.giftCertificates.update(attrs);
-          return this.okay(giftCertificate.toHash());
-        }
-        catch(e)
-        {
-          return this.internalServerError(e);
-        }
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.Promotion = core.Model.extend(
-  {
-    recordType: 'promotioncode',
-
-    // fields to be parsed on input
-    fields: {
-      'id'               : 'int',
-      'externalid'       : 'string',
-      'code'             : 'string',
-      'description'      : 'string',
-      'discount'         : 'float',
-      'discounttype'     : 'string',
-      'usetype'          : 'string',
-      'startdate'        : 'timestamp',
-      'enddate'          : 'timestamp'
-    },
-
-    // fields to be parsed on output
-    visible: [
-      'ns_id',
-      'coupons_id'
-    ],
-
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    getCouponsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'code');
-    },
-
-    // getCreatedAtAttribute: function()
-    // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
-    // },
-    //
-    // getUpdatedAtAttribute: function()
-    // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
-    // },
-
-    setNsIdAttribute: function(value)
-    {
-      if (value) core.Util.set(this.attrs, 'id', value);
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.PromotionSearchResult = core.Model.extend(
-  {
-    // fields to be parsed on input
-    fields: {
-      'id'         : 'int',
-      'externalid' : 'string',
-      'code'       : 'string'
-    },
-
-    // fields to be parsed on output
-    visible: [
-      'ns_id',
-      'coupons_id'
-    ],
-
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    getCouponsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'code');
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.PromotionRepository = core.Repository.extend(
-  {
-    recordClass: core.Promotion,
-    searchClass: core.PromotionSearchResult,
-
-    searchColumns: [
-      'externalid',
-      'code'
-    ],
-
-    get: function()
-    {
-      var results = core.Repository.prototype.get.call(this);
-
-      return results.map(function(result)
-      {
-        return new this.searchClass(result);
-      }, this);
-    },
-
-    update: function(attrs)
-    {
-      var model = this.find(attrs.ns_id);
-      if ( ! model) return false;
-
-      model.set(attrs);
-
-      // this model might be missing some sublist ids
-      model = core.Repository.prototype.update.call(this, model);
-
-      // reload model so ids are set on sublists etc
-      model = this.find(model.get('id'));
-
-      return model;
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.PromotionsController = core.Controller.extend(
-  {
-    initialize: function()
-    {
-      this.promotions = new core.PromotionRepository();
-    },
-
-    index: function()
-    {
-      // var input      = new core.Input(datain).parseDates().parseArrays();
-      var promotions = this.promotions
-                               .filter(input.get('filters', []))
-                              //  .orderBy('lastmodifieddate', 'ASC')
-                               .paginate(input.get('page', 1), input.get('per_page', 10));
-
-      return this.okay(promotions.toHash());
-    },
-
-    show: function()
-    {
-      // var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
-
-      if (validator.passes())
-      {
-        try
-        {
-          var promotion = input.has('ns_id')
-                        ? this.promotions.find(input.get('ns_id'))
-                        : this.promotions.findByExternalId(input.get('coupons_id'));
-
-          return promotion ? this.okay(promotion.toHash()) : this.notFound();
-        }
-        catch(e)
-        {
-          return this.internalServerError(e);
-        }
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
-    },
-
-    update: function(datain)
-    {
-      var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {ns_id: 'required'});
-
-      if (validator.passes())
-      {
-        // get what we need
-        var attrs = input.only(
-          'ns_id',
-          'coupons_id'
-        );
-
-        try
-        {
-          var promotion = this.promotions.update(attrs);
-          return this.okay(promotion.toHash());
-        }
-        catch(e)
-        {
-          return this.internalServerError(e);
-        }
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.Coupon = core.Model.extend(
-  {
-    recordType: 'couponcode',
-
-    // fields to be parsed on input
-    fields: {
-      'id'               : 'int'
-    },
-
-    // fields to be parsed on output
-    visible: [
-      'ns_id'
-    ],
-
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    },
-
-    setNsIdAttribute: function(value)
-    {
-      if (value) core.Util.set(this.attrs, 'id', value);
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.CouponSearchResult = core.Model.extend(
-  {
-    // fields to be parsed on input
-    fields: {
-      'id'         : 'int',
-      'externalid' : 'string'
-    },
-
-    // fields to be parsed on output
-    visible: [
-      'ns_id'
-    ],
-
-    getNsIdAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'id');
-    }
-  });
-})(core);
-
-(function(core)
-{
-  core.CouponRepository = core.Repository.extend(
-  {
-    recordClass: core.Coupon,
-    searchClass: core.CouponSearchResult,
-
-    searchColumns: [
-      'externalid'
-    ],
-
-    get: function()
-    {
-      var results = core.Repository.prototype.get.call(this);
-
-      return results.map(function(result)
-      {
-        return new this.searchClass(result);
-      }, this);
-    },
-
-    update: function(attrs)
-    {
-      var model = this.find(attrs.ns_id);
-      if ( ! model) return false;
-
-      model.set(attrs);
-
-      // this model might be missing some sublist ids
-      model = core.Repository.prototype.update.call(this, model);
-
-      // reload model so ids are set on sublists etc
-      model = this.find(model.get('id'));
-
-      return model;
     }
   });
 })(core);

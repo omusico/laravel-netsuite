@@ -124,10 +124,11 @@
       {
         _.each(this.recordrefs, function(recordClass, recordref)
         {
-          var record = nlapiLoadRecord(new recordClass().recordType, core.Util.get(this.attrs, recordref));
+          var id = object.getFieldValue(recordref);
 
-          if (record)
+          if (id)
           {
+            var record = nlapiLoadRecord(new recordClass().recordType, id);
             attrs[recordref] = new recordClass(record);
           }
         }, this);
