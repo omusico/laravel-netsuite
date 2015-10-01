@@ -1118,9 +1118,25 @@ _.mixin({
 
     internalServerError: function(exception)
     {
-      var message = _.isString(exception) ? exception : _.isUndefined(exception) ? false : exception.message;
+      var code, message;
 
-      return this.error(500, message || 'Internal Server Error');
+      if (_.isString(exception))
+      {
+        message = exception;
+      }
+      else if (_.isObject(exception))
+      {
+        if (exception.message)
+        {
+          message = exception.message;
+        }
+        else if (exception.code)
+        {
+          message = '\nRestlet StackTrace:\n' + exception.stackTrace.join('\n');
+        }
+      }
+
+      return this.error(code || 500, message || 'Internal Server Error');
     },
 
     error: function(code, message)
