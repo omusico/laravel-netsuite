@@ -4,16 +4,23 @@
   {
     recordType: 'giftcertredemption',
 
+    // fields to be parsed on input
     fields: {
-      'authcode'          : 'int',    // item id
-      'authcode_display'  : 'string', // item id
-      'authcodeapplied'   : 'float',  // quantity
+      'authcode'             : 'int',
+      'externalid'           : 'string',
+      'authcode_display'     : 'string',
+      "authcodeamtremaining" : 'float',
+      "authcodeapplied"      : 'float',
+      "giftcertavailable"    : 'float'
     },
 
+    // fields to be parsed on output
     visible: [
       'ns_id',
+      // 'gift_cards_id',
       'gift_cards_code',
-      'authcodeapplied'
+      'gift_cards_amount',
+      'gift_cards_amount_remaining'
     ],
 
     getNsIdAttribute: function()
@@ -21,14 +28,24 @@
       return core.Util.get(this.attrs, 'authcode');
     },
 
+    getGiftCardsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'externalid');
+    },
+
     getGiftCardsCodeAttribute: function()
     {
       return core.Util.get(this.attrs, 'authcode_display');
     },
 
-    getAuthcodeappliedAttribute: function()
+    getGiftCardsAmountAttribute: function()
     {
-      return core.Util.get(this.attrs, 'authcodeapplied');
+      return core.Util.get(this.attrs, 'giftcertavailable');
+    },
+
+    getGiftCardsAmountRemainingAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'authcodeamtremaining');
     }
   });
 })(core);

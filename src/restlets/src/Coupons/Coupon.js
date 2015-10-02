@@ -6,17 +6,24 @@
 
     // fields to be parsed on input
     fields: {
-      'id' : 'int'
+      'id'      : 'int',
+      'code'    : 'string'
     },
 
     // fields to be parsed on output
     visible: [
-      'ns_id'
+      'ns_id',
+      'coupons_id'
     ],
 
     getNsIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'id');
+    },
+
+    getCouponsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'code');
     },
 
     setNsIdAttribute: function(value)

@@ -16,12 +16,6 @@
       'class'            : 'int',    // web, retail, etc
       'location'         : 'int',
 
-      // 'discountitem' : 'notsure',
-
-      // customer is a nesteded entity
-      // 'email'            : 'string',
-      // 'telephone'        : 'string',
-
       // shipping
       'shipaddressee'    : 'string',
       'shipaddr1'        : 'string',
@@ -43,12 +37,6 @@
       'shippingcost'     : 'float',
       'taxtotal'         : 'float',
       'total'            : 'float',
-
-      // 'giftcertredemption' : 'object',
-      'couponcode'         : 'object',
-
-      'giftcertapplied'  : 'int',
-      'promotionapplied' : 'int',
 
       'custbody14'       : 'string', // comments
 
@@ -183,9 +171,9 @@
 
     getGiftCertificatesAttribute: function()
     {
-      return _.map(core.Util.get(this.attrs, 'giftcertredemption', []), function(item)
+      return _.map(core.Util.get(this.attrs, 'giftcertredemption', []), function(giftcertificate)
       {
-        return item.toHash();
+        return giftcertificate.toHash();
       }, this);
     },
 
