@@ -260,7 +260,7 @@
     {
       var addresses = _.map(value, function(address)
       {
-        var model = new this.sublists.addressbook(address, {mutate: true});
+        var model = new core[this.sublists.addressbook](address, {mutate: true});
         return model;
       }, this);
 
