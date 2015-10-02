@@ -95,9 +95,10 @@
 
     formatCurrency: function(value, decimalPlaces, prefix)
     {
-      floatValue     = parseFloat(value);
-      decimalPlaces  = decimalPlaces  || 2;
-      prefix         = (floatValue < 0 ? '-' : '') + prefix || '$';
+      floatValue    = parseFloat(value);
+      decimalPlaces = decimalPlaces  || 2;
+      prefix        = prefix || '$';
+      prefix        = (floatValue < 0 ? '-' : '') + prefix;
       return prefix + Math.abs(floatValue).toFixed(decimalPlaces);
     }
   };

@@ -772,17 +772,24 @@
 
     // fields to be parsed on input
     fields: {
-      'id' : 'int'
+      'id'      : 'int',
+      'code'    : 'string'
     },
 
     // fields to be parsed on output
     visible: [
-      'ns_id'
+      'ns_id',
+      'coupons_id'
     ],
 
     getNsIdAttribute: function()
     {
       return core.Util.get(this.attrs, 'id');
+    },
+
+    getCouponsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'code');
     },
 
     setNsIdAttribute: function(value)
@@ -1476,16 +1483,23 @@
   {
     recordType: 'giftcertredemption',
 
+    // fields to be parsed on input
     fields: {
-      'authcode'          : 'int',    // item id
-      'authcode_display'  : 'string', // item id
-      'authcodeapplied'   : 'float',  // quantity
+      'authcode'             : 'int',
+      'externalid'           : 'string',
+      'authcode_display'     : 'string',
+      "authcodeamtremaining" : 'float',
+      "authcodeapplied"      : 'float',
+      "giftcertavailable"    : 'float'
     },
 
+    // fields to be parsed on output
     visible: [
       'ns_id',
+      // 'gift_cards_id',
       'gift_cards_code',
-      'authcodeapplied'
+      'gift_cards_amount',
+      'gift_cards_amount_remaining'
     ],
 
     getNsIdAttribute: function()
@@ -1493,14 +1507,24 @@
       return core.Util.get(this.attrs, 'authcode');
     },
 
+    getGiftCardsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'externalid');
+    },
+
     getGiftCardsCodeAttribute: function()
     {
       return core.Util.get(this.attrs, 'authcode_display');
     },
 
-    getAuthcodeappliedAttribute: function()
+    getGiftCardsAmountAttribute: function()
     {
-      return core.Util.get(this.attrs, 'authcodeapplied');
+      return core.Util.get(this.attrs, 'giftcertavailable');
+    },
+
+    getGiftCardsAmountRemainingAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'authcodeamtremaining');
     }
   });
 })(core);
@@ -1523,12 +1547,6 @@
       'class'            : 'int',    // web, retail, etc
       'location'         : 'int',
 
-      // 'discountitem' : 'notsure',
-
-      // customer is a nesteded entity
-      // 'email'            : 'string',
-      // 'telephone'        : 'string',
-
       // shipping
       'shipaddressee'    : 'string',
       'shipaddr1'        : 'string',
@@ -1550,12 +1568,6 @@
       'shippingcost'     : 'float',
       'taxtotal'         : 'float',
       'total'            : 'float',
-
-      // 'giftcertredemption' : 'object',
-      'couponcode'         : 'object',
-
-      'giftcertapplied'  : 'int',
-      'promotionapplied' : 'int',
 
       'custbody14'       : 'string', // comments
 
@@ -1690,9 +1702,9 @@
 
     getGiftCertificatesAttribute: function()
     {
-      return _.map(core.Util.get(this.attrs, 'giftcertredemption', []), function(item)
+      return _.map(core.Util.get(this.attrs, 'giftcertredemption', []), function(giftcertificate)
       {
-        return item.toHash();
+        return giftcertificate.toHash();
       }, this);
     },
 
@@ -1919,7 +1931,7 @@
                        ? this.salesOrders.find(input.get('ns_id'))
                        : this.salesOrders.findByExternalId(input.get('orders_id'));
 
-        // return this.okay({model: salesOrder.toHash(), record: nlapiLoadRecord('salesorder', input.get('ns_id'))});
+        return this.okay({model: salesOrder.toHash(), record: nlapiLoadRecord('salesorder', input.get('ns_id'))});
 
         return salesOrder ? this.okay(salesOrder.toHash()) : this.notFound();
       }
