@@ -22,6 +22,11 @@
       }, this);
     },
 
+    findByExternalId: function(externalid)
+    {
+      return this.where('code', 'is', externalid).first();
+    },
+
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);

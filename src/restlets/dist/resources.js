@@ -772,6 +772,11 @@
       }, this);
     },
 
+    findByExternalId: function(externalid)
+    {
+      return this.where('code', 'is', externalid).first();
+    },
+
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
@@ -811,8 +816,6 @@
 
     show: function()
     {
-      // return nlapiLoadRecord('promotioncode', input.get('ns_id'));
-
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())
@@ -836,7 +839,39 @@
       }
     },
 
-    update: function(datain)
+    store: function()
+    {
+      var validator = new core.Validator(input, {
+        coupons_id : 'required'
+      });
+
+      if (validator.passes())
+      {
+        // set defaults
+        var attrs = _.defaults(input.only(
+          'coupons_id'
+        ), {
+
+        });
+
+        try
+        {
+          var promotion = this.promotions.create(attrs);
+
+          return this.created(promotion.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    update: function()
     {
       var validator = new core.Validator(input, {ns_id: 'required'});
 
