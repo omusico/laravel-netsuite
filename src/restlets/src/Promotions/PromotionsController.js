@@ -9,18 +9,17 @@
 
     index: function()
     {
-      // var input      = new core.Input(datain).parseDates().parseArrays();
       var promotions = this.promotions
-                               .filter(input.get('filters', []))
-                              //  .orderBy('lastmodifieddate', 'ASC')
-                               .paginate(input.get('page', 1), input.get('per_page', 10));
+                           .filter(input.get('filters', []))
+                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(promotions.toHash());
     },
 
     show: function()
     {
-      // var input     = new core.Input(datain);
+      // return nlapiLoadRecord('promotioncode', input.get('ns_id'));
+
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())
@@ -46,15 +45,13 @@
 
     update: function(datain)
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'});
 
       if (validator.passes())
       {
         // get what we need
         var attrs = input.only(
-          'ns_id',
-          'coupons_id'
+          'ns_id'
         );
 
         try

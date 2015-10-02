@@ -12,7 +12,7 @@
     constructor: function()
     {
       if ( ! this.recordClass) throw 'Repository missing recordClass';
-      this.recordType = new this.recordClass().recordType; // set recordType from recordClass
+      this.recordType = new core[this.recordClass]().recordType; // set recordType from recordClass
       this.initialize.apply(this, arguments);
     },
 
@@ -152,7 +152,7 @@
     find: function(id)
     {
       var record = id ? nlapiLoadRecord(this.recordType, id) : null;
-      return record ? new this.recordClass(record) : null;
+      return record ? new core[this.recordClass](record) : null;
     },
 
     // find a single record by external id

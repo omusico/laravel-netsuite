@@ -2,8 +2,8 @@
 {
   core.CouponRepository = core.Repository.extend(
   {
-    recordClass: core.Coupon,
-    searchClass: core.CouponSearchResult,
+    recordClass: 'Coupon',
+    searchClass: 'CouponSearchResult',
 
     searchColumns: [
       'externalid'
@@ -15,7 +15,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 

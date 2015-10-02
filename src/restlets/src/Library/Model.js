@@ -4,6 +4,7 @@
   {
     recordType : '',
     timeFormat : 'M/D/YYYY h:mm a',
+    dateFormat : 'M/D/YYYY',
 
     attrs      : {},
     fields     : {},
@@ -128,8 +129,8 @@
 
           if (id)
           {
-            var record = nlapiLoadRecord(new recordClass().recordType, id);
-            attrs[recordref] = new recordClass(record);
+            var record = nlapiLoadRecord(new core[recordClass]().recordType, id);
+            attrs[recordref] = new core[recordClass](record);
           }
         }, this);
       }
@@ -138,7 +139,9 @@
       {
         _.each(this.sublists, function(recordClass, sublist)
         {
-          var count = isRecord ? object.getLineItemCount(sublist) : core.Util.get(object, sublist, []).length;
+          var count = isRecord
+                    ? object.getLineItemCount(sublist)
+                    : core.Util.get(object, sublist, []).length;
 
           if (count)
           {
@@ -152,7 +155,7 @@
               {
                 // core.Log.debug('sublist fields', {recordClass: sublist, fields: object.getAllLineItemFields(sublist)});
 
-                _.each(new recordClass().fields, function(value, key)
+                _.each(new core[recordClass]().fields, function(value, key)
                 {
                   item[key] = object.getLineItemValue(sublist, key, i);
                 });
@@ -162,7 +165,7 @@
                 item = object[sublist][i];
               }
 
-              attrs[sublist].push(new recordClass(item));
+              attrs[sublist].push(new core[recordClass](item));
             });
           }
         });
@@ -186,6 +189,10 @@
           break;
         case 'timestamp':
           var date = moment(value, this.timeFormat, true);
+          value = date.isValid() ? value : null;
+          break;
+        case 'date':
+          var date = moment(value, this.dateFormat, true);
           value = date.isValid() ? value : null;
           break;
         case 'string':

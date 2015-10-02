@@ -2,8 +2,8 @@
 {
   core.CustomerRepository = core.Repository.extend(
   {
-    recordClass: core.Customer,
-    searchClass: core.CustomerSearchResult,
+    recordClass: 'Customer',
+    searchClass: 'CustomerSearchResult',
 
     searchColumns: [
       'internalid',
@@ -30,7 +30,7 @@
 
       var models = results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
 
       return models;
@@ -38,7 +38,7 @@
 
     create: function(attrs)
     {
-      var model = new this.recordClass(attrs, {mutate: true});
+      var model = new core[this.recordClass](attrs, {mutate: true});
 
       // this model will have id set on it, but might be missing some sublist ids
       model = core.Repository.prototype.create.call(this, model);

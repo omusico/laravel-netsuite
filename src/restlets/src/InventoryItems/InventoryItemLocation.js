@@ -2,8 +2,6 @@
 {
   core.InventoryItemLocation = core.Model.extend(
   {
-    recordType: '',
-
     // fields to be parsed on input
     fields: {
       'locationid'        : 'int',

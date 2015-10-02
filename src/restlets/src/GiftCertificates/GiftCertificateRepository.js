@@ -2,8 +2,8 @@
 {
   core.GiftCertificateRepository = core.Repository.extend(
   {
-    recordClass: core.GiftCertificate,
-    searchClass: core.GiftCertificateSearchResult,
+    recordClass: 'GiftCertificate',
+    searchClass: 'GiftCertificateSearchResult',
 
     searchColumns: [
       // 'externalid',
@@ -21,7 +21,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 

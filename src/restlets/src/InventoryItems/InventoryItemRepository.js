@@ -2,8 +2,8 @@
 {
   core.InventoryItemRepository = core.Repository.extend(
   {
-    recordClass: core.InventoryItem,
-    searchClass: core.InventoryItemSearchResult,
+    recordClass: 'InventoryItem',
+    searchClass: 'InventoryItemSearchResult',
 
     searchColumns: [
       'externalid',
@@ -17,7 +17,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 

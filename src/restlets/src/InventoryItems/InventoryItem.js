@@ -16,8 +16,8 @@
 
     // sublists to be parsed on input
     sublists: {
-      'locations' : core.InventoryItemLocation,
-      'price'     : core.InventoryItemPriceList
+      'locations' : 'InventoryItemLocation',
+      'price'     : 'InventoryItemPriceList'
     },
 
     // fields to be parsed on output
@@ -102,40 +102,8 @@
 
       _.each(_.omit(this.fields, 'id'), function(value, key)
       {
-        core.Log.debug(key, this.get(key));
         record.setFieldValue(key, this.get(key));
       }, this);
-
-      // when we update product, we only need to update it's own attributes, not sublists etc
-
-      // _.each(this.sublists, function(recordClass, sublist)
-      // {
-      //   // remove any item in record and not in sent sublist
-      //   _.times(record.getLineItemCount(sublist), function(index)
-      //   {
-      //     index++; // sublists are 1 based
-      //
-      //     var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
-      //         foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), {id: id});
-      //
-      //     // remove that one
-      //     if ( ! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
-      //   }, this);
-      //
-      //   // update/add the rest
-      //   _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
-      //   {
-      //     index++; // sublists are 1 based
-      //
-      //     _.each(item.fields, function(type, field)
-      //     {
-      //       if (item.has(field))
-      //       {
-      //         record.setLineItemValue(sublist, field, index, item.get(field));
-      //       }
-      //     });
-      //   }, this);
-      // }, this);
 
       return record;
     }

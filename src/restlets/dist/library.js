@@ -601,6 +601,7 @@ _.mixin({
   {
     recordType : '',
     timeFormat : 'M/D/YYYY h:mm a',
+    dateFormat : 'M/D/YYYY',
 
     attrs      : {},
     fields     : {},
@@ -725,8 +726,8 @@ _.mixin({
 
           if (id)
           {
-            var record = nlapiLoadRecord(new recordClass().recordType, id);
-            attrs[recordref] = new recordClass(record);
+            var record = nlapiLoadRecord(new core[recordClass]().recordType, id);
+            attrs[recordref] = new core[recordClass](record);
           }
         }, this);
       }
@@ -735,7 +736,9 @@ _.mixin({
       {
         _.each(this.sublists, function(recordClass, sublist)
         {
-          var count = isRecord ? object.getLineItemCount(sublist) : core.Util.get(object, sublist, []).length;
+          var count = isRecord
+                    ? object.getLineItemCount(sublist)
+                    : core.Util.get(object, sublist, []).length;
 
           if (count)
           {
@@ -749,7 +752,7 @@ _.mixin({
               {
                 // core.Log.debug('sublist fields', {recordClass: sublist, fields: object.getAllLineItemFields(sublist)});
 
-                _.each(new recordClass().fields, function(value, key)
+                _.each(new core[recordClass]().fields, function(value, key)
                 {
                   item[key] = object.getLineItemValue(sublist, key, i);
                 });
@@ -759,7 +762,7 @@ _.mixin({
                 item = object[sublist][i];
               }
 
-              attrs[sublist].push(new recordClass(item));
+              attrs[sublist].push(new core[recordClass](item));
             });
           }
         });
@@ -783,6 +786,10 @@ _.mixin({
           break;
         case 'timestamp':
           var date = moment(value, this.timeFormat, true);
+          value = date.isValid() ? value : null;
+          break;
+        case 'date':
+          var date = moment(value, this.dateFormat, true);
           value = date.isValid() ? value : null;
           break;
         case 'string':
@@ -1249,7 +1256,7 @@ _.mixin({
     constructor: function()
     {
       if ( ! this.recordClass) throw 'Repository missing recordClass';
-      this.recordType = new this.recordClass().recordType; // set recordType from recordClass
+      this.recordType = new core[this.recordClass]().recordType; // set recordType from recordClass
       this.initialize.apply(this, arguments);
     },
 
@@ -1389,7 +1396,7 @@ _.mixin({
     find: function(id)
     {
       var record = id ? nlapiLoadRecord(this.recordType, id) : null;
-      return record ? new this.recordClass(record) : null;
+      return record ? new core[this.recordClass](record) : null;
     },
 
     // find a single record by external id

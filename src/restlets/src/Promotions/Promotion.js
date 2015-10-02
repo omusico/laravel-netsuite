@@ -8,19 +8,31 @@
     fields: {
       'id'               : 'int',
       'externalid'       : 'string',
-      'code'             : 'string',
+      'name'             : 'string',
       'description'      : 'string',
-      'discount'         : 'float',
+      'discount'         : 'string',
       'discounttype'     : 'string',
       'usetype'          : 'string',
-      'startdate'        : 'timestamp',
-      'enddate'          : 'timestamp'
+      'startdate'        : 'date',
+      'enddate'          : 'date'
+    },
+
+    sublists: {
+      'items' : 'InventoryItem'
     },
 
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'coupons_id'
+      'name',
+      'description',
+      'discount',
+      'discounttype',
+      'usetype',
+      'startdate',
+      'enddate',
+      'codes',
+      'items'
     ],
 
     getNsIdAttribute: function()
@@ -28,19 +40,17 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getCouponsIdAttribute: function()
+    getCodesAttribute: function()
     {
-      return core.Util.get(this.attrs, 'code');
+      return _.map(core.Util.get(this.attrs, 'code', []), function(code)
+      {
+        return code.toHash();
+      }, this);
     },
 
-    // getCreatedAtAttribute: function()
+    // getCouponsIdAttribute: function()
     // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
-    // },
-    //
-    // getUpdatedAtAttribute: function()
-    // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+    //   return core.Util.get(this.attrs, 'code');
     // },
 
     setNsIdAttribute: function(value)

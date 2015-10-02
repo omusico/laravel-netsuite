@@ -47,13 +47,13 @@
     },
 
     recordrefs: {
-      'entity'     : core.Customer,
-      'couponcode' : core.Coupon
+      'entity'     : 'Customer',
+      'couponcode' : 'Coupon'
     },
 
     sublists: {
-      'item'               : core.SalesOrderItem,
-      'giftcertredemption' : core.SalesOrderGiftCertRedemption
+      'item'               : 'SalesOrderItem',
+      'giftcertredemption' : 'SalesOrderGiftCertRedemption'
     },
 
     // fields to be parsed on output

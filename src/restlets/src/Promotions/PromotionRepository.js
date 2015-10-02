@@ -2,8 +2,8 @@
 {
   core.PromotionRepository = core.Repository.extend(
   {
-    recordClass: core.Promotion,
-    searchClass: core.PromotionSearchResult,
+    recordClass: 'Promotion',
+    searchClass: 'PromotionSearchResult',
 
     searchColumns: [
       'externalid',
@@ -16,7 +16,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 

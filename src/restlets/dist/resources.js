@@ -138,7 +138,7 @@
 
     // sublists to be parsed on input
     sublists: {
-      'addressbook' : core.Address
+      'addressbook' : 'Address'
     },
 
     // fields to be parsed on output
@@ -321,8 +321,8 @@
 {
   core.CustomerRepository = core.Repository.extend(
   {
-    recordClass: core.Customer,
-    searchClass: core.CustomerSearchResult,
+    recordClass: 'Customer',
+    searchClass: 'CustomerSearchResult',
 
     searchColumns: [
       'internalid',
@@ -349,7 +349,7 @@
 
       var models = results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
 
       return models;
@@ -357,7 +357,7 @@
 
     create: function(attrs)
     {
-      var model = new this.recordClass(attrs, {mutate: true});
+      var model = new core[this.recordClass](attrs, {mutate: true});
 
       // this model will have id set on it, but might be missing some sublist ids
       model = core.Repository.prototype.create.call(this, model);
@@ -576,19 +576,31 @@
     fields: {
       'id'               : 'int',
       'externalid'       : 'string',
-      'code'             : 'string',
+      'name'             : 'string',
       'description'      : 'string',
-      'discount'         : 'float',
+      'discount'         : 'string',
       'discounttype'     : 'string',
       'usetype'          : 'string',
-      'startdate'        : 'timestamp',
-      'enddate'          : 'timestamp'
+      'startdate'        : 'date',
+      'enddate'          : 'date'
+    },
+
+    sublists: {
+      'items' : 'InventoryItem'
     },
 
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'coupons_id'
+      'name',
+      'description',
+      'discount',
+      'discounttype',
+      'usetype',
+      'startdate',
+      'enddate',
+      'codes',
+      'items'
     ],
 
     getNsIdAttribute: function()
@@ -596,19 +608,17 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getCouponsIdAttribute: function()
+    getCodesAttribute: function()
     {
-      return core.Util.get(this.attrs, 'code');
+      return _.map(core.Util.get(this.attrs, 'code', []), function(code)
+      {
+        return code.toHash();
+      }, this);
     },
 
-    // getCreatedAtAttribute: function()
+    // getCouponsIdAttribute: function()
     // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
-    // },
-    //
-    // getUpdatedAtAttribute: function()
-    // {
-    //   return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+    //   return core.Util.get(this.attrs, 'code');
     // },
 
     setNsIdAttribute: function(value)
@@ -651,8 +661,8 @@
 {
   core.PromotionRepository = core.Repository.extend(
   {
-    recordClass: core.Promotion,
-    searchClass: core.PromotionSearchResult,
+    recordClass: 'Promotion',
+    searchClass: 'PromotionSearchResult',
 
     searchColumns: [
       'externalid',
@@ -665,7 +675,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 
@@ -698,18 +708,17 @@
 
     index: function()
     {
-      // var input      = new core.Input(datain).parseDates().parseArrays();
       var promotions = this.promotions
-                               .filter(input.get('filters', []))
-                              //  .orderBy('lastmodifieddate', 'ASC')
-                               .paginate(input.get('page', 1), input.get('per_page', 10));
+                           .filter(input.get('filters', []))
+                           .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(promotions.toHash());
     },
 
     show: function()
     {
-      // var input     = new core.Input(datain);
+      // return nlapiLoadRecord('promotioncode', input.get('ns_id'));
+
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())
@@ -735,15 +744,13 @@
 
     update: function(datain)
     {
-      var input     = new core.Input(datain);
       var validator = new core.Validator(input, {ns_id: 'required'});
 
       if (validator.passes())
       {
         // get what we need
         var attrs = input.only(
-          'ns_id',
-          'coupons_id'
+          'ns_id'
         );
 
         try
@@ -773,13 +780,31 @@
     // fields to be parsed on input
     fields: {
       'id'      : 'int',
-      'code'    : 'string'
+      'code'    : 'string',
+      'used'    : 'int'
+    },
+
+    recordrefs: {
+      'promotion' : 'Promotion'
     },
 
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'coupons_id'
+      'coupons_id',
+      'coupons_category_id',
+      'coupons_description',
+      'coupons_discount',
+      'coupons_discount_amount',
+      // 'coupons_max_use', ???
+      'coupons_number_available',
+      'coupons_min_order_type',
+      'coupons_min_order',
+      'coupons_date_start',
+      'coupons_date_end',
+      'coupons_full_price'
+      // 'created_at',
+      // 'updated_at'
     ],
 
     getNsIdAttribute: function()
@@ -791,6 +816,53 @@
     {
       return core.Util.get(this.attrs, 'code');
     },
+
+    getCouponsCategoryIdAttribute: function()
+    {
+      return null;
+    },
+
+    getCouponsDescriptionAttribute: function()
+    {
+      var promotion = core.Util.get(this.attrs, 'promotion');
+
+      return promotion ? promotion.get('description') : '';
+    },
+
+    // 'coupons_discount',
+    // 'coupons_discount_amount',
+    // 'coupons_max_use',
+    // 'coupons_number_available',
+    // 'coupons_min_order_type',
+    // 'coupons_min_order',
+
+    getCouponsDateStartAttribute: function()
+    {
+      var promotion = core.Util.get(this.attrs, 'promotion');
+
+      core.Log.debug('promotion', promotion);
+
+      return promotion
+           ? core.Util.formatDate(promotion.get('startdate'), 'M/D/YYYY', 'YYYY-MM-DD 00:00:00')
+           : null;
+    },
+
+    getCouponsDateEndAttribute: function()
+    {
+      var promotion = core.Util.get(this.attrs, 'promotion');
+
+      return promotion
+           ? core.Util.formatDate(promotion.get('enddate'), 'M/D/YYYY', 'YYYY-MM-DD 23:59:59')
+           : null;
+    },
+
+    getCouponsFullPriceAttribute: function()
+    {
+      return 1; // TODO: update when custom field arrives
+    },
+
+    // 'created_at',
+    // 'updated_at'
 
     setNsIdAttribute: function(value)
     {
@@ -825,8 +897,8 @@
 {
   core.CouponRepository = core.Repository.extend(
   {
-    recordClass: core.Coupon,
-    searchClass: core.CouponSearchResult,
+    recordClass: 'Coupon',
+    searchClass: 'CouponSearchResult',
 
     searchColumns: [
       'externalid'
@@ -838,7 +910,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 
@@ -880,6 +952,8 @@
 
     show: function()
     {
+      // return nlapiLoadRecord('couponcode', input.get('ns_id'));
+
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())
@@ -1068,8 +1142,8 @@
 {
   core.GiftCertificateRepository = core.Repository.extend(
   {
-    recordClass: core.GiftCertificate,
-    searchClass: core.GiftCertificateSearchResult,
+    recordClass: 'GiftCertificate',
+    searchClass: 'GiftCertificateSearchResult',
 
     searchColumns: [
       // 'externalid',
@@ -1087,7 +1161,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 
@@ -1189,8 +1263,6 @@
 {
   core.InventoryItemLocation = core.Model.extend(
   {
-    recordType: '',
-
     // fields to be parsed on input
     fields: {
       'locationid'        : 'int',
@@ -1225,8 +1297,6 @@
 {
   core.InventoryItemPriceList = core.Model.extend(
   {
-    recordType: '',
-
     // fields to be parsed on input
     fields: {
       'pricelevel'     : 'int',
@@ -1287,8 +1357,8 @@
 
     // sublists to be parsed on input
     sublists: {
-      'locations' : core.InventoryItemLocation,
-      'price'     : core.InventoryItemPriceList
+      'locations' : 'InventoryItemLocation',
+      'price'     : 'InventoryItemPriceList'
     },
 
     // fields to be parsed on output
@@ -1373,40 +1443,8 @@
 
       _.each(_.omit(this.fields, 'id'), function(value, key)
       {
-        core.Log.debug(key, this.get(key));
         record.setFieldValue(key, this.get(key));
       }, this);
-
-      // when we update product, we only need to update it's own attributes, not sublists etc
-
-      // _.each(this.sublists, function(recordClass, sublist)
-      // {
-      //   // remove any item in record and not in sent sublist
-      //   _.times(record.getLineItemCount(sublist), function(index)
-      //   {
-      //     index++; // sublists are 1 based
-      //
-      //     var id          = parseInt(record.getLineItemValue(sublist, 'id', index), 10),
-      //         foundInList = _.findWhere(core.Util.get(this.attrs, sublist, []), {id: id});
-      //
-      //     // remove that one
-      //     if ( ! _.isUndefined(foundInList)) record.removeLineItem(sublist, index);
-      //   }, this);
-      //
-      //   // update/add the rest
-      //   _.each(core.Util.get(this.attrs, sublist, []), function(item, index)
-      //   {
-      //     index++; // sublists are 1 based
-      //
-      //     _.each(item.fields, function(type, field)
-      //     {
-      //       if (item.has(field))
-      //       {
-      //         record.setLineItemValue(sublist, field, index, item.get(field));
-      //       }
-      //     });
-      //   }, this);
-      // }, this);
 
       return record;
     }
@@ -1461,8 +1499,8 @@
 {
   core.InventoryItemRepository = core.Repository.extend(
   {
-    recordClass: core.InventoryItem,
-    searchClass: core.InventoryItemSearchResult,
+    recordClass: 'InventoryItem',
+    searchClass: 'InventoryItemSearchResult',
 
     searchColumns: [
       'externalid',
@@ -1476,7 +1514,7 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 
@@ -1711,13 +1749,13 @@
     },
 
     recordrefs: {
-      'entity'     : core.Customer,
-      'couponcode' : core.Coupon
+      'entity'     : 'Customer',
+      'couponcode' : 'Coupon'
     },
 
     sublists: {
-      'item'               : core.SalesOrderItem,
-      'giftcertredemption' : core.SalesOrderGiftCertRedemption
+      'item'               : 'SalesOrderItem',
+      'giftcertredemption' : 'SalesOrderGiftCertRedemption'
     },
 
     // fields to be parsed on output
@@ -1972,8 +2010,8 @@
 {
   core.SalesOrderRepository = core.Repository.extend(
   {
-    recordClass: core.SalesOrder,
-    searchClass: core.SalesOrderSearchResult,
+    recordClass: 'SalesOrder',
+    searchClass: 'SalesOrderSearchResult',
 
     searchColumns: [
       'externalid',
@@ -1987,13 +2025,13 @@
 
       return results.map(function(result)
       {
-        return new this.searchClass(result);
+        return new core[this.searchClass](result);
       }, this);
     },
 
     create: function(attrs)
     {
-      var model = new this.recordClass(attrs, {mutate: true});
+      var model = new core[this.recordClass](attrs, {mutate: true});
 
       // this model will have id set on it, but might be missing some sublist ids
       model = core.Repository.prototype.create.call(this, model);
@@ -2160,7 +2198,7 @@
     recordType: 'cashsale',
 
     sublists: {
-      item: core.CashSaleItem
+      item: 'CashSaleItem'
     }
   });
 })(core);
@@ -2174,8 +2212,8 @@
 {
   core.CashSaleRepository = core.SalesOrderRepository.extend(
   {
-    recordClass: core.CashSale,
-    searchClass: core.CashSaleSearchResult
+    recordClass: 'CashSale',
+    searchClass: 'CashSaleSearchResult'
   });
 })(core);
 

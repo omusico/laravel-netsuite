@@ -5,7 +5,7 @@
     recordType: 'cashsale',
 
     sublists: {
-      item: core.CashSaleItem
+      item: 'CashSaleItem'
     }
   });
 })(core);

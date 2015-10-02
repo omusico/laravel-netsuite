@@ -2,8 +2,6 @@
 {
   core.InventoryItemPriceList = core.Model.extend(
   {
-    recordType: '',
-
     // fields to be parsed on input
     fields: {
       'pricelevel'     : 'int',

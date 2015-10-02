@@ -18,6 +18,8 @@
 
     show: function()
     {
+      // return nlapiLoadRecord('couponcode', input.get('ns_id'));
+
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
       if (validator.passes())

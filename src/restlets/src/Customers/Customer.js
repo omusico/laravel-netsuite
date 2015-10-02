@@ -24,7 +24,7 @@
 
     // sublists to be parsed on input
     sublists: {
-      'addressbook' : core.Address
+      'addressbook' : 'Address'
     },
 
     // fields to be parsed on output
