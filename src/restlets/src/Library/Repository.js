@@ -58,7 +58,6 @@
     // left join a column to filter on
     join: function(recordType, column)
     {
-      this.searchColumns = this.searchColumns || [];
       this.searchColumns.push(new nlobjSearchColumn(column, recordType));
       return this;
     },

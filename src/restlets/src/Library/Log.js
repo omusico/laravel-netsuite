@@ -14,36 +14,33 @@
   core.Log = {
     details: {},
 
-    extend: function(one, two, type)
-    {
-      var extend = {};
-      _.isObject(two) ? extend = two : extend[type] = two;
-      return _.extend(one, extend);
-    },
-
     register: function(key, value)
     {
       this.details[key] = value;
     },
 
-    audit: function(title, details)
-    {
-      log('AUDIT', title, this.extend(this.details, details, 'audit'));
-    },
-
     debug: function(title, details)
     {
-      if (core.debug) log('DEBUG', title, this.extend(this.details, details, 'debug'));
+      this.register(title, details);
+      if (core.debug) log('DEBUG', title, this.details);
+    },
+
+    audit: function(title, details)
+    {
+      this.register(title, details);
+      log('AUDIT', title, this.details);
     },
 
     error: function(title, details)
     {
-      log('ERROR', title, this.extend(this.details, details, 'error'));
+      this.register(title, details);
+      log('ERROR', title, this.details);
     },
 
     emergency: function(title, details)
     {
-      log('EMERGENCY', title, this.extend(this.details, details, 'emergency'));
+      this.register(title, details);
+      log('EMERGENCY', title, this.details);
     }
   };
 })(core);

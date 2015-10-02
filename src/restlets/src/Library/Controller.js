@@ -53,7 +53,7 @@
         }
         else if (exception.code)
         {
-          message = '\nRestlet StackTrace:\n' + exception.stackTrace.join('\n');
+          message = '\nMessage: ' + exception.code + '\n'+ '\nRestlet StackTrace:\n' + exception.stackTrace.join('\n');
         }
       }
 
