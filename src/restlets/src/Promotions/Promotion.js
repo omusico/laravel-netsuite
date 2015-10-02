@@ -21,7 +21,7 @@
       'custrecord_min_order_type'   : 'string',
       'startdate'                   : 'date',
       'enddate'                     : 'date',
-      'custrecord_full_price'       : 'int',
+      'custrecord_full_price'       : 'string',
       'custrecord_createddate'      : 'timestamp',
       'custrecord_lastmodifieddate' : 'timestamp'
     },
@@ -73,21 +73,42 @@
 
     getCouponsDiscountTypeAttribute: function()
     {
+      if (core.Util.get(this.attrs, 'freeshipmethod') != null)
+      {
+        return 'shipping';
+      }
+
+      if (parseFloat(core.Util.get(this.attrs, 'rate')) == 0)
+      {
+        return 'no_value';
+      }
+
       return core.Util.get(this.attrs, 'discounttype') != 'percent'
-           ? 'amount'
+           ? 'fixed'
            : 'percent';
     },
 
     getCouponsDiscountAmountAttribute: function()
     {
-      return core.Util.get(this.attrs, 'discounttype') == 'percent'
-           ? Math.abs(parseFloat(core.Util.get(this.attrs, 'rate')) / 100)
-           : parseFloat(core.Util.get(this.attrs, 'rate'));
+      var discount_type   = this.get('coupons_discount_type');
+      var discount_amount = core.Util.get(this.attrs, 'rate');
+
+      switch(discount_type)
+      {
+        case 'percent':  return Math.abs(parseFloat(discount_amount) / 100); break;
+        case 'fixed':    return parseFloat(discount_amount);                 break;
+        case 'shipping': return parseInt(discount_amount);                   break;
+        case 'no_value': return 0;                                           break;
+        default:         return null;
+      }
     },
 
     getCouponsMinOrderTypeAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_min_order_type');
+      return core.Util.get({
+        '1': 'price',
+        '2': 'amount'
+      }, core.Util.get(this.attrs, 'custrecord_min_order_type', '1'), 'price');
     },
 
     getCouponsMinOrderAttribute: function()
@@ -97,27 +118,27 @@
 
     getCouponsDateStartAttribute: function()
     {
-      return core.Util.get(this.attrs, 'startdate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'startdate'), this.dateFormat, 'YYYY-MM-DD 00:00:00');
     },
 
     getCouponsDateEndAttribute: function()
     {
-      return core.Util.get(this.attrs, 'enddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'enddate'), this.dateFormat, 'YYYY-MM-DD 23:59:59');
     },
 
     getCouponsFullPriceAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_full_price');
+      return core.Util.get(this.attrs, 'custrecord_full_price') == 'T' ? 1 : 0;
     },
 
     getCreatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_createddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custrecord_createddate'), this.timeFormat, 'YYYY-MM-DD hh:mm:00');
     },
 
     getUpdatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_lastmodifieddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custrecord_lastmodifieddate'), this.timeFormat, 'YYYY-MM-DD hh:mm:00');
     },
 
     getCouponsProductsAttribute: function()

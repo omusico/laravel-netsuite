@@ -68,7 +68,7 @@
       var promotion = core.Util.get(this.attrs, 'promotion');
 
       return promotion
-           ? core.Util.formatDate(promotion.get('startdate'), 'M/D/YYYY', 'YYYY-MM-DD 00:00:00')
+           ? core.Util.formatDate(promotion.get('startdate'), this.dateFormat, 'YYYY-MM-DD 00:00:00')
            : null;
     },
 
@@ -77,7 +77,7 @@
       var promotion = core.Util.get(this.attrs, 'promotion');
 
       return promotion
-           ? core.Util.formatDate(promotion.get('enddate'), 'M/D/YYYY', 'YYYY-MM-DD 23:59:59')
+           ? core.Util.formatDate(promotion.get('enddate'), this.dateFormat, 'YYYY-MM-DD 23:59:59')
            : null;
     },
 
