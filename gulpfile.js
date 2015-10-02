@@ -48,7 +48,7 @@ var resources = [{
 }, {
   name  : 'coupons',
   files : [
-    baseDir + 'Coupons/Coupon.js'
+    baseDir + 'Coupons/Coupon.js',
     baseDir + 'Coupons/CouponSearchResult.js',
     baseDir + 'Coupons/CouponRepository.js',
     baseDir + 'Coupons/CouponsController.js'
