@@ -25,7 +25,8 @@
         router.resource('inventory_items',   'InventoryItemsController');
 
         router.resource('gift_certificates', 'GiftCertificatesController');
-        router.resource('promotions',        'PromotionsSalesController');
+        router.resource('promotions',        'PromotionsController');
+        router.resource('coupons',           'CouponsController');
 
         // match a route!
         var match = router.match(input.get('method').toLowerCase(), input.get('url'));
