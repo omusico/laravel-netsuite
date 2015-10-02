@@ -46,9 +46,9 @@
       'coupons_date_end',
       'coupons_full_price',
       'created_at',
-      'updated_at'
+      'updated_at',
 
-      // 'coupons_products' // 'items'
+      'coupons_products'
     ],
 
     getNsIdAttribute: function()
@@ -118,6 +118,14 @@
     getUpdatedAtAttribute: function()
     {
       return core.Util.get(this.attrs, 'custrecord_lastmodifieddate');
+    },
+
+    getCouponsProductsAttribute: function()
+    {
+      return _.filter(_.map(core.Util.get(this.attrs, 'items', []), function(item)
+      {
+        return item.get('externalid');
+      }, this), this);
     },
 
     setNsIdAttribute: function(value)
