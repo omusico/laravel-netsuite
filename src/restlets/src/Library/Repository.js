@@ -71,7 +71,7 @@
 
       var searchColumns = _((columns && columns.length) ? this.searchColumns.concat(columns) : this.searchColumns)
                           .chain()
-                          .filter(function(column) { return column != 'id'; })
+                          // .filter(function(column) { return column != 'id'; })
                           .map(function(column) { return new nlobjSearchColumn(column); })
                           .value();
 

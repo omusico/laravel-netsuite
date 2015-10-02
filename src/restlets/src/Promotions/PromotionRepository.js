@@ -6,8 +6,10 @@
     searchClass: 'PromotionSearchResult',
 
     searchColumns: [
-      'externalid',
-      'code'
+      'internalid',
+      'code',
+      'custrecord_createddate',
+      'custrecord_lastmodifieddate'
     ],
 
     get: function()

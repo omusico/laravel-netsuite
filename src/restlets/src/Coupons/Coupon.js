@@ -67,8 +67,6 @@
     {
       var promotion = core.Util.get(this.attrs, 'promotion');
 
-      core.Log.debug('promotion', promotion);
-
       return promotion
            ? core.Util.formatDate(promotion.get('startdate'), 'M/D/YYYY', 'YYYY-MM-DD 00:00:00')
            : null;

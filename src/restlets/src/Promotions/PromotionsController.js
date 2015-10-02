@@ -11,6 +11,7 @@
     {
       var promotions = this.promotions
                            .filter(input.get('filters', []))
+                           .sort(input.get('sorts', []))
                            .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(promotions.toHash());
