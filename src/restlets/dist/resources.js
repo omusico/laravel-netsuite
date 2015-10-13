@@ -1766,7 +1766,7 @@
     recordType: 'salesorderitem',
 
     fields: {
-      'item'      : 'int',    // item id
+      'item'      : 'int',   // item id
       'quantity'  : 'int',   // quantity
       'rate'      : 'float', // price
       'amount'    : 'float', // line item price
@@ -1776,7 +1776,8 @@
     visible: [
       'products_ns_id',
       'products_quantity',
-      'products_price'
+      'products_price',
+      'products_tax'
     ],
 
     getProductsNsIdAttribute: function()
@@ -1792,6 +1793,11 @@
     getProductsPriceAttribute: function()
     {
       return core.Util.get(this.attrs, 'rate')
+    },
+
+    getProductsTax: function()
+    {
+      return core.Util.get(this.attrs, 'istaxable');
     }
   });
 })(core);
@@ -1889,6 +1895,7 @@
       'total'            : 'float',
 
       'custbody14'       : 'string', // comments
+      'custbody_special_instructions' : 'string', // special_instructions
 
       // 'taxrate' : 'float',
 
@@ -1924,6 +1931,7 @@
       'orders_status',
       'date_purchased',
       'last_modified',
+      'special_instructions',
 
       // recordrefs
       'gift_certificates',
@@ -2032,11 +2040,18 @@
       return core.Util.get(this.attrs, 'couponcode');
     },
 
+    getSpecialInstructionsAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'custbody_special_instructions', 'N/A');
+    },
+
     getProductsAttribute: function()
     {
       return _.map(core.Util.get(this.attrs, 'item', []), function(item)
       {
-        return item.toHash();
+        var item = item.toHash();
+        item.products_tax = parseFloat(item.products_tax ? this.get('tax_rate') : 0);
+        return item;
       });
     },
 

@@ -5,7 +5,7 @@
     recordType: 'salesorderitem',
 
     fields: {
-      'item'      : 'int',    // item id
+      'item'      : 'int',   // item id
       'quantity'  : 'int',   // quantity
       'rate'      : 'float', // price
       'amount'    : 'float', // line item price
@@ -15,7 +15,8 @@
     visible: [
       'products_ns_id',
       'products_quantity',
-      'products_price'
+      'products_price',
+      'products_tax'
     ],
 
     getProductsNsIdAttribute: function()
@@ -31,6 +32,11 @@
     getProductsPriceAttribute: function()
     {
       return core.Util.get(this.attrs, 'rate')
+    },
+
+    getProductsTax: function()
+    {
+      return core.Util.get(this.attrs, 'istaxable');
     }
   });
 })(core);
