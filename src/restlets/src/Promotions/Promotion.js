@@ -11,7 +11,7 @@
     fields: {
       'id'                          : 'int',
       'code'                        : 'string',
-      'custrecord_category_id'      : 'int',
+      'custrecord_categories_id'      : 'int',
       'description'                 : 'string',
       'discounttype'                : 'string',
       'rate'                        : 'string',
@@ -34,7 +34,7 @@
     visible: [
       'ns_id',
       'coupons_id',
-      'coupons_category_id',
+      'coupons_categories_id',
       'coupons_description',
       'coupons_discount_type',
       'coupons_discount_amount',
@@ -61,9 +61,9 @@
       return core.Util.get(this.attrs, 'code');
     },
 
-    getCouponsCategoryIdAttribute: function()
+    getCouponsCategoriesIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_category_id');
+      return core.Util.get(this.attrs, 'custrecord_categories_id');
     },
 
     getCouponsDescriptionAttribute: function()
