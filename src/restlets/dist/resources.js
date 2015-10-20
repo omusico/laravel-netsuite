@@ -579,7 +579,7 @@
     fields: {
       'id'                          : 'int',
       'code'                        : 'string',
-      'custrecord_categories_id'      : 'int',
+      'custrecord_categories_id'    : 'int',
       'description'                 : 'string',
       'discounttype'                : 'string',
       'rate'                        : 'string',
@@ -595,7 +595,7 @@
     },
 
     sublists: {
-      'items' : 'InventoryItem'
+      'items' : 'PromotionItem'
     },
 
     // fields to be parsed on output
@@ -711,16 +711,129 @@
 
     getCouponsProductsAttribute: function()
     {
-      return _.filter(_.map(core.Util.get(this.attrs, 'items', []), function(item)
+      return _.map(core.Util.get(this.attrs, 'items', []), function(item)
       {
-        return item.get('externalid');
-      }, this), this);
+        return item.get('ns_id');
+      }, this);
     },
 
     setNsIdAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'id', value);
+    },
+
+    // 'coupons_id',
+    // 'code'                        : 'string',
+    setCouponsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'code', value);
+    },
+
+    // 'custrecord_categories_id'    : 'int',
+    // 'coupons_categories_id',
+    setCouponsCategoriesIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'custrecord_categories_id', value);
+    },
+
+    // 'description'                 : 'string',
+    // 'coupons_description',
+    setCouponsDescriptionAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'description', value);
+    },
+
+    // 'discounttype'                : 'string',
+    // 'coupons_discount_type',
+    setCouponsDiscountTypeAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'discounttype', value);
+    },
+
+    // 'rate'                        : 'string',
+    // 'coupons_discount_amount',
+    setCouponsDiscountAmountAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'rate', value);
+    },
+
+    // 'minimumorderamount'          : 'float',
+    // 'coupons_min_order',
+    setCouponsMinOrderAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'minimumorderamount', value);
+    },
+
+    // 'custrecord_min_order_type'   : 'string',
+    // 'coupons_min_order_type',
+    setCouponsMinOrderTypeAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'custrecord_min_order_type', value);
+    },
+
+    // 'startdate'                   : 'date',
+    // 'coupons_date_start',
+    setCouponsDateStartAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'startdate', value);
+    },
+
+    // 'enddate'                     : 'date',
+    // 'coupons_date_end',
+    setCouponsEndDateAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'enddate', value);
+    },
+
+    // 'custrecord_full_price'       : 'string',
+    // 'coupons_full_price',
+    setCouponsFullPriceAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'custrecord_full_price', value);
+    },
+
+    // IGNROE THESE
+    // 'custrecord_createddate'      : 'timestamp',
+    // 'created_at',
+    // 'custrecord_lastmodifieddate' : 'timestamp'
+    // 'updated_at',
+
+    setCouponsProductsAttribute: function(item)
+    {
+      var promotioncodeitem = _.map(item, function(promotioncodeitem)
+      {
+        var model = new core[this.sublists.items](promotioncodeitem, {mutate: true});
+        return model;
+      }, this);
+
+      core.Util.set(this.attrs, 'items', promotioncodeitem);
     }
+
+  });
+})(core);
+
+(function(core)
+{
+  core.PromotionItem = core.Model.extend(
+  {
+    // these are custrecords with seconds!
+    timeFormat : 'M/D/YYYY h:mm:ss a',
+
+    // fields to be parsed on input
+    fields: {
+      'item' : 'int',
+    },
+
+    // fields to be parsed on output
+    visible: [
+      'ns_id'
+    ],
+
+    getNsIdAttribute: function()
+    {
+      return core.Util.get(this.attrs, 'item');
+    }
+
   });
 })(core);
 
@@ -1224,10 +1337,61 @@
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
     },
 
+    // 'id'               : 'int',
+    // 'ns_id',
     setNsIdAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'id', value);
-    }
+    },
+
+    // 'externalid'       : 'string',
+    // 'gift_cards_id',
+    setGiftCardsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'externalid', value);
+    },
+
+    // 'giftcertcode'     : 'string',
+    // 'gift_cards_code',
+    setGiftCardsCodeAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'giftcertcode', value);
+    },
+
+    // 'originalamount'   : 'float',
+    // 'gift_cards_amount',
+    setGiftCardsAmountAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'originalamount', value);
+    },
+
+    // 'amountremaining'  : 'float',
+    // 'gift_cards_amount_remaining',
+    setGiftCardsAmountRemainingAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'amountremaining', value);
+    },
+
+    // 'expirationdate'   : 'timestamp',
+    // 'date_end',
+    setDateEndAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'expirationdate', value);
+    },
+
+    // 'createddate'      : 'timestamp',
+    // 'date_added',
+    setDateAddedAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'createddate', value);
+    },
+
+    // 'lastmodifieddate' : 'timestamp'
+    // 'date_updated'
+    setDateUpdateddAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'lastmodifieddate', value);
+    },
   });
 })(core);
 

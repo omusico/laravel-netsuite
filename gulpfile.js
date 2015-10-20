@@ -41,6 +41,7 @@ var resources = [{
   name  : 'promotions',
   files : [
     baseDir + 'Promotions/Promotion.js',
+    baseDir + 'Promotions/PromotionItem.js',
     baseDir + 'Promotions/PromotionSearchResult.js',
     baseDir + 'Promotions/PromotionRepository.js',
     baseDir + 'Promotions/PromotionsController.js'

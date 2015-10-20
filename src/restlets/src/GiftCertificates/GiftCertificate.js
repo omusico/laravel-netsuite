@@ -68,9 +68,60 @@
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
     },
 
+    // 'id'               : 'int',
+    // 'ns_id',
     setNsIdAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'id', value);
-    }
+    },
+
+    // 'externalid'       : 'string',
+    // 'gift_cards_id',
+    setGiftCardsIdAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'externalid', value);
+    },
+
+    // 'giftcertcode'     : 'string',
+    // 'gift_cards_code',
+    setGiftCardsCodeAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'giftcertcode', value);
+    },
+
+    // 'originalamount'   : 'float',
+    // 'gift_cards_amount',
+    setGiftCardsAmountAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'originalamount', value);
+    },
+
+    // 'amountremaining'  : 'float',
+    // 'gift_cards_amount_remaining',
+    setGiftCardsAmountRemainingAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'amountremaining', value);
+    },
+
+    // 'expirationdate'   : 'timestamp',
+    // 'date_end',
+    setDateEndAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'expirationdate', value);
+    },
+
+    // 'createddate'      : 'timestamp',
+    // 'date_added',
+    setDateAddedAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'createddate', value);
+    },
+
+    // 'lastmodifieddate' : 'timestamp'
+    // 'date_updated'
+    setDateUpdateddAttribute: function(value)
+    {
+      if (value) core.Util.set(this.attrs, 'lastmodifieddate', value);
+    },
   });
 })(core);
