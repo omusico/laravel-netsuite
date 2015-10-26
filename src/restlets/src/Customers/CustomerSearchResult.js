@@ -30,6 +30,7 @@
 
     getCreatedAtAttribute: function()
     {
+      // core.Util.set(this.attrs, 'datecreated', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
       var value = core.Util.get(this.attrs, 'datecreated');
       var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
       date = date != 'Invalid date' ? date : null;
@@ -38,6 +39,7 @@
 
     getUpdatedAtAttribute: function()
     {
+      // core.Util.set(this.attrs, 'datecreated', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
       var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
       date = date != 'Invalid date' ? date : null;

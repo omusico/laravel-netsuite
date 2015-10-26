@@ -301,6 +301,7 @@
 
     getCreatedAtAttribute: function()
     {
+      // core.Util.set(this.attrs, 'datecreated', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
       var value = core.Util.get(this.attrs, 'datecreated');
       var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
       date = date != 'Invalid date' ? date : null;
@@ -309,6 +310,7 @@
 
     getUpdatedAtAttribute: function()
     {
+      // core.Util.set(this.attrs, 'datecreated', core.Util.formatDate(value, core.Util.timeFormat, this.timeFormat));
       var value = core.Util.get(this.attrs, 'lastmodifieddate');
       var date = moment(value, this.timeFormat).format(core.Util.timeFormat);
       date = date != 'Invalid date' ? date : null;
@@ -867,17 +869,17 @@
 
     getCouponsIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'code');
+      return core.Util.get(this.attrs, 'code').toLowerCase();
     },
 
     getCreatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_createddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custrecord_createddate'), this.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_lastmodifieddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custrecord_lastmodifieddate'), this.timeFormat);
     }
   });
 })(core);

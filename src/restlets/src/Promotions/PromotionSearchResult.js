@@ -28,17 +28,17 @@
 
     getCouponsIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'code');
+      return core.Util.get(this.attrs, 'code').toLowerCase();
     },
 
     getCreatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_createddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custrecord_createddate'), this.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_lastmodifieddate');
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custrecord_lastmodifieddate'), this.timeFormat);
     }
   });
 })(core);
