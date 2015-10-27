@@ -8,6 +8,7 @@
     searchColumns: [
       'internalid',
       'code',
+      'externalid',
       'custrecord_createddate',
       'custrecord_lastmodifieddate'
     ],
@@ -24,7 +25,7 @@
 
     findByExternalId: function(externalid)
     {
-      return this.where('code', 'is', externalid).first();
+      return this.where('externalid', 'is', externalid).first();
     },
 
     update: function(attrs)

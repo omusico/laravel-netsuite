@@ -19,27 +19,29 @@
 
     show: function()
     {
-      var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
+      return nlapiLoadRecord('promotioncode', input.get('ns_id'));
 
-      if (validator.passes())
-      {
-        try
-        {
-          var promotion = input.has('ns_id')
-                        ? this.promotions.find(input.get('ns_id'))
-                        : this.promotions.findByExternalId(input.get('coupons_id'));
-
-          return promotion ? this.okay(promotion.toHash()) : this.notFound();
-        }
-        catch(e)
-        {
-          return this.internalServerError(e);
-        }
-      }
-      else
-      {
-        return this.badRequest(validator.toHash());
-      }
+      // var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
+      //
+      // if (validator.passes())
+      // {
+      //   try
+      //   {
+      //     var promotion = input.has('ns_id')
+      //                   ? this.promotions.find(input.get('ns_id'))
+      //                   : this.promotions.findByExternalId(input.get('coupons_id'));
+      //
+      //     return promotion ? this.okay(promotion.toHash()) : this.notFound();
+      //   }
+      //   catch(e)
+      //   {
+      //     return this.internalServerError(e);
+      //   }
+      // }
+      // else
+      // {
+      //   return this.badRequest(validator.toHash());
+      // }
     },
 
     store: function()
@@ -50,12 +52,11 @@
 
       if (validator.passes())
       {
-        // set defaults
         var attrs = _.defaults(input.only(
-          'coupons_id'
-        ), {
-
-        });
+          'coupons_id',
+          'coupons_discount_type',
+          'coupons_discount_amount'
+        ), {});
 
         try
         {
@@ -80,7 +81,6 @@
 
       if (validator.passes())
       {
-        // get what we need
         var attrs = input.only(
           'ns_id'
         );

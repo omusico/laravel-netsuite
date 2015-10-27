@@ -154,81 +154,72 @@
       if (value) core.Util.set(this.attrs, 'id', value);
     },
 
-    // 'coupons_id',
-    // 'code'                        : 'string',
     setCouponsIdAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'code', value);
+      if (value)
+      {
+        core.Util.set(this.attrs, 'code', value);
+        core.Util.set(this.attrs, 'externalid', value);
+      }
     },
 
-    // 'custrecord_categories_id'    : 'int',
-    // 'coupons_categories_id',
     setCouponsCategoriesIdAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'custrecord_categories_id', value);
     },
 
-    // 'description'                 : 'string',
-    // 'coupons_description',
     setCouponsDescriptionAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'description', value);
     },
 
-    // 'discounttype'                : 'string',
-    // 'coupons_discount_type',
     setCouponsDiscountTypeAttribute: function(value)
     {
+      if (value == 'shipping')
+      {
+        value = 'freeshipmethod';
+      }
+      else if (value == 'percent')
+      {
+        value = 'percent';
+      }
+      else if (value == 'fixed')
+      {
+        value = 'flat';
+      }
+
       if (value) core.Util.set(this.attrs, 'discounttype', value);
     },
 
-    // 'rate'                        : 'string',
-    // 'coupons_discount_amount',
     setCouponsDiscountAmountAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'rate', value);
     },
 
-    // 'minimumorderamount'          : 'float',
-    // 'coupons_min_order',
     setCouponsMinOrderAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'minimumorderamount', value);
     },
 
-    // 'custrecord_min_order_type'   : 'string',
-    // 'coupons_min_order_type',
     setCouponsMinOrderTypeAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'custrecord_min_order_type', value);
     },
 
-    // 'startdate'                   : 'date',
-    // 'coupons_date_start',
     setCouponsDateStartAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'startdate', value);
     },
 
-    // 'enddate'                     : 'date',
-    // 'coupons_date_end',
     setCouponsEndDateAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'enddate', value);
     },
 
-    // 'custrecord_full_price'       : 'string',
-    // 'coupons_full_price',
     setCouponsFullPriceAttribute: function(value)
     {
       if (value) core.Util.set(this.attrs, 'custrecord_full_price', value);
     },
-
-    // IGNROE THESE
-    // 'custrecord_createddate'      : 'timestamp',
-    // 'created_at',
-    // 'custrecord_lastmodifieddate' : 'timestamp'
-    // 'updated_at',
 
     setCouponsProductsAttribute: function(item)
     {
