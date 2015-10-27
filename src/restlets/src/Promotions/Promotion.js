@@ -13,6 +13,7 @@
       'code'                        : 'string',
       'custrecord_categories_id'    : 'int',
       'description'                 : 'string',
+      'discount'                    : 'int', // Customer Accommodation
       'discounttype'                : 'string',
       'rate'                        : 'string',
       // 'coupons_max_use',
@@ -25,6 +26,10 @@
       'custrecord_createddate'      : 'timestamp',
       'custrecord_lastmodifieddate' : 'timestamp'
     },
+
+    // recordrefs: {
+    //   'discount' : 'Discount',
+    // },
 
     sublists: {
       'items' : 'PromotionItem'
@@ -58,7 +63,9 @@
 
     getCouponsIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'code').toLowerCase();
+      var code = core.Util.get(this.attrs, 'code');
+
+      return code ? code.toLowerCase() : null;
     },
 
     getCouponsCategoriesIdAttribute: function()
@@ -83,9 +90,7 @@
         return 'no_value';
       }
 
-      return core.Util.get(this.attrs, 'discounttype') != 'percent'
-           ? 'fixed'
-           : 'percent';
+      return core.Util.get(this.attrs, 'discounttype') == 'percent' ? 'percent' : 'fixed';
     },
 
     getCouponsDiscountAmountAttribute: function()
@@ -96,8 +101,8 @@
       switch(discount_type)
       {
         case 'percent':  return Math.abs(parseFloat(discount_amount) / 100); break;
-        case 'fixed':    return parseFloat(discount_amount);                 break;
-        case 'shipping': return parseInt(discount_amount);                   break;
+        case 'fixed':    return Math.abs(parseFloat(discount_amount));       break;
+        case 'shipping': return Math.abs(parseInt(discount_amount));         break;
         case 'no_value': return 0;                                           break;
         default:         return null;
       }
@@ -128,7 +133,7 @@
 
     getCouponsFullPriceAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_full_price') == 'T' ? 1 : 0;
+      return core.Util.get(this.attrs, 'custrecord_full_price') ? 1 : 0;
     },
 
     getCreatedAtAttribute: function()
@@ -177,23 +182,19 @@
     {
       if (value == 'shipping')
       {
-        value = 'freeshipmethod';
+        core.Util.set(this.attrs, 'freeshipmethod', 'T');
+        core.Util.set(this.attrs, 'discounttype', 'F');
       }
-      else if (value == 'percent')
+      else
       {
-        value = 'percent';
+        core.Util.set(this.attrs, 'freeshipmethod', 'F');
+        core.Util.set(this.attrs, 'discounttype', value == 'percent' ? 'percent' : 'flat');
       }
-      else if (value == 'fixed')
-      {
-        value = 'flat';
-      }
-
-      if (value) core.Util.set(this.attrs, 'discounttype', value);
     },
 
     setCouponsDiscountAmountAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'rate', value);
+      if (value) core.Util.set(this.attrs, 'rate', value < 1 ? value * 100 : value);
     },
 
     setCouponsMinOrderAttribute: function(value)

@@ -28,6 +28,19 @@
       return this.where('externalid', 'is', externalid).first();
     },
 
+    create: function(attrs)
+    {
+      var model = new core[this.recordClass](attrs, {mutate: true});
+
+      // this model will have id set on it, but might be missing some sublist ids
+      model = core.Repository.prototype.create.call(this, model);
+
+      // reload model so ids are set on sublists etc
+      model = this.find(model.get('id'));
+
+      return model;
+    },
+
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
