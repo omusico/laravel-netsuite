@@ -467,6 +467,7 @@ _.mixin({
   core.Util = {
 
     timeFormat: 'YYYY-MM-DD HH:mm:ss',
+    dateFormat: 'YYYY-MM-DD',
 
     has: function(obj, key)
     {

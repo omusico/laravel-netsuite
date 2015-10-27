@@ -5,7 +5,7 @@
     recordType: 'promotioncode',
 
     // these are custrecords with seconds!
-    timeFormat : 'M/D/YYYY h:mm:ss a',
+    timeFormat: 'M/D/YYYY h:mm:ss a',
 
     // fields to be parsed on input
     fields: {
@@ -133,7 +133,7 @@
 
     getCouponsFullPriceAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_full_price') ? 1 : 0;
+      return core.Util.get(this.attrs, 'custrecord_full_price') == 'T' ? 1 : 0;
     },
 
     getCreatedAtAttribute: function()
@@ -163,6 +163,7 @@
     {
       if (value)
       {
+        value = value.toUpperCase();
         core.Util.set(this.attrs, 'code', value);
         core.Util.set(this.attrs, 'externalid', value);
       }
@@ -209,17 +210,17 @@
 
     setCouponsDateStartAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'startdate', value);
+      if (value) core.Util.set(this.attrs, 'startdate', core.Util.formatDate(value, 'M/D/Y h:mm a', this.dateFormat));
     },
 
-    setCouponsEndDateAttribute: function(value)
+    setCouponsDateEndAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'enddate', value);
+      if (value) core.Util.set(this.attrs, 'enddate', core.Util.formatDate(value, 'M/D/Y h:mm a', this.dateFormat));
     },
 
     setCouponsFullPriceAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'custrecord_full_price', value);
+      if (value) core.Util.set(this.attrs, 'custrecord_full_price', parseInt(value) ? 'T' : 'F');
     },
 
     setCouponsProductsAttribute: function(item)

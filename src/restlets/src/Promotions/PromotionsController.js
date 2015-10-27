@@ -19,7 +19,7 @@
 
     show: function()
     {
-      return nlapiLoadRecord('promotioncode', input.get('ns_id'));
+      // return nlapiLoadRecord('promotioncode', input.get('ns_id'));
 
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
@@ -57,6 +57,7 @@
           'coupons_discount_type',
           'coupons_discount_amount'
         ), {
+          'coupons_full_price': 0,
           'discount': 3466 // Customer Accommodation
         });
 
@@ -83,9 +84,7 @@
 
       if (validator.passes())
       {
-        var attrs = input.only(
-          'ns_id'
-        );
+        var attrs = input.all()
 
         try
         {

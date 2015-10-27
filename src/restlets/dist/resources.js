@@ -575,7 +575,7 @@
     recordType: 'promotioncode',
 
     // these are custrecords with seconds!
-    timeFormat : 'M/D/YYYY h:mm:ss a',
+    timeFormat: 'M/D/YYYY h:mm:ss a',
 
     // fields to be parsed on input
     fields: {
@@ -703,7 +703,7 @@
 
     getCouponsFullPriceAttribute: function()
     {
-      return core.Util.get(this.attrs, 'custrecord_full_price') ? 1 : 0;
+      return core.Util.get(this.attrs, 'custrecord_full_price') == 'T' ? 1 : 0;
     },
 
     getCreatedAtAttribute: function()
@@ -733,6 +733,7 @@
     {
       if (value)
       {
+        value = value.toUpperCase();
         core.Util.set(this.attrs, 'code', value);
         core.Util.set(this.attrs, 'externalid', value);
       }
@@ -779,17 +780,17 @@
 
     setCouponsDateStartAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'startdate', value);
+      if (value) core.Util.set(this.attrs, 'startdate', core.Util.formatDate(value, 'M/D/Y h:mm a', this.dateFormat));
     },
 
-    setCouponsEndDateAttribute: function(value)
+    setCouponsDateEndAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'enddate', value);
+      if (value) core.Util.set(this.attrs, 'enddate', core.Util.formatDate(value, 'M/D/Y h:mm a', this.dateFormat));
     },
 
     setCouponsFullPriceAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'custrecord_full_price', value);
+      if (value) core.Util.set(this.attrs, 'custrecord_full_price', parseInt(value) ? 'T' : 'F');
     },
 
     setCouponsProductsAttribute: function(item)
@@ -901,14 +902,17 @@
       }, this);
     },
 
-    findByExternalId: function(externalid)
+    findByExternalId: function(code)
     {
-      return this.where('externalid', 'is', externalid).first();
+      return this.where('code', 'is', code.toUpperCase()).first();
     },
 
     create: function(attrs)
     {
       var model = new core[this.recordClass](attrs, {mutate: true});
+      var timeFormat = (new core.Promotion).timeFormat;
+      model.set('custrecord_createddate', moment().format(timeFormat));
+      model.set('custrecord_lastmodifieddate', moment().format(timeFormat));
 
       // this model will have id set on it, but might be missing some sublist ids
       model = core.Repository.prototype.create.call(this, model);
@@ -923,8 +927,10 @@
     {
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
-
       model.set(attrs);
+      model.set('custrecord_lastmodifieddate', moment().format((new core.Promotion).timeFormat));
+
+      core.Log.debug('model', model.attrs);
 
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
@@ -958,7 +964,7 @@
 
     show: function()
     {
-      return nlapiLoadRecord('promotioncode', input.get('ns_id'));
+      // return nlapiLoadRecord('promotioncode', input.get('ns_id'));
 
       var validator = new core.Validator(input, {ns_id: 'required'}, {coupons_id : 'required'});
 
@@ -996,6 +1002,7 @@
           'coupons_discount_type',
           'coupons_discount_amount'
         ), {
+          'coupons_full_price': 0,
           'discount': 3466 // Customer Accommodation
         });
 
@@ -1022,9 +1029,7 @@
 
       if (validator.passes())
       {
-        var attrs = input.only(
-          'ns_id'
-        );
+        var attrs = input.all()
 
         try
         {
