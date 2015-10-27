@@ -628,7 +628,7 @@
 
     getCouponsIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'code');
+      return core.Util.get(this.attrs, 'code').toLowerCase();
     },
 
     getCouponsCategoriesIdAttribute: function()
