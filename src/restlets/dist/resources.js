@@ -886,8 +886,8 @@
 
     searchColumns: [
       'internalid',
-      'code',
       'externalid',
+      'code',
       'custrecord_createddate',
       'custrecord_lastmodifieddate'
     ],
@@ -930,7 +930,7 @@
       model.set(attrs);
       model.set('custrecord_lastmodifieddate', moment().format((new core.Promotion).timeFormat));
 
-      core.Log.debug('model', model.attrs);
+      // core.Log.debug('model', model.attrs);
 
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
@@ -992,18 +992,33 @@
     store: function()
     {
       var validator = new core.Validator(input, {
-        coupons_id : 'required'
+        coupons_id              : 'required',
+        coupons_discount_type   : 'required',
+        coupons_discount_amount : 'required'
       });
 
       if (validator.passes())
       {
         var attrs = _.defaults(input.only(
+          // 'ns_id',
           'coupons_id',
+          'coupons_categories_id',
+          'coupons_description',
           'coupons_discount_type',
-          'coupons_discount_amount'
+          'coupons_discount_amount',
+          // 'coupons_max_use',
+          // 'coupons_number_available',
+          'coupons_min_order_type',
+          'coupons_min_order',
+          'coupons_date_start',
+          'coupons_date_end',
+          'coupons_full_price',
+          // 'created_at',
+          // 'updated_at',
+          'coupons_products'
         ), {
-          'coupons_full_price': 0,
-          'discount': 3466 // Customer Accommodation
+          'coupons_full_price' : 0,
+          'discount'           : 3466 // Customer Accommodation
         });
 
         try
@@ -1029,7 +1044,24 @@
 
       if (validator.passes())
       {
-        var attrs = input.all()
+        var attrs = input.only(
+          'ns_id',
+          'coupons_id',
+          'coupons_categories_id',
+          'coupons_description',
+          'coupons_discount_type',
+          'coupons_discount_amount',
+          // 'coupons_max_use',
+          // 'coupons_number_available',
+          'coupons_min_order_type',
+          'coupons_min_order',
+          'coupons_date_start',
+          'coupons_date_end',
+          'coupons_full_price',
+          // 'created_at',
+          // 'updated_at',
+          'coupons_products'
+        );
 
         try
         {
@@ -1290,14 +1322,15 @@
 
     // fields to be parsed on input
     fields: {
-      'id'               : 'int',
-      'externalid'       : 'string',
-      'giftcertcode'     : 'string',
-      'originalamount'   : 'float',
-      'amountremaining'  : 'float',
-      'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'id'                              : 'int',
+      'externalid'                      : 'string',
+      'giftcertcode'                    : 'string',
+      'originalamount'                  : 'float',
+      'amountremaining'                 : 'float',
+      'expirationdate'                  : 'timestamp',
+      'createddate'                     : 'timestamp',
+      'lastmodifieddate'                : 'timestamp',
+      'custitemnumber_lastmodifieddate' : 'timestamp'
     },
 
     // fields to be parsed on output
@@ -1350,6 +1383,11 @@
     getDateUpdatedAttribute: function()
     {
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
+    },
+
+    getUpdatedAtAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat, 'YYYY-MM-DD hh:mm:00');
     },
 
     // 'id'               : 'int',
@@ -1407,6 +1445,7 @@
     {
       if (value) core.Util.set(this.attrs, 'lastmodifieddate', value);
     },
+
   });
 })(core);
 
@@ -1414,23 +1453,24 @@
 {
   core.GiftCertificateSearchResult = core.Model.extend(
   {
+
+    // these are custrecords with seconds!
+    timeFormat : 'M/D/YYYY h:mm:ss a',
+
     // fields to be parsed on input
     fields: {
-      'id'               : 'int',
-      'giftcertcode'     : 'string',
-      'originalamount'   : 'float',
-      'amountremaining'  : 'float',
-      'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp'
+      'id'                              : 'int',
+      'externalid'                      : 'string',
+      'createddate'                     : 'timestamp'
+      'custitemnumber_lastmodifieddate' : 'timestamp'
     },
 
     // fields to be parsed on output
     visible: [
-      'gift_cards_code',
-      'gift_cards_amount',
-      'gift_cards_amount_remaining',
-      'date_end',
-      'date_added'
+      'ns_id',
+      'gift_cards_id',
+      'date_added',
+      'date_updated'
     ],
 
     getNsIdAttribute: function()
@@ -1438,31 +1478,22 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getGiftCardsCodeAttribute: function()
+    getGiftCardsIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'giftcertcode');
-    },
-
-    getGiftCardsAmountAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'originalamount');
-    },
-
-    getGiftCardsAmountRemainingAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'amountremaining');
-    },
-
-    getDateEndAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
+      return core.Util.get(this.attrs, 'externalid');
     },
 
     getDateAddedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
+    },
+
+    getDateUpdatedAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat);
     }
   });
+  
 })(core);
 
 (function(core)
@@ -1473,13 +1504,14 @@
     searchClass: 'GiftCertificateSearchResult',
 
     searchColumns: [
-      // 'externalid',
+      'internalid',
+      'externalid',
       'giftcertcode',
       'originalamount',
       'amountremaining',
       'expirationdate',
-      'createddate'
-      // 'lastmodifieddate'
+      'createddate',
+      'custitemnumber_lastmodifieddate'
     ],
 
     get: function()
@@ -1492,12 +1524,31 @@
       }, this);
     },
 
+    create: function(attrs)
+    {
+
+      var model      = new core[this.recordClass](attrs, {mutate: true}),
+          timeFormat = (new core.GiftCertificate).timeFormat;
+
+      model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
+
+      // call superclass
+      model = core.Repository.prototype.create.call(this, model);
+
+      // reload model as per usual
+      model = this.find(model.get('id'));
+
+      return model;
+    },
+
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
-
       model.set(attrs);
+      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate).timeFormat));
+
+      // core.Log.debug('model', model.attrs);
 
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
@@ -1507,6 +1558,7 @@
 
       return model;
     }
+
   });
 })(core);
 
@@ -1523,6 +1575,7 @@
     {
       var giftCertificates = this.giftCertificates
                                  .filter(input.get('filters', []))
+                                 .sort(input.get('sorts', []))
                                  .paginate(input.get('page', 1), input.get('per_page', 10));
 
       return this.okay(giftCertificates.toHash());
@@ -1530,9 +1583,9 @@
 
     show: function()
     {
-      var validator = new core.Validator(input, {ns_id: 'required'}, {gift_cards_id : 'required'});
-
       // return nlapiLoadRecord('giftcertificate', input.get('ns_id'));
+
+      var validator = new core.Validator(input, {ns_id: 'required'}, {gift_cards_id : 'required'});
 
       if (validator.passes())
       {
@@ -1555,17 +1608,63 @@
       }
     },
 
-    update: function(datain)
+    store: function()
     {
-      var input     = new core.Input(datain);
-      var validator = new core.Validator(input, {ns_id: 'required'});
+      var validator = new core.Validator(input, {
+        gift_cards_id               : 'required',
+        gift_cards_code             : 'required',
+        gift_cards_amount           : 'required',
+        // gift_cards_amount_remaining : 'required'
+      });
+
+      if (validator.passes())
+      {
+        var attrs = _.defaults(input.only(
+          // 'ns_id',
+          'gift_cards_id',
+          'gift_cards_code',
+          'gift_cards_amount',
+          'gift_cards_amount_remaining',
+          'date_end',
+          // 'date_added',
+          // 'date_updated'
+        ), {
+          'gift_cards_amount_remaining' : input.get('gift_cards_amount')
+        });
+
+        try
+        {
+          var giftCertificate = this.giftCertificates.create(attrs);
+          return this.created(giftCertificate.toHash());
+        }
+        catch(e)
+        {
+          return this.internalServerError(e);
+        }
+      }
+      else
+      {
+        return this.badRequest(validator.toHash());
+      }
+    },
+
+    update: function()
+    {
+
+      var validator = new core.Validator(input, {ns_id: 'required'}) ;
 
       if (validator.passes())
       {
         // get what we need
         var attrs = input.only(
           'ns_id',
-          'gift_cards_id'
+          'gift_cards_id',
+          'gift_cards_code',
+          'gift_cards_amount',
+          'gift_cards_amount_remaining',
+          'date_end',
+          // 'date_added',
+          // 'date_updated'
         );
 
         try

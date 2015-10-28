@@ -2,23 +2,24 @@
 {
   core.GiftCertificateSearchResult = core.Model.extend(
   {
+
+    // these are custrecords with seconds!
+    timeFormat : 'M/D/YYYY h:mm:ss a',
+
     // fields to be parsed on input
     fields: {
-      'id'               : 'int',
-      'giftcertcode'     : 'string',
-      'originalamount'   : 'float',
-      'amountremaining'  : 'float',
-      'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp'
+      'id'                              : 'int',
+      'externalid'                      : 'string',
+      'createddate'                     : 'timestamp'
+      'custitemnumber_lastmodifieddate' : 'timestamp'
     },
 
     // fields to be parsed on output
     visible: [
-      'gift_cards_code',
-      'gift_cards_amount',
-      'gift_cards_amount_remaining',
-      'date_end',
-      'date_added'
+      'ns_id',
+      'gift_cards_id',
+      'date_added',
+      'date_updated'
     ],
 
     getNsIdAttribute: function()
@@ -26,29 +27,20 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getGiftCardsCodeAttribute: function()
+    getGiftCardsIdAttribute: function()
     {
-      return core.Util.get(this.attrs, 'giftcertcode');
-    },
-
-    getGiftCardsAmountAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'originalamount');
-    },
-
-    getGiftCardsAmountRemainingAttribute: function()
-    {
-      return core.Util.get(this.attrs, 'amountremaining');
-    },
-
-    getDateEndAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
+      return core.Util.get(this.attrs, 'externalid');
     },
 
     getDateAddedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
+    },
+
+    getDateUpdatedAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat);
     }
   });
+  
 })(core);

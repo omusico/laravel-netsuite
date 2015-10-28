@@ -6,14 +6,15 @@
 
     // fields to be parsed on input
     fields: {
-      'id'               : 'int',
-      'externalid'       : 'string',
-      'giftcertcode'     : 'string',
-      'originalamount'   : 'float',
-      'amountremaining'  : 'float',
-      'expirationdate'   : 'timestamp',
-      'createddate'      : 'timestamp',
-      'lastmodifieddate' : 'timestamp'
+      'id'                              : 'int',
+      'externalid'                      : 'string',
+      'giftcertcode'                    : 'string',
+      'originalamount'                  : 'float',
+      'amountremaining'                 : 'float',
+      'expirationdate'                  : 'timestamp',
+      'createddate'                     : 'timestamp',
+      'lastmodifieddate'                : 'timestamp',
+      'custitemnumber_lastmodifieddate' : 'timestamp'
     },
 
     // fields to be parsed on output
@@ -66,6 +67,11 @@
     getDateUpdatedAttribute: function()
     {
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
+    },
+
+    getUpdatedAtAttribute: function()
+    {
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat, 'YYYY-MM-DD hh:mm:00');
     },
 
     // 'id'               : 'int',
@@ -123,5 +129,6 @@
     {
       if (value) core.Util.set(this.attrs, 'lastmodifieddate', value);
     },
+
   });
 })(core);

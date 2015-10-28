@@ -7,8 +7,8 @@
 
     searchColumns: [
       'internalid',
-      'code',
       'externalid',
+      'code',
       'custrecord_createddate',
       'custrecord_lastmodifieddate'
     ],
@@ -51,7 +51,7 @@
       model.set(attrs);
       model.set('custrecord_lastmodifieddate', moment().format((new core.Promotion).timeFormat));
 
-      core.Log.debug('model', model.attrs);
+      // core.Log.debug('model', model.attrs);
 
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);

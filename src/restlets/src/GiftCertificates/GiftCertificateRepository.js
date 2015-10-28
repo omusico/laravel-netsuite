@@ -6,13 +6,14 @@
     searchClass: 'GiftCertificateSearchResult',
 
     searchColumns: [
-      // 'externalid',
+      'internalid',
+      'externalid',
       'giftcertcode',
       'originalamount',
       'amountremaining',
       'expirationdate',
-      'createddate'
-      // 'lastmodifieddate'
+      'createddate',
+      'custitemnumber_lastmodifieddate'
     ],
 
     get: function()
@@ -25,12 +26,31 @@
       }, this);
     },
 
+    create: function(attrs)
+    {
+
+      var model      = new core[this.recordClass](attrs, {mutate: true}),
+          timeFormat = (new core.GiftCertificate).timeFormat;
+
+      model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
+
+      // call superclass
+      model = core.Repository.prototype.create.call(this, model);
+
+      // reload model as per usual
+      model = this.find(model.get('id'));
+
+      return model;
+    },
+
     update: function(attrs)
     {
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
-
       model.set(attrs);
+      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate).timeFormat));
+
+      // core.Log.debug('model', model.attrs);
 
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
@@ -40,5 +60,6 @@
 
       return model;
     }
+
   });
 })(core);
