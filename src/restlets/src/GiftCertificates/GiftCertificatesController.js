@@ -61,7 +61,7 @@
           'gift_cards_code',
           'gift_cards_amount',
           'gift_cards_amount_remaining',
-          'date_end',
+          'date_end'
           // 'date_added',
           // 'date_updated'
         ), {
@@ -98,7 +98,7 @@
           'gift_cards_code',
           'gift_cards_amount',
           'gift_cards_amount_remaining',
-          'date_end',
+          'date_end'
           // 'date_added',
           // 'date_updated'
         );

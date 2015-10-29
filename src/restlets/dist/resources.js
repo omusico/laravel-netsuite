@@ -1372,17 +1372,17 @@
 
     getDateEndAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat);
     },
 
     getDateAddedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
     },
 
     getDateUpdatedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
@@ -1461,7 +1461,7 @@
     fields: {
       'id'                              : 'int',
       'externalid'                      : 'string',
-      'createddate'                     : 'timestamp'
+      'createddate'                     : 'timestamp',
       'custitemnumber_lastmodifieddate' : 'timestamp'
     },
 
@@ -1493,7 +1493,7 @@
       return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat);
     }
   });
-  
+
 })(core);
 
 (function(core)
@@ -1528,7 +1528,7 @@
     {
 
       var model      = new core[this.recordClass](attrs, {mutate: true}),
-          timeFormat = (new core.GiftCertificate).timeFormat;
+          timeFormat = (new core.GiftCertificate()).timeFormat;
 
       model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
 
@@ -1546,7 +1546,7 @@
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
       model.set(attrs);
-      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate).timeFormat));
+      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate()).timeFormat));
 
       // core.Log.debug('model', model.attrs);
 
@@ -1625,7 +1625,7 @@
           'gift_cards_code',
           'gift_cards_amount',
           'gift_cards_amount_remaining',
-          'date_end',
+          'date_end'
           // 'date_added',
           // 'date_updated'
         ), {
@@ -1662,7 +1662,7 @@
           'gift_cards_code',
           'gift_cards_amount',
           'gift_cards_amount_remaining',
-          'date_end',
+          'date_end'
           // 'date_added',
           // 'date_updated'
         );

@@ -30,7 +30,7 @@
     {
 
       var model      = new core[this.recordClass](attrs, {mutate: true}),
-          timeFormat = (new core.GiftCertificate).timeFormat;
+          timeFormat = (new core.GiftCertificate()).timeFormat;
 
       model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
 
@@ -48,7 +48,7 @@
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
       model.set(attrs);
-      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate).timeFormat));
+      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate()).timeFormat));
 
       // core.Log.debug('model', model.attrs);
 

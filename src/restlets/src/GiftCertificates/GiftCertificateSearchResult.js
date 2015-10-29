@@ -10,7 +10,7 @@
     fields: {
       'id'                              : 'int',
       'externalid'                      : 'string',
-      'createddate'                     : 'timestamp'
+      'createddate'                     : 'timestamp',
       'custitemnumber_lastmodifieddate' : 'timestamp'
     },
 
@@ -42,5 +42,5 @@
       return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat);
     }
   });
-  
+
 })(core);

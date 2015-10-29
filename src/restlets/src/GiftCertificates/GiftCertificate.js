@@ -56,17 +56,17 @@
 
     getDateEndAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'expirationdate'), this.timeFormat);
     },
 
     getDateAddedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
     },
 
     getDateUpdatedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat)
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
     },
 
     getUpdatedAtAttribute: function()
