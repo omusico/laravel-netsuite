@@ -19,10 +19,19 @@
       this.details[key] = value;
     },
 
-    debug: function(title, details)
+    unregister: function(key)
     {
+      delete this.details[key];
+    },
+
+    debug: function(title, details, omitDetails)
+    {
+
+      if (omitDetails) return log('DEBUG', title, details);
+
       this.register(title, details);
       if (core.debug) log('DEBUG', title, this.details);
+      this.unregister(title);
     },
 
     audit: function(title, details)

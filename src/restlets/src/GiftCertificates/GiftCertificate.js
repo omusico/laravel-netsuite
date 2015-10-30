@@ -4,6 +4,9 @@
   {
     recordType: 'giftcertificate',
 
+    // these are custrecords with seconds!
+    timeFormat: 'M/D/YYYY h:mm:ss a',
+
     // fields to be parsed on input
     fields: {
       'id'                              : 'int',
@@ -69,11 +72,6 @@
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
     },
 
-    getUpdatedAtAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat, 'YYYY-MM-DD hh:mm:00');
-    },
-
     // 'id'               : 'int',
     // 'ns_id',
     setNsIdAttribute: function(value)
@@ -85,7 +83,7 @@
     // 'gift_cards_id',
     setGiftCardsIdAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'externalid', value);
+      core.Util.set(this.attrs, 'externalid', value);
     },
 
     // 'giftcertcode'     : 'string',
@@ -99,14 +97,14 @@
     // 'gift_cards_amount',
     setGiftCardsAmountAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'originalamount', value);
+      core.Util.set(this.attrs, 'originalamount', value);
     },
 
     // 'amountremaining'  : 'float',
     // 'gift_cards_amount_remaining',
     setGiftCardsAmountRemainingAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'amountremaining', value);
+      core.Util.set(this.attrs, 'amountremaining', value);
     },
 
     // 'expirationdate'   : 'timestamp',

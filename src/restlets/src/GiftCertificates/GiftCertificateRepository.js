@@ -7,7 +7,7 @@
 
     searchColumns: [
       'internalid',
-      'externalid',
+      // 'externalid',
       'giftcertcode',
       'originalamount',
       'amountremaining',
@@ -32,6 +32,7 @@
       var model      = new core[this.recordClass](attrs, {mutate: true}),
           timeFormat = (new core.GiftCertificate()).timeFormat;
 
+
       model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
 
       // call superclass
@@ -50,13 +51,12 @@
       model.set(attrs);
       model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate()).timeFormat));
 
-      // core.Log.debug('model', model.attrs);
-
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
 
       // reload model so ids are set on sublists etc
       model = this.find(model.get('id'));
+      core.Log.debug('should have external', model.toHash(), true);
 
       return model;
     }

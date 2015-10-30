@@ -1320,6 +1320,9 @@
   {
     recordType: 'giftcertificate',
 
+    // these are custrecords with seconds!
+    timeFormat: 'M/D/YYYY h:mm:ss a',
+
     // fields to be parsed on input
     fields: {
       'id'                              : 'int',
@@ -1385,11 +1388,6 @@
       return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
     },
 
-    getUpdatedAtAttribute: function()
-    {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), this.timeFormat, 'YYYY-MM-DD hh:mm:00');
-    },
-
     // 'id'               : 'int',
     // 'ns_id',
     setNsIdAttribute: function(value)
@@ -1401,7 +1399,7 @@
     // 'gift_cards_id',
     setGiftCardsIdAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'externalid', value);
+      core.Util.set(this.attrs, 'externalid', value);
     },
 
     // 'giftcertcode'     : 'string',
@@ -1415,14 +1413,14 @@
     // 'gift_cards_amount',
     setGiftCardsAmountAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'originalamount', value);
+      core.Util.set(this.attrs, 'originalamount', value);
     },
 
     // 'amountremaining'  : 'float',
     // 'gift_cards_amount_remaining',
     setGiftCardsAmountRemainingAttribute: function(value)
     {
-      if (value) core.Util.set(this.attrs, 'amountremaining', value);
+      core.Util.set(this.attrs, 'amountremaining', value);
     },
 
     // 'expirationdate'   : 'timestamp',
@@ -1460,7 +1458,7 @@
     // fields to be parsed on input
     fields: {
       'id'                              : 'int',
-      'externalid'                      : 'string',
+      'giftcertcode'                    : 'string',
       'createddate'                     : 'timestamp',
       'custitemnumber_lastmodifieddate' : 'timestamp'
     },
@@ -1468,7 +1466,7 @@
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'gift_cards_id',
+      'gift_cards_code',
       'date_added',
       'date_updated'
     ],
@@ -1478,9 +1476,9 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getGiftCardsIdAttribute: function()
+    getGiftCardsCodeAttribute: function()
     {
-      return core.Util.get(this.attrs, 'externalid');
+      return core.Util.get(this.attrs, 'giftcertcode');
     },
 
     getDateAddedAttribute: function()
@@ -1505,7 +1503,7 @@
 
     searchColumns: [
       'internalid',
-      'externalid',
+      // 'externalid',
       'giftcertcode',
       'originalamount',
       'amountremaining',
@@ -1530,6 +1528,7 @@
       var model      = new core[this.recordClass](attrs, {mutate: true}),
           timeFormat = (new core.GiftCertificate()).timeFormat;
 
+
       model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
 
       // call superclass
@@ -1548,13 +1547,12 @@
       model.set(attrs);
       model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate()).timeFormat));
 
-      // core.Log.debug('model', model.attrs);
-
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
 
       // reload model so ids are set on sublists etc
       model = this.find(model.get('id'));
+      core.Log.debug('should have external', model.toHash(), true);
 
       return model;
     }

@@ -9,7 +9,7 @@
     // fields to be parsed on input
     fields: {
       'id'                              : 'int',
-      'externalid'                      : 'string',
+      'giftcertcode'                    : 'string',
       'createddate'                     : 'timestamp',
       'custitemnumber_lastmodifieddate' : 'timestamp'
     },
@@ -17,7 +17,7 @@
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'gift_cards_id',
+      'gift_cards_code',
       'date_added',
       'date_updated'
     ],
@@ -27,9 +27,9 @@
       return core.Util.get(this.attrs, 'id');
     },
 
-    getGiftCardsIdAttribute: function()
+    getGiftCardsCodeAttribute: function()
     {
-      return core.Util.get(this.attrs, 'externalid');
+      return core.Util.get(this.attrs, 'giftcertcode');
     },
 
     getDateAddedAttribute: function()

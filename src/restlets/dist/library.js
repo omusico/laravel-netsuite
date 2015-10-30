@@ -436,10 +436,19 @@ _.mixin({
       this.details[key] = value;
     },
 
-    debug: function(title, details)
+    unregister: function(key)
     {
+      delete this.details[key];
+    },
+
+    debug: function(title, details, omitDetails)
+    {
+
+      if (omitDetails) return log('DEBUG', title, details);
+
       this.register(title, details);
       if (core.debug) log('DEBUG', title, this.details);
+      this.unregister(title);
     },
 
     audit: function(title, details)
@@ -840,6 +849,15 @@ _.mixin({
 
       _.each(_.omit(this.fields, 'id'), function(value, key)
       {
+
+        if (this.recordType == 'giftcertificate')
+        {
+          if (key == 'externalid') {
+            return record.setFieldValue('externalidstring', this.get(key));
+          }
+          core.Log.debug(('get Key '+key), this.get(key), true);
+        }
+
         record.setFieldValue(key, this.get(key));
       }, this);
 
@@ -1420,6 +1438,7 @@ _.mixin({
     update: function(model)
     {
       var record = model.toUpdateRecord();
+      core.Log.debug('record', record.externalid, true);
       nlapiSubmitRecord(record, true);
       return model;
     },
