@@ -178,7 +178,6 @@
     update: function(model)
     {
       var record = model.toUpdateRecord();
-      core.Log.debug('record', record.externalid, true);
       nlapiSubmitRecord(record, true);
       return model;
     },

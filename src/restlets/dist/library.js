@@ -849,15 +849,6 @@ _.mixin({
 
       _.each(_.omit(this.fields, 'id'), function(value, key)
       {
-
-        if (this.recordType == 'giftcertificate')
-        {
-          if (key == 'externalid') {
-            return record.setFieldValue('externalidstring', this.get(key));
-          }
-          core.Log.debug(('get Key '+key), this.get(key), true);
-        }
-
         record.setFieldValue(key, this.get(key));
       }, this);
 
@@ -1438,7 +1429,6 @@ _.mixin({
     update: function(model)
     {
       var record = model.toUpdateRecord();
-      core.Log.debug('record', record.externalid, true);
       nlapiSubmitRecord(record, true);
       return model;
     },

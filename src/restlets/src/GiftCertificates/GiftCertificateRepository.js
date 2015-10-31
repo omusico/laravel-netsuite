@@ -26,6 +26,11 @@
       }, this);
     },
 
+    findByExternalId: function(giftcertcode)
+    {
+      return this.where('giftcertcode', 'is', giftcertcode.toUpperCase()).first();
+    },
+
     create: function(attrs)
     {
 
@@ -56,7 +61,6 @@
 
       // reload model so ids are set on sublists etc
       model = this.find(model.get('id'));
-      core.Log.debug('should have external', model.toHash(), true);
 
       return model;
     }
