@@ -14,8 +14,8 @@
     visible: [
       'ns_id',
       'orders_id',
-      'datepurchased',
-      'lastmodified'
+      'date_purchased',
+      'last_modified'
     ],
 
     getNsIdAttribute: function()
