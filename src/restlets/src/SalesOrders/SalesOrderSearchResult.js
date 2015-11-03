@@ -14,8 +14,8 @@
     visible: [
       'ns_id',
       'orders_id',
-      'created_at',
-      'updated_at'
+      'datepurchased',
+      'lastmodified'
     ],
 
     getNsIdAttribute: function()
@@ -28,16 +28,14 @@
       return core.Util.get(this.attrs, 'externalid');
     },
 
-    getCreatedAtAttribute: function()
+    getDatePurchasedAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'datecreated');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'datecreated'), this.timeFormat);
     },
 
-    getUpdatedAtAttribute: function()
+    getLastModifiedAttribute: function()
     {
-      var value = core.Util.get(this.attrs, 'lastmodifieddate');
-      return moment(value, this.timeFormat).format(core.Util.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
     }
   });
 })(core);

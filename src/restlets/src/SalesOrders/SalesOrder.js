@@ -43,7 +43,7 @@
 
       // 'taxrate' : 'float',
 
-      'createddate'      : 'timestamp',
+      'datecreated'      : 'timestamp',
       'lastmodifieddate' : 'timestamp'
     },
 
@@ -259,7 +259,7 @@
 
     getDatePurchasedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'createddate'), this.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'datecreated'), this.timeFormat);
     },
 
     getLastModifiedAttribute: function()
