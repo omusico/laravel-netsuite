@@ -5,7 +5,7 @@
     recordType: 'giftcertificate',
 
     // these are custrecords with seconds!
-    timeFormat: 'M/D/YYYY h:mm:ss a',
+    // timeFormat: 'M/D/YYYY h:mm:ss a',
 
     // fields to be parsed on input
     fields: {
@@ -17,13 +17,12 @@
       'expirationdate'                  : 'timestamp',
       'createddate'                     : 'timestamp',
       'lastmodifieddate'                : 'timestamp',
-      'custitemnumber_lastmodifieddate' : 'timestamp'
+      'custitemnumber_lastmodifieddate' : 'string'
     },
 
     // fields to be parsed on output
     visible: [
       'ns_id',
-      'gift_cards_id',
       'gift_cards_code',
       'gift_cards_amount',
       'gift_cards_amount_remaining',
@@ -69,7 +68,7 @@
 
     getDateUpdatedAttribute: function()
     {
-      return core.Util.formatDate(core.Util.get(this.attrs, 'lastmodifieddate'), this.timeFormat);
+      return core.Util.formatDate(core.Util.get(this.attrs, 'custitemnumber_lastmodifieddate'), 'M/D/YYYY h:mm:ss a');
     },
 
     // 'id'               : 'int',
@@ -121,12 +120,12 @@
       if (value) core.Util.set(this.attrs, 'createddate', value);
     },
 
-    // 'lastmodifieddate' : 'timestamp'
-    // 'date_updated'
-    setDateUpdateddAttribute: function(value)
-    {
-      if (value) core.Util.set(this.attrs, 'lastmodifieddate', value);
-    },
+    // // 'lastmodifieddate' : 'timestamp'
+    // // 'date_updated'
+    // setDateUpdateddAttribute: function(value)
+    // {
+    //   // if (value) core.Util.set(this.attrs, 'custitemnumber_lastmodifieddate', core.Util.formatDate(value, 'M/D/YYYY h:mm:ss a', core.Util.timeFormat ));
+    // },
 
   });
 })(core);

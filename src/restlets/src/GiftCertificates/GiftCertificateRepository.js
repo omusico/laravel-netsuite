@@ -33,12 +33,8 @@
 
     create: function(attrs)
     {
-
-      var model      = new core[this.recordClass](attrs, {mutate: true}),
-          timeFormat = (new core.GiftCertificate()).timeFormat;
-
-
-      model.set('custitemnumber_lastmodifieddate', moment().format(timeFormat));
+      attrs.custitemnumber_lastmodifieddate = moment().format('M/D/YYYY h:mm:ss a');
+      var model = new core[this.recordClass](attrs, {mutate: true});
 
       // call superclass
       model = core.Repository.prototype.create.call(this, model);
@@ -53,8 +49,8 @@
     {
       var model = this.find(attrs.ns_id);
       if ( ! model) return false;
+      attrs.custitemnumber_lastmodifieddate = moment().format('M/D/YYYY h:mm:ss a');
       model.set(attrs);
-      model.set('custitemnumber_lastmodifieddate', moment().format((new core.GiftCertificate()).timeFormat));
 
       // this model might be missing some sublist ids
       model = core.Repository.prototype.update.call(this, model);
