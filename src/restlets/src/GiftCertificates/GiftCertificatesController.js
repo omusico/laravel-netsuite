@@ -47,7 +47,7 @@
     store: function()
     {
       var validator = new core.Validator(input, {
-        gift_cards_id               : 'required',
+        // gift_cards_id               : 'required',
         gift_cards_code             : 'required',
         gift_cards_amount           : 'required',
         // gift_cards_amount_remaining : 'required'
@@ -57,15 +57,15 @@
       {
         var attrs = _.defaults(input.only(
           // 'ns_id',
-          'gift_cards_id',
+          // 'gift_cards_id',
           'gift_cards_code',
           'gift_cards_amount',
-          'gift_cards_amount_remaining',
+          // 'gift_cards_amount_remaining',
           'date_end'
           // 'date_added',
           // 'date_updated'
         ), {
-          'gift_cards_amount_remaining' : input.get('gift_cards_amount')
+          // 'gift_cards_amount_remaining' : input.get('gift_cards_amount')
         });
 
         try
